@@ -43,6 +43,7 @@ from thirteenf.manager_scoring import (
 )
 from thirteenf.consensus import compute_consensus
 from thirteenf.trends import compute_trends
+from thirteenf.portfolio import cross_check
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -320,6 +321,25 @@ def cmd_score(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_portfolio(args: argparse.Namespace) -> int:
+    """Cross-check My Portfolio config against the DB (offline)."""
+    db_path = Path(args.db_path)
+    portfolio_path = Path(args.portfolio)
+    conn = connect(db_path)
+    init_db(conn)
+    results = cross_check(conn, portfolio_path)
+    conn.close()
+    print(f"portfolio_holdings={len(results)}")
+    for r in results:
+        print(
+            f"{r.ticker}: holders={r.tracked_holders} "
+            f"highq={r.high_quality_holders} consensus={r.consensus_score} "
+            f"1Q={r.trend_1q} 4Q={r.trend_4q} 8Q={r.trend_8q} "
+            f"new={r.notable_new} exit={r.notable_exit} evidence={r.evidence}"
+        )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -370,6 +390,13 @@ def build_parser() -> argparse.ArgumentParser:
     score.add_argument("--scoring", default=str(ROOT / "config" / "manager_scoring.yaml"))
     score.add_argument("--methodology", default="0.1.0")
     score.set_defaults(func=cmd_score)
+
+    portfolio = sub.add_parser(
+        "portfolio", help="Cross-check My Portfolio against the database"
+    )
+    portfolio.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
+    portfolio.add_argument("--portfolio", default=str(ROOT / "config" / "portfolio.csv"))
+    portfolio.set_defaults(func=cmd_portfolio)
 
     return parser
 
