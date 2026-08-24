@@ -29,6 +29,8 @@ from thirteenf.research.resolution.sources import (
     distinct_us_tickers,
     names_match,
     parse_openfigi_entry,
+    price_cache_key,
+    price_symbol,
     raw_norm,
     us_filter,
 )
@@ -368,6 +370,14 @@ def test_historical_csv_loader(tmp_path):
     m = load_historical_symbols(p)
     assert m["852234103"][0].symbol == "SQ"
     assert load_historical_symbols(tmp_path / "missing.csv") == {}
+
+
+def test_price_symbol_class_shares():
+    assert price_symbol("BRK/B") == "BRK-B"
+    assert price_symbol("BF/A") == "BF-A"
+    assert price_symbol("^GSPC") == "^GSPC"
+    assert price_cache_key("^GSPC") == "_GSPC"
+    assert price_cache_key("BRK/B") == "BRK-B"
 
 
 def test_persistence_observations():

@@ -27,10 +27,9 @@ def _direction(change_type: str) -> int:
 
 def persistence_observations(obs: pd.DataFrame, k: int) -> pd.DataFrame:
     """Rows where (manager, security) direction is same for k consecutive
-    quarters including current. Mirrors experiments._persistence_eligible."""
-    work = obs[
-        ["manager_id", "security_id", "cusip", "report_period", "change_type"]
-    ].copy()
+    quarters including current. Mirrors experiments._persistence_eligible and
+    preserves all input columns (info_date, part, activity, ...)."""
+    work = obs.copy()
     work["direction"] = work["change_type"].map(_direction)
     work = work.sort_values(["manager_id", "security_id", "report_period"])
     flags: list[bool] = []
@@ -48,7 +47,7 @@ def persistence_observations(obs: pd.DataFrame, k: int) -> pd.DataFrame:
                 j -= 1
             flags.append(run >= k)
     work["persist"] = flags
-    return work[work["persist"]]
+    return work[work["persist"]].drop(columns=["direction", "persist"])
 
 
 def build_observation_frames(conn: sqlite3.Connection) -> dict[str, pd.DataFrame]:
@@ -102,8 +101,18 @@ def build_observation_frames(conn: sqlite3.Connection) -> dict[str, pd.DataFrame
         )
     )
     frames = {"O0": obs}
-    frames["O1_2Q"] = persistence_observations(obs, 2)
-    frames["O1_3Q"] = persistence_observations(obs, 3)
+    # The frozen research CLI recomputes persistence INSIDE each split part
+    # (a1_signals(part_obs)); replicate exactly so denominators match the
+    # frozen outcome manifest.
+    part_names = ("H0_dev", "H1_time_holdout", "H2_manager_holdout",
+                  "H3_security_holdout", "H4_combined", "OTHER")
+    for variant, k in (("O1_2Q", 2), ("O1_3Q", 3)):
+        pieces = [
+            persistence_observations(obs[obs["part"] == p], k)
+            for p in part_names
+            if (obs["part"] == p).any()
+        ]
+        frames[variant] = pd.concat(pieces, ignore_index=True) if pieces else obs.iloc[0:0].copy()
     return frames
 
 

@@ -1,0 +1,960 @@
+security_id,cusip,issuer,reason,conflicting_evidence,impacted_observation_count,affected_variants,affected_splits,recommended_review_action
+,G4124C109,GRAB HOLDINGS LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,68,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G61188127,LIBERTY GLOBAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,59,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G9460G101,VALARIS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,51,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,G61188101,LIBERTY GLOBAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,50,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G9001E128,LIBERTY LATIN AMERICA LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,49,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,74144T108,PRICE T ROWE GROUP INC,CONFLICT,SEC title 'T ROWE PRICE GROUP INC' -> ['TKNZ'] != OpenFIGI TROW,48,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,review conflict evidence
+,G9001E102,LIBERTY LATIN AMERICA LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,48,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,233331107,DTE ENERGY CO,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,47,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,023586100,U HAUL HOLDING COMPANY,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,44,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,09180C106,BJS RESTAURANTS INC,CONFLICT,SEC title 'BJ'S RESTAURANTS INC' -> ['BJ'] != OpenFIGI BJRI,43,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,G0250X107,AMCOR PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,42,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G65431127,NOBLE CORP PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,42,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,Y7388L103,SAFE BULKERS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,42,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,784305104,H2O AMERICA,AMBIGUOUS,"multiple distinct US tickers: ['HTO', 'SJW']",40,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,02665T306,AMERICAN HOMES 4 RENT,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,39,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,25525P107,DIVERSIFIED HEALTHCARE TR,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,38,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,319383204,FIRST BUSEY CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,38,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,46137V357,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSP,38,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,G0772R208,BANK OF N T BUTTERFIELD & SO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,36,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G7500M104,RENEW ENERGY GLOBAL PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,36,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,60784B101,MODIV INDUSTRIAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,35,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,892331307,TOYOTA MOTOR CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,35,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,98149E303,WORLD GOLD TR,CONFLICT,SEC title 'SPDR GOLD MINISHARES TRUST' -> ['GLD'] != OpenFIGI GLDM,35,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,G9108L173,TSAKOS ENERGY NAVIGATION LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,35,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,Y27183600,GLOBAL SHIP LEASE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,35,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,67623L307,OFFERPAD SOLUTIONS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,33,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,706327103,PEMBINA PIPELINE CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,33,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,72346Q104,PINNACLE FINL PARTNERS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,33,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,91705J204,URBAN ONE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,33,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,Y1771G102,COSTAMARE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,33,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,30779N105,FARMERS & MERCHANTS BANCORP,CONFLICT,SEC unique ticker FMCB != OpenFIGI FMAO,32,O0;O1_2Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined,review conflict evidence
+,90984P303,UNITED CMNTY BKS BLAIRSVLE G,AMBIGUOUS,"multiple distinct US tickers: ['UCB', 'UCBI']",32,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,M7S64L123,PAGAYA TECHNOLOGIES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,32,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,559166103,MAGIC SOFTWARE ENTERPRISES L,CONFLICT,SEC unique ticker RMTHF != OpenFIGI MGIC,31,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,review conflict evidence
+,65345N106,NEXTNAV INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,31,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,78137L105,RUM GROUP INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,31,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,X3R81D102,FORAFRIC GLOBAL PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,31,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,904767704,UNILEVER PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,30,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G3730V105,FTAI AVIATION LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,30,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,M9607U115,VALENS SEMICONDUCTOR LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,30,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined,resolve ambiguity
+,Y2066G104,DIANA SHIPPING INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,30,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V233,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 TOP 50 ETF' -> ['VVR'] != OpenFIGI XLG,27,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46137V241,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 QUALITY ETF' -> ['VVR'] != OpenFIGI SPHQ,27,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,G9572D103,WEBULL CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,26,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V431,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 GARP ETF' -> ['VVR'] != OpenFIGI SPGP,25,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46138G508,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO SENIOR LOAN ETF' -> ['VVR'] != OpenFIGI BKLN,25,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,47030M106,JAMES HARDIE INDS PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,25,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,601137102,MILLROSE PPTYS INC,AMBIGUOUS,"multiple distinct US tickers: ['MRP', 'MRP-W']",25,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G9503X103,WALDENCAST PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,25,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,L18268109,CODERE ONLINE LUXEMBOURG S A,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,25,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V258,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 PURE VALUE E' -> ['VVR'] != OpenFIGI RPV,24,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined,review conflict evidence
+,46138E362,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 HIGH DIVIDEN' -> ['VVR'] != OpenFIGI SPHD,24,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138G698,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 REVENUE ETF' -> ['VVR'] != OpenFIGI RWL,24,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46428R107,ISHARES S&P GSCI COMMODITY-,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,24,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,583928106,MEDALLION FINANCIAL CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,24,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G4253H101,JAMES HARDIE INDS PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,24,O0;O1_2Q;O1_3Q,H4_combined,resolve ambiguity
+,G5568L109,LIFEZONE METALS LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,24,O0;O1_2Q;O1_3Q,H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,693691107,PSQ HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,23,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,73933H101,POWER REIT,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,23,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G2662B103,CRITICAL METALS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,23,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G85727108,SUNCAR TECHNOLOGY GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,23,O0;O1_2Q,H3_security_holdout;H4_combined,resolve ambiguity
+,23248B109,CXAPP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,22,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V282,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPT,22,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46138E339,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 MOMENTUM ETF' -> ['VVR'] != OpenFIGI SPMO,22,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined,review conflict evidence
+,46138E354,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 LOW VOLATILI' -> ['VVR'] != OpenFIGI SPLV,22,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46138E370,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 HIGH BETA ET' -> ['VVR'] != OpenFIGI SPHB,22,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,review conflict evidence
+,78397T202,SAB BIOTHERAPEUTICS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,22,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,92854T100,VIVID SEATS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,22,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G29201103,ECARX HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,22,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,G9471C206,VERTICAL AEROSPACE LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,21,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G9491K105,GOGORO INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,21,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,M0740A108,ALPHA TAU MEDICAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,21,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,46137V266,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 PURE GROWTH' -> ['VVR'] != OpenFIGI RPG,20,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,358029106,FRESENIUS MEDICAL CARE AG,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,40049J206,GRUPO TELEVISA S A B,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,49457M106,NAKAMOTO INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,60743G100,MOBIX LABS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G16252101,BROOKFIELD INFRASTRUCTURE PA,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G5753U112,MAIDEN HOLDINGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,L0175J138,ALTISOURCE PORTFOLIO SOLUTIO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,L01800108,ALVOTECH,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,19,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V498,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P SMALLCAP MOMENTU' -> ['VVR'] != OpenFIGI XSMO,18,O0;O1_2Q,H3_security_holdout;H3_security_holdout;H4_combined,review conflict evidence
+,98400V101,XBP GLOBAL HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,G05384501,ASPEN INSURANCE HOLDINGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0;O1_2Q,H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,G51405101,FREIGHTOS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,G75398100,REZOLVE AI PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,L0175J112,ALTISOURCE PORTFOLIO SOLUTIO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0;O1_2Q;O1_3Q,H3_security_holdout;H4_combined,resolve ambiguity
+,L0175J120,ALTISOURCE PORTFOLIO SOLUTIO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,18,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46137V563,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO HIGH YIELD EQUITY DI' -> ['VLT'] != OpenFIGI PEY,17,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,530909308,LIBERTY LIVE HOLDINGS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,17,O0;O1_2Q;O1_3Q,H4_combined;H4_combined;H4_combined,resolve ambiguity
+,67080N119,NUVATION BIO INC,CONFLICT,SEC unique ticker NUVB != OpenFIGI NUVB/WS,17,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,74933W452,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 3 MONTH BILL' -> ['FMBM'] != OpenFIGI TBIL,17,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,review conflict evidence
+,G7606H108,ROADZEN INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,17,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,30329Y304,FG NEXUS INC.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,16,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,35473P801,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. LARGE CAP MULT' -> ['FT'] != OpenFIGI FLQL,16,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,53271X108,LIMINATUS PHARMA INC.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,16,O0;O1_2Q,H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,67054R203,T3 DEFENSE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,16,O0;O1_2Q;O1_3Q,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G7006A109,PERFECT CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,16,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,Y9390M103,VINFAST AUTO LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,16,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,20731J102,PRESURANCE HOLDINGS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,15,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,46435U218,ISHARES TR,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],15,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,87200P109,SYSTEM1 INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,15,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,G4000K175,GORILLA TECHNOLOGY GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,15,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,26923N819,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG NVIDIA DLY TRGT' -> ['TRXA'] != OpenFIGI NVDX,14,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V191,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P MIDCAP 400 PURE' -> ['VVR'] != OpenFIGI RFV,14,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V332,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPH,14,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E206,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO CALIFORNIA AMT-FREE' -> ['VCV'] != OpenFIGI PWZ,14,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E263,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P GLOBAL WATER IND' -> ['VVR'] != OpenFIGI CGW,14,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,590717401,MESOBLAST LTD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,14,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,683712137,OPENDOOR TECHNOLOGIES INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,14,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,78163D100,RUNWAY GROWTH FINANCE CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,14,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,G20707108,CHECHE GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,14,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,Y2066G138,DIANA SHIPPING INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,14,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined,resolve ambiguity
+,08178Q309,BENEFICIENT,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,09260U109,BLACKROCK CAP ALLOCATION TER,AMBIGUOUS,"multiple distinct US tickers: ['BCAT', 'XCATX']",13,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,21924U300,CORNERSTONE TOTAL RETURN FD,AMBIGUOUS,"multiple distinct US tickers: ['CRF', 'XCRFX']",13,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,26923N835,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG TESLA DLY TRGT' -> ['TRXA'] != OpenFIGI TSLT,13,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,456948108,MULTISENSOR AI HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0,H0_dev;H2_manager_holdout,resolve ambiguity
+,46137V167,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P SMALLCAP 600 PUR' -> ['VVR'] != OpenFIGI RZV,13,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V399,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 BUYWRITE ETF' -> ['VVR'] != OpenFIGI PBP,13,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138E297,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P EMERGING MARKETS' -> ['VVR'] != OpenFIGI EELV,13,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,500767736,KRANESHARES TRUST,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],13,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,744413105,P3 HEALTH PARTNERS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,84862C203,SPLASH BEVERAGE GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,87283Q883,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TFLR,13,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,G1152A104,BITFUFU INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G4236L138,GUARDFORCE AI CO LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,H5870P102,OCULIS HOLDING AG,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q;O1_3Q,H3_security_holdout;H4_combined;H4_combined;H4_combined,resolve ambiguity
+,M68057104,MARIS TECH LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,13,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,09076W117,BIOAFFINITY TECHNOLOGIES INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,098070154,BONE BIOLOGICS CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,22544F103,CREDIT SUISSE HIGH YIELD CRE,AMBIGUOUS,"multiple distinct US tickers: ['DHY', 'XDHYX']",12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,33830Q109,5E ADVANCED MATERIALS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,35473P553,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. CORE BOND ETF' -> ['FT'] != OpenFIGI FLCB,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,45409F785,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY CORE PLUS BOND' -> ['MMD'] != OpenFIGI CPLB,12,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,46137V373,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPS,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V449,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 100 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI EQWL,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,review conflict evidence
+,46137V472,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P MIDCAP QUAL ETF' -> ['VVR'] != OpenFIGI XMHQ,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138E115,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP INFORMA' -> ['VVR'] != OpenFIGI PSCT,12,O0;O1_2Q,H3_security_holdout;H3_security_holdout;H4_combined,review conflict evidence
+,46138E123,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP INDUSTR' -> ['VVR'] != OpenFIGI PSCI,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138E172,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP CONSUME' -> ['VVR'] != OpenFIGI PSCC,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E198,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P MIDCAP LOW VOLAT' -> ['VVR'] != OpenFIGI XMLV,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138E230,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P INTERNATIONAL DE' -> ['VVR'] != OpenFIGI IDLV,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,52468L406,LEGG MASON ETF INVT,CONFLICT,SEC title 'FRANKLIN U.S. LOW VOLATILITY' -> ['FT'] != OpenFIGI LVHD,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,53656F623,LISTED FDS TR,CONFLICT,SEC title 'HORIZON KINETICS INFL BENEF' -> ['HKHC'] != OpenFIGI INFL,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,552737108,ABERDEEN MULTI-MARKET INCOME,AMBIGUOUS,"multiple distinct US tickers: ['MMT', 'XMMTX']",12,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,617477104,MORGAN STANLEY EMERGING MKTS,AMBIGUOUS,"multiple distinct US tickers: ['EDD', 'XEDDX']",12,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,74933W536,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 10 YEAR NOTE' -> ['FMBM'] != OpenFIGI UTEN,12,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,74933W544,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 20 YEAR BOND' -> ['FMBM'] != OpenFIGI UTWY,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,76135L119,REVELATION BIOSCIENCES INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,77313F114,ROCKET PHARMACEUTICALS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,824430102,SHF HOLDINGS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,87283Q602,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TAGG,12,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,review conflict evidence
+,87283Q842,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TGRT,12,O0;O1_2Q;O1_3Q,H3_security_holdout,review conflict evidence
+,G0370L116,GRAB HOLDINGS LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0,H2_manager_holdout,resolve ambiguity
+,G3142E105,EUDA HEALTH HOLDINGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,M61472110,NEXERA TECHNOLOGIES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,Q56120142,LOCAFY LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,Y2188B108,DYNAGAS LNG PARTNERS LP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,12,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,02008G201,ALLURION TECHNOLOGIES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0,H2_manager_holdout,resolve ambiguity
+,09076W109,BIOAFFINITY TECHNOLOGIES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,09260K101,BLACKROCK SCIENCE & TECHNOLO,AMBIGUOUS,"multiple distinct US tickers: ['BSTZ', 'XBSZX']",11,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,09660L105,BNY MELLON HIGH YIELD STRATE,AMBIGUOUS,"multiple distinct US tickers: ['DHF', 'XDHFX']",11,O0;O1_2Q,H3_security_holdout;H3_security_holdout;H4_combined,resolve ambiguity
+,104932108,BRAND ENGAGEMENT NETWORK INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,23325P104,DNP SELECT INCOME FD INC,AMBIGUOUS,"multiple distinct US tickers: ['DNP', 'XDNPX']",11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,35473P488,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. TREASURY BOND' -> ['FT'] != OpenFIGI FLGV,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,35473P884,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. MID CAP MULTIF' -> ['FT'] != OpenFIGI FLQM,11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,362397101,GABELLI EQUITY TR INC,AMBIGUOUS,"multiple distinct US tickers: ['GAB', 'XGABX']",11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,42968F108,HIGH INCOME SECS FD,AMBIGUOUS,"multiple distinct US tickers: ['PCF', 'XPCFX']",11,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,45409F736,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY HIGH INCOME ETF' -> ['MMD'] != OpenFIGI IQHI,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,45409F827,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY MUNI INTRM ETF' -> ['MMD'] != OpenFIGI MMIT,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V324,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPN,11,O0;O1_2Q,H3_security_holdout,review conflict evidence
+,46137V381,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPD,11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46141D203,INVESCO DB US DLR INDEX TR,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,51655R101,LANZATECH GLOBAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,64190A103,NEUBERGER R/EST SECS INC FD,AMBIGUOUS,"multiple distinct US tickers: ['NRO', 'XNROX']",11,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,670656107,NUVEEN NY AMT FREE,AMBIGUOUS,"multiple distinct US tickers: ['NRK', 'XNRKX']",11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,670657105,NUVEEN AMT FREE QLTY MUN INC,AMBIGUOUS,"multiple distinct US tickers: ['NEA', 'XNEAX']",11,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,691543102,OXFORD LANE CAP CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,74933W528,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 7 YEAR NOTE' -> ['FMBM'] != OpenFIGI USVN,11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,75946W116,RELIANCE GLOBAL GROUP INC,CONFLICT,SEC unique ticker EZRA != OpenFIGI EZRAW,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,84862C302,SPLASH BEVERAGE GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q,H4_combined,resolve ambiguity
+,895436103,TRI CONTL CORP,AMBIGUOUS,"multiple distinct US tickers: ['TY', 'XTYCX']",11,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G0085J117,ADS TEC ENERGY PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G0411D115,APOLLOMICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,11,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,09255P107,BLACKROCK CORPOR HI YLD FD I,AMBIGUOUS,"multiple distinct US tickers: ['HYT', 'XHYTX']",10,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,09260Q108,BLACKROCK TECH AND PRIVATE E,AMBIGUOUS,"multiple distinct US tickers: ['BTX', 'XBTPX']",10,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,09262G108,BLACKROCK 2037 MUNICIPAL TAR,AMBIGUOUS,"multiple distinct US tickers: ['BMN', 'XBMNX']",10,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,165167180,EXPAND ENERGY CORPORATION,CONFLICT,SEC unique ticker EXE != OpenFIGI EXEEL,10,O0;O1_2Q,H0_dev;H0_dev,review conflict evidence
+,25861R105,DOUBLELINE ETF TRUST,CONFLICT,SEC title 'DOUBLELINE OPPOR COR BND-USD' -> ['DBL'] != OpenFIGI DBND,10,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,258622109,DOUBLELINE INCOME SOLUTIONS,AMBIGUOUS,"multiple distinct US tickers: ['DSL', 'XDSLX']",10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,320703309,CALIDI BIOTHERAPEUTICS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,337655302,FISCALNOTE HOLDINGS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,35472T101,FRANKLIN LTD DURATION INCOME,AMBIGUOUS,"multiple distinct US tickers: ['FTF', 'XFTFX']",10,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,35473P405,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. EQUITY INDEX E' -> ['FT'] != OpenFIGI USPX,10,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,43010E404,HIGHLAND OPPS & INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['HFRO', 'XHFOX']",10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,46137V159,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P SPIN-OFF ETF' -> ['VVR'] != OpenFIGI CSD,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V175,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P SMALLCAP 600 PUR' -> ['VVR'] != OpenFIGI RZG,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V217,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P MIDCAP 400 PURE' -> ['VVR'] != OpenFIGI RFG,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V225,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P MIDCAP 400 GARP' -> ['VVR'] != OpenFIGI GRPM,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V316,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPM,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V340,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPF,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V480,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P SMALLCAP VALUE W' -> ['VVR'] != OpenFIGI XSVM,10,O0,H3_security_holdout;H4_combined,review conflict evidence
+,46138E180,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP CONSUME' -> ['VVR'] != OpenFIGI PSCD,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E289,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P EMERGING MARKETS' -> ['VVR'] != OpenFIGI EEMO,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E388,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 EX-RATE SENS' -> ['VVR'] != OpenFIGI XRLV,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E396,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 CONCENTRATED' -> ['VVR'] != OpenFIGI QVMT,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138G656,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P ULTRA DIVIDEND' -> ['VVR'] != OpenFIGI RDIV,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,50186A132,LGL GROUP INC,CONFLICT,SEC unique ticker LGL != OpenFIGI LGL/WS,10,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,review conflict evidence
+,530158104,LIBERTY ALL STAR EQUITY FD,AMBIGUOUS,"multiple distinct US tickers: ['USA', 'XUSAX']",10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,63911H306,NAUTICUS ROBOTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,,resolve ambiguity
+,670663103,NUVEEN MUN CR OPPORTUNITIES,AMBIGUOUS,"multiple distinct US tickers: ['NMCO', 'XNMCX']",10,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,670682103,NUVEEN MUN HIGH INCOME OPPOR,AMBIGUOUS,"multiple distinct US tickers: ['NMZ', 'XNMZX']",10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,68277K207,ONFOLIO HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,722014107,PIMCO HIGH INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['PHK', 'XPHKX']",10,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,74933W395,RBB FD INC,CONFLICT,SEC title 'F/M 3-YEAR INV GR CORP B ETF' -> ['FMBM'] != OpenFIGI ZTRE,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,74933W411,RBB FD INC,CONFLICT,SEC title 'F/M 10-YEAR INV G CORP B ETF' -> ['FMBM'] != OpenFIGI ZTEN,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,74933W460,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 6 MONTH BILL' -> ['FMBM'] != OpenFIGI XBIL,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,74933W494,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 3 YEAR NOTE' -> ['FMBM'] != OpenFIGI UTRE,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,862945102,STRIVE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,87283Q826,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TMSL,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,87283Q834,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TOUS,10,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,95766K109,WESTERN ASSET HIGH INCOME OP,AMBIGUOUS,"multiple distinct US tickers: ['HIO', 'XHIOX']",10,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G0567U127,ARQIT QUANTUM INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H3_security_holdout;H3_security_holdout;H4_combined;H4_combined,resolve ambiguity
+,G1149B116,ABLE VIEW GLOBAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G6202B101,MONEYHERO LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,G72245122,PRENETICS GLOBAL LTD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G8976D107,TOYO CO LTD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,10,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,02072L870,EA SERIES TRUST,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],9,O0,H0_dev;H2_manager_holdout,review conflict evidence
+,09260E105,BLACKROCK HEALTH SCIENCES TE,AMBIGUOUS,"multiple distinct US tickers: ['BMEZ', 'XBMZX']",9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,114082308,ERNEXA THERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,18914E106,CLOUGH GLOBAL OPPORTUNITIES,AMBIGUOUS,"multiple distinct US tickers: ['GLO', 'XGLOX']",9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,19249Q103,COHEN & STEERS REAL ESTATE O,AMBIGUOUS,"multiple distinct US tickers: ['RLTY', 'XRLTX']",9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,26145B304,DRAGONFLY ENERGY HOLDINGS CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,26916J106,ESS TECH INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,27828H105,EATON VANCE LIMITED DURATION,AMBIGUOUS,"multiple distinct US tickers: ['EVV', 'XEVVX']",9,O0,H3_security_holdout,resolve ambiguity
+,30290Y101,FS CREDIT OPPORTUNITIES CORP,AMBIGUOUS,"multiple distinct US tickers: ['FSCO', 'XFSCX']",9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,40167F101,GUGGENHEIM STRATEGIC OPPORTU,AMBIGUOUS,"multiple distinct US tickers: ['GOF', 'XGOFX']",9,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,45409F686,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY SECUR INC ETF' -> ['MMD'] != OpenFIGI SECR,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,45409F777,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY CA MUNI INTERM' -> ['MMD'] != OpenFIGI MMCA,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,45409F843,NEW YORK LIFE INVTS ACTIVE E,CONFLICT,SEC title 'NYLI MACKAY MUNI INSURED ETF' -> ['MMD'] != OpenFIGI MMIN,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138E156,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP FINANCI' -> ['VVR'] != OpenFIGI PSCF,9,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138E214,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P INTERNATIONAL DE' -> ['VVR'] != OpenFIGI IDHQ,9,O0,H0_dev;H1_time_holdout,review conflict evidence
+,46138G441,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SC 600 GARP ETF' -> ['VVR'] != OpenFIGI GRPZ,9,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,46138G474,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP ENERGY' -> ['VVR'] != OpenFIGI PSCE,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46138G573,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P MIDCAP 400 QVM M' -> ['VVR'] != OpenFIGI QVMM,9,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,46144X487,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,552738106,ABERDEEN MUN INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['MFM', 'XMFMX']",9,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,64113L202,NETCAPITAL INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,69122G102,BLUE OWL CAP CORP III,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,69181V107,OXFORD SQUARE CAP CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,69344A784,PGIM ETF TR,CONFLICT,SEC title 'PGIM SHORT DURATION HIGH YLD' -> ['SDHY'] != OpenFIGI PSH,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,74933W478,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 12 MONTH BIL' -> ['FMBM'] != OpenFIGI OBIL,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,87283Q800,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TOTR,9,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,87283Q859,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TVAL,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,95766R104,WESTERN AST INFL LKD OPP & I,AMBIGUOUS,"multiple distinct US tickers: ['WIW', 'XWIWX']",9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G0369L101,ANGHAMI INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G0544E113,NEWGENIVF GROUP LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G20707116,CHECHE GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G6209W108,MKDWELL TECH INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,M74240108,NEUROSENSE THERAPEUTICS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,9,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,044103869,ASHFORD HOSPITALITY TR INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,09074F405,BIOVIE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0,H2_manager_holdout,resolve ambiguity
+,09662E109,BNY MELLON STRATEGIC MUN BD,AMBIGUOUS,"multiple distinct US tickers: ['DSM', 'XDSMX']",8,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,112830104,BROOKFIELD REAL ASSETS INCOM,AMBIGUOUS,"multiple distinct US tickers: ['RA', 'XRAIX']",8,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,165167172,EXPAND ENERGY CORPORATION,CONFLICT,SEC unique ticker EXE != OpenFIGI EXEEZ,8,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,19248A109,COHEN & STEERS INFRASTRUCTUR,AMBIGUOUS,"multiple distinct US tickers: ['UTF', 'XUTFX']",8,O0;O1_2Q,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,40416EAF0,HCI GROUP INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,44862P117,HYCROFT MINING HOLDING CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,46138E222,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P INTERNATIONAL DE' -> ['VVR'] != OpenFIGI IDMO,8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,529900102,LIBERTY ALL-STAR GROWTH FD I,AMBIGUOUS,"multiple distinct US tickers: ['ASG', 'XASGX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,55273C107,MFS INTER INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['MIN', 'XMINX']",8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,552939100,MFS GOVT MKTS INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['MGF', 'XMGFX']",8,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,602687105,MINDWALK HOLDINGS CORP,AMBIGUOUS,"multiple distinct US tickers: ['HYFT', 'IPA']",8,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,67062C107,NUVEEN CALIFORNIA MUNI VLU F,AMBIGUOUS,"multiple distinct US tickers: ['NCA', 'XNCAX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,67064R102,NUVEEN VA QUALITY MUN INCOM,AMBIGUOUS,"multiple distinct US tickers: ['NPV', 'XNPVX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,67071L106,NUVEEN AMT FREE MUN CR INC F,AMBIGUOUS,"multiple distinct US tickers: ['NVG', 'XNVGX']",8,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,67072T108,NUVEEN FLOATING RATE INCOME,AMBIGUOUS,"multiple distinct US tickers: ['JFR', 'XJFRX']",8,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,67073D102,NUVEEN CR STRATEGIES INCOME,AMBIGUOUS,"multiple distinct US tickers: ['JQC', 'XJQCX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,670928100,NUVEEN MUN VALUE FD INC,AMBIGUOUS,"multiple distinct US tickers: ['NUV', 'XNUVX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,72200M108,PIMCO CALIF MUN INCOME FD II,CONFLICT,SEC title 'PIMCO CALIFORNIA MUNICIPA II' -> ['PCQ'] != OpenFIGI XPCKX,8,O0,H0_dev;H1_time_holdout,review conflict evidence
+,72201B101,PIMCO CORPORATE & INCOME OPP,AMBIGUOUS,"multiple distinct US tickers: ['PTY', 'XPTYX']",8,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,72201H108,PIMCO INCOME STRATEGY FD,AMBIGUOUS,"multiple distinct US tickers: ['PFL', 'XPFLX']",8,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,746823103,PUTNAM MANAGED MUN INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['PMM', 'XPMMX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,746853100,PUTNAM PREMIER INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['PPT', 'XPPTX']",8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,74933W486,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 2 YEAR NOTE' -> ['FMBM'] != OpenFIGI UTWO,8,O0,H0_dev;H1_time_holdout,review conflict evidence
+,74933W510,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 5 YEAR NOTE' -> ['FMBM'] != OpenFIGI UFIV,8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,74933W551,RBB FD INC,CONFLICT,SEC title 'F/M US TREASURY 30 YEAR BOND' -> ['FMBM'] != OpenFIGI UTHY,8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,80516T105,SAVERONE 2014 LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,867781700,SUNSHINE BIOPHARMA INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,87283Q701,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TBUX,8,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,92891H507,VS TRUST,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,95766J102,WESTERN ASSET HIGH INCOM FD,AMBIGUOUS,"multiple distinct US tickers: ['HIX', 'XHGIX']",8,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,98955N108,ZHIHU INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G6209W116,MKDWELL TECH INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G72245114,PRENETICS GLOBAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G7410G106,REAL MESSENGER CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7823S101,SATELLOGIC INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0,H0_dev,resolve ambiguity
+,L64875112,MOOLEC SCIENCE SA,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,8,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,00548F105,ADAM NAT RES FD INC,AMBIGUOUS,"multiple distinct US tickers: ['PEO', 'XPEOX']",7,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,02919L307,AMERICAN REBEL HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,05588W108,BNY MELLON STRATEGIC MUNS IN,AMBIGUOUS,"multiple distinct US tickers: ['LEO', 'XLEOX']",7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,09251A104,BLACKROCK ENHANCED EQUITY DI,AMBIGUOUS,"multiple distinct US tickers: ['BDJ', 'XBDJX']",7,O0,H0_dev;H2_manager_holdout,resolve ambiguity
+,09253N104,BLACKROCK MUNIHOLDINGS FD IN,AMBIGUOUS,"multiple distinct US tickers: ['MHD', 'XMHDX']",7,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09254E103,BLACKROCK MUNIYIELD QUALITY,AMBIGUOUS,"multiple distinct US tickers: ['MYI', 'XMYIX']",7,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09257A108,BLACKROCK RES & COMMODITIES,AMBIGUOUS,"multiple distinct US tickers: ['BCX', 'XBCRX']",7,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09769B115,BOLT PROJS HLDGS INC,CONFLICT,SEC title 'GOLDEN ARROW MERGER A -CW26' -> ['GARWF'] != OpenFIGI BSLKW,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,12811P108,CALAMOS CONV & HIGH INCOME F,AMBIGUOUS,"multiple distinct US tickers: ['CHY', 'XCHYX']",7,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,18914C100,CLOUGH GLOBAL EQUITY FD,AMBIGUOUS,"multiple distinct US tickers: ['GLQ', 'XGLQX']",7,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,19249X108,COHEN & STEERS TAX ADVAN PFD,AMBIGUOUS,"multiple distinct US tickers: ['PTA', 'XPTAX']",7,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,27829C105,EATON VANCE TAX-MANAGED GLOB,AMBIGUOUS,"multiple distinct US tickers: ['ETW', 'XETWX']",7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,35473P306,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN U.S. CORE DIVIDEND' -> ['FT'] != OpenFIGI UDIV,7,O0;O1_2Q,H3_security_holdout,review conflict evidence
+,36240B109,GABELLI CONV & INC SECS FD I,AMBIGUOUS,"multiple distinct US tickers: ['GCV', 'XGCVX']",7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,46092D673,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],7,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46137V274,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPU,7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,46137V423,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 VALUE WITH M' -> ['VVR'] != OpenFIGI SPVM,7,O0,H0_dev;H1_time_holdout,review conflict evidence
+,46583A204,IVEDA SOLUTIONS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,52567D115,LEMONADE INC,CONFLICT,SEC unique ticker LMND != OpenFIGI LMND/WS,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,553745118,MSP RECOVERY INC,CONFLICT,SEC unique ticker MSPR != OpenFIGI MSPRZ,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,583435102,STEAKHOLDER FOODS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,63911H207,NAUTICUS ROBOTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0,H2_manager_holdout,resolve ambiguity
+,67021W301,NUBURU INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0,H0_dev;H2_manager_holdout,resolve ambiguity
+,67071B108,NUVEEN REAL ESTATE INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['JRS', 'XJRSX']",7,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,67074Y105,NUVEEN REAL ASSET INCOME & G,AMBIGUOUS,"multiple distinct US tickers: ['JRI', 'XJRIX']",7,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,72200X104,PIMCO STRATEGIC INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['RCS', 'XRCSX']",7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,72201Y101,PIMCO DYNAMIC INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['PDI', 'XPDIX']",7,O0,H4_combined,resolve ambiguity
+,74016W403,PRECIDIAN ETFS TR,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,746922103,PUTNAM MUN OPPORTUNITIES TR,AMBIGUOUS,"multiple distinct US tickers: ['PMO', 'XPMOX']",7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,74954L112,RF ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,81256L203,SEASTAR MEDICAL HOLDING CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0,H2_manager_holdout,resolve ambiguity
+,85513Q103,STAR EQUITY HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,872340104,TCW STRATEGIC INCOME FD INC,AMBIGUOUS,"multiple distinct US tickers: ['TSI', 'XXCVTXX']",7,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,88066N303,TENON MEDICAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,92346X115,VERIFYME INC,CONFLICT,SEC unique ticker VRME != OpenFIGI VRMEW,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,95766A101,WESTERN ASSET EMERGING MKTS,AMBIGUOUS,"multiple distinct US tickers: ['EMD', 'XEMDX']",7,O0,H3_security_holdout;H4_combined,resolve ambiguity
+,95790K109,WESTERN ASSET DIVERSIFIED IN,AMBIGUOUS,"multiple distinct US tickers: ['WDI', 'XWDIX']",7,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,98148L746,WORLD FDS TR,CONFLICT,SEC title 'T-REX 2X INVERSE BITCOIN DLY' -> ['TRXA'] != OpenFIGI BTCZ,7,O0,H3_security_holdout,review conflict evidence
+,G0250X149,AMCOR PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,G0411D107,APOLLOMICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G1148A119,BLACK HAWK ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,G1149B108,ABLE VIEW GLOBAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1263B108,BIG TREE CLOUD HLDGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G1827P106,CANTOR EQUITY PARTNERS II IN,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G29201111,ECARX HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G4035N103,GP-ACT III ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G5451A103,LEGATO MERGER CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,G5490M118,LIGHTWAVE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G6693P106,ROBO.AI INC.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H2_manager_holdout;H2_manager_holdout,resolve ambiguity
+,G86302125,SWVL HOLDINGS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0,H3_security_holdout,resolve ambiguity
+,M74240116,NEUROSENSE THERAPEUTICS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,M7S64L115,PAGAYA TECHNOLOGIES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,7,O0;O1_2Q,H0_dev;H0_dev;H2_manager_holdout,resolve ambiguity
+,003057106,ABRDN INCOME CREDIT STRATEGI,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H1_time_holdout,resolve ambiguity
+,114082209,ERNEXA THERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,128117108,CALAMOS CONV OPPORTUNITIES &,AMBIGUOUS,"multiple distinct US tickers: ['CHI', 'XCHIX']",6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,12811V105,CALAMOS DYNAMIC CONV & INCOM,AMBIGUOUS,"multiple distinct US tickers: ['CCD', 'XCCDX']",6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,27826S103,EATON VANCE SR INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['EVF', 'XEVFX']",6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,27828N102,EATON VANCE TAX-MANAGED DIVE,AMBIGUOUS,"multiple distinct US tickers: ['ETY', 'XETYX']",6,O0;O1_2Q;O1_3Q,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,28059P204,EDIBLE GARDEN AG INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,338480106,FLAHERTY & CRUMRINE PFD INCO,AMBIGUOUS,"multiple distinct US tickers: ['PFD', 'XPFDX']",6,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,36465A109,GAMCO GLOBAL GOLD NAT RES &,AMBIGUOUS,"multiple distinct US tickers: ['GGN', 'XGGNX']",6,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,46132H106,INVESCO CALIF VALUE MUN INCO,AMBIGUOUS,"multiple distinct US tickers: ['VCV', 'XVCVX']",6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,46132X101,INVESCO MUNI INCOME OPP TRST,AMBIGUOUS,"multiple distinct US tickers: ['OIA', 'XOIAX']",6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,46137V456,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P MIDCAP VALUE WIT' -> ['VVR'] != OpenFIGI XMVM,6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46138G201,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP MATERIA' -> ['VVR'] != OpenFIGI PSCM,6,O0,H3_security_holdout,review conflict evidence
+,46138G300,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP QUALITY' -> ['VVR'] != OpenFIGI XSHQ,6,O0,H0_dev;H1_time_holdout,review conflict evidence
+,46138G581,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P 500 QVM MULTI-FA' -> ['VVR'] != OpenFIGI QVML,6,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,46144X131,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],6,O0;O1_2Q,H3_security_holdout,review conflict evidence
+,47109U104,JAPAN SMALLER CAPITALIZATION,AMBIGUOUS,"multiple distinct US tickers: ['JOF', 'XXJOFXX']",6,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,471871103,JASPER THERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,55380K125,M-TRON INDS INC,CONFLICT,SEC unique ticker MPTI != OpenFIGI MPTI/WS,6,O0;O1_2Q,H2_manager_holdout,review conflict evidence
+,557437100,XAI MADISON EQUITY PREMIUM I,AMBIGUOUS,"multiple distinct US tickers: ['MCN', 'XMCNX']",6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,583435201,STEAKHOLDER FOODS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,60879E119,MOMENTUS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,60879E309,MOMENTUS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H2_manager_holdout,resolve ambiguity
+,64113L103,NETCAPITAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,64124P101,NEUBERGER MUN FD INC,AMBIGUOUS,"multiple distinct US tickers: ['NBH', 'XNBHX']",6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,644323107,FS SPECIALTY LENDING FD,AMBIGUOUS,"multiple distinct US tickers: ['FSSL', 'XFSLX']",6,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,67061T101,NUVEEN SELECT MAT MUN FD,AMBIGUOUS,"multiple distinct US tickers: ['NIM', 'XNIMX']",6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,67062M105,NUVEEN N Y MUN VALUE FD,AMBIGUOUS,"multiple distinct US tickers: ['NNY', 'XNNYX']",6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,67070X101,NUVEEN MUNICIPAL CREDIT INC,AMBIGUOUS,"multiple distinct US tickers: ['NZF', 'XNZFX']",6,O0,H3_security_holdout,resolve ambiguity
+,72203T100,PIMCO ACCESS INCOME FUND,AMBIGUOUS,"multiple distinct US tickers: ['PAXS', 'XPAAX']",6,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,74933W429,RBB FD INC,CONFLICT,SEC title 'F/M 2-YEAR INV G CORP B ETF' -> ['FMBM'] != OpenFIGI ZTWO,6,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,76881Y109,RIVERNORTH OPPORTUNITIES FD,AMBIGUOUS,"multiple distinct US tickers: ['RIV', 'XRIVX']",6,O0,H4_combined,resolve ambiguity
+,780915104,ROYCE MICRO-CAP TR INC,AMBIGUOUS,"multiple distinct US tickers: ['RMT', 'XOTCX']",6,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,83006G104,60 DEGREES PHARMACEUTICALS I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,867781403,SUNSHINE BIOPHARMA INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,86887P200,CEA INDUSTRIES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,880198205,SABA CAPITAL INCOME & OPPORT,AMBIGUOUS,"multiple distinct US tickers: ['SABA', 'XSABX']",6,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,92259N104,VELO3D INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,92835W107,VIRTUS TOTAL RETURN FD INC,AMBIGUOUS,"multiple distinct US tickers: ['XZTRX', 'ZTR']",6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,94987B105,ALLSPRING INCOME OPPORTUNIT,AMBIGUOUS,"multiple distinct US tickers: ['EAD', 'XEADX']",6,O0;O1_2Q,H3_security_holdout;H4_combined,resolve ambiguity
+,G0411D123,APOLLOMICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H4_combined,resolve ambiguity
+,G26745102,ANDRETTI ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G3302D103,FGI INDUSTRIES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout;H4_combined,resolve ambiguity
+,G33033104,ARES ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G4R52R103,HELPORT AI LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,G50737124,JAWS MUSTANG ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,G5331N101,KYIVSTAR GROUP LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H4_combined,resolve ambiguity
+,G5380J100,LANVIN GROUP HOLDINGS LIMITE,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G8403L102,SRIVARU HOLDING LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev,resolve ambiguity
+,G8403L110,SRIVARU HOLDING LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G86302117,SWVL HOLDINGS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G9491K139,GOGORO INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G9675P102,WILLOW LANE ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G9R16L118,VALUENCE MERGER CORP I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,M1R95N100,ARBE ROBOTICS LTD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,M6000J119,HUB CYBER SECURITY LTD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,6,O0,H3_security_holdout,resolve ambiguity
+,003009107,ABRDN ASIA PACIFIC INCOME FU,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,00326W106,ABRDN GLOBAL INFRA INCOME FU,AMBIGUOUS,"multiple distinct US tickers: ['ASGI', 'XAGIX']",5,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,008183113,AEYE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,01879R106,ALLIANCEBERNSTEIN GLOBAL HIG,AMBIGUOUS,"multiple distinct US tickers: ['AWF', 'XAWFX']",5,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,09074F207,BIOVIE INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,09254F100,BLACKROCK MUNIYILD QULT FD I,AMBIGUOUS,"multiple distinct US tickers: ['MQY', 'XMQYX']",5,O0,H1_time_holdout,resolve ambiguity
+,09254X101,BLACKROCK MUNIHLDGS NJ QLTY,AMBIGUOUS,"multiple distinct US tickers: ['MUJ', 'XMUJX']",5,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,09255X100,BLACKROCK FLOATING RATE INCO,AMBIGUOUS,"multiple distinct US tickers: ['FRA', 'XFRAX']",5,O0,H2_manager_holdout,resolve ambiguity
+,09256U105,BLACKSTONE SENI FLTN RAT 202,AMBIGUOUS,"multiple distinct US tickers: ['BSL', 'XBSLX']",5,O0,H2_manager_holdout,resolve ambiguity
+,09262F100,BLACKROCK ESG CAP ALLC TERM,AMBIGUOUS,"multiple distinct US tickers: ['ECAT', 'XESGX']",5,O0;O1_2Q,H2_manager_holdout,resolve ambiguity
+,09263B108,BLACKSKY TECHNOLOGY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,128125101,CALAMOS STRATEGIC TOTAL RETU,AMBIGUOUS,"multiple distinct US tickers: ['CSQ', 'XCSQX']",5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,16842Q134,CHICKEN SOUP FOR THE SOUL EN,AMBIGUOUS,"multiple distinct US tickers: ['CSSEL', 'CSSLQ']",5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,18469P209,CLEARBRIDGE ENERGY MIDSTRM O,AMBIGUOUS,"multiple distinct US tickers: ['EMO', 'XEMOX']",5,O0,H0_dev;H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,20678X304,CDT EQUITY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,224916106,CREDIT SUISSE ASSET MGMT,AMBIGUOUS,"multiple distinct US tickers: ['CIK', 'XCIKX']",5,O0;O1_2Q;O1_3Q,H3_security_holdout,resolve ambiguity
+,25862D105,DOUBLELINE YIELD OPPORTUNITI,AMBIGUOUS,"multiple distinct US tickers: ['DLY', 'XDLYX']",5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,26433C105,DUFF & PHELPS UTLITY AND INF,AMBIGUOUS,"multiple distinct US tickers: ['DPG', 'XDPGX']",5,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,26923N413,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X INVERSE MSTR DT ETF' -> ['TRXA'] != OpenFIGI MSTZ,5,O0;O1_2Q,H3_security_holdout,review conflict evidence
+,30052F118,EVGO INC,CONFLICT,SEC unique ticker EVGO != OpenFIGI EVGOW,5,O0,H2_manager_holdout,review conflict evidence
+,351471305,FOXO TECHNOLOGIES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H3_security_holdout,resolve ambiguity
+,36246K103,GABELLI HEALTHCARE & WELLNES,AMBIGUOUS,"multiple distinct US tickers: ['GRX', 'XXGRX']",5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,46090A705,INVESCO ACTIVELY MANAGED EXC,CONFLICT,SEC title 'INVESCO S&P 500 DOWNSIDE HED' -> ['VVR'] != OpenFIGI PHDG,5,O0;O1_2Q,H0_dev;H0_dev,review conflict evidence
+,46092D384,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],5,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,46092D665,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],5,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46131H107,INVESCO SR INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['VVR', 'XVVRX']",5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,46132C107,INVESCO MUN OPPORTUNIT TR,AMBIGUOUS,"multiple distinct US tickers: ['VMO', 'XVMOX']",5,O0,H4_combined,resolve ambiguity
+,46137V290,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIGHT' -> ['VVR'] != OpenFIGI RSPR,5,O0,H3_security_holdout;H4_combined,review conflict evidence
+,61745C105,MORGAN STANLEY INDIA INVT FD,AMBIGUOUS,"multiple distinct US tickers: ['IIF', 'XIIFX']",5,O0,H2_manager_holdout,resolve ambiguity
+,64133Q108,NEUBERGER NEXT GENERATION,AMBIGUOUS,"multiple distinct US tickers: ['NBXG', 'XNBGX']",5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,655187102,ACLARION INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,68989M129,OUSTER INC,CONFLICT,SEC unique ticker OUST != OpenFIGI OUSTW,5,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,69355M107,PIMCO DYNAMIC INCOME OPRNTS,AMBIGUOUS,"multiple distinct US tickers: ['PDO', 'XPDOX']",5,O0,H2_manager_holdout,resolve ambiguity
+,72200U100,PIMCO CORPORATE & INCM STRG,AMBIGUOUS,"multiple distinct US tickers: ['PCN', 'XPCNX']",5,O0,H4_combined,resolve ambiguity
+,72200Y102,PIMCO NEW YORK MUN FD II,AMBIGUOUS,"multiple distinct US tickers: ['PNI', 'XPNIX']",5,O0,H3_security_holdout,resolve ambiguity
+,746909100,PUTNAM MASTER INTER INCOME T,AMBIGUOUS,"multiple distinct US tickers: ['PIM', 'XPIMX']",5,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,76883Y107,RIVERNORTH FLEXIBLE MUNI INC,AMBIGUOUS,"multiple distinct US tickers: ['RFMZ', 'XRFZX']",5,O0,H1_time_holdout,resolve ambiguity
+,854936119,STARDUST PWR INC,CONFLICT,SEC title 'GLOBAL PARTNER ACQ A -CW27' -> ['GLP'] != OpenFIGI SDSTW,5,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,review conflict evidence
+,87283Q750,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TMED,5,O0,H0_dev;H1_time_holdout,review conflict evidence
+,87283Q768,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TFNS,5,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,87283Q792,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TTEQ,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,880192109,TEMPLETON EMERGING MKTS INCO,AMBIGUOUS,"multiple distinct US tickers: ['TEI', 'XTEIX']",5,O0,H1_time_holdout,resolve ambiguity
+,89601Y119,IRIS ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev,resolve ambiguity
+,92838U108,VIRTUS CONVERTIBLE & INC FD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,92838X102,VIRTUS CONVERTIBLE & INCOME,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,94987C103,ALLSPRING GLOBAL DIVIDEND OP,AMBIGUOUS,"multiple distinct US tickers: ['EOD', 'XEODX']",5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G0136H102,AERIES TECHNOLOGY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G0750N120,AXIOM INTELLIGENCE AC CORP 1,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1051H101,BERTO ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1051H127,BERTO ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1069P137,BEST SPAC I ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1828A108,CANTOR EQUITY PARTNERS III I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G20315100,CENTURION ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G2868C111,DIGITAL ASSET ACQUISITION CO,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G32901103,FACT II ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G3415K101,FIFTH ERA ACQUISITION CORP I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G3415K135,FIFTH ERA ACQUISITION CORP I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G50716110,NVNI GROUP LIMITED,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H0_dev,resolve ambiguity
+,G5093B121,JENA ACQUISITION CORP II,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,G5353S129,LAKESHORE ACQUISITION III CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G5501C109,LIONHEART HOLDINGS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,G5S86M100,LAUNCH ONE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0,H3_security_holdout,resolve ambiguity
+,G6202B119,MONEYHERO LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,G6858G123,OXLEY BRIDGE ACQ LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7490F119,RENATUS TACTICAL ACQUIS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7515A111,REPUBLIC DIGITAL ACQUISITION,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H0_dev;H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G75389109,RF ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,G7852T103,SAIHEAT LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G9471C107,VERTICAL AEROSPACE LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G9R39C129,WEN ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q;O1_3Q,H3_security_holdout,resolve ambiguity
+,M97838102,WEARABLE DEVICES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,5,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,00301W105,ABRDN EMERGING MARKETS EX CH,AMBIGUOUS,"multiple distinct US tickers: ['AEF', 'XAEFX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,00373V118,ABOVE FOOD INGREDIENTS INC,CONFLICT,SEC unique ticker ABVEF != OpenFIGI ABVWF,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,00835Q111,AEVA TECHNOLOGIES INC,CONFLICT,SEC unique ticker AEVA != OpenFIGI AEVAW,4,O0,H0_dev,review conflict evidence
+,06748F324,BARCLAYS BANK PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,091748509,BITWISE FUNDS TRUST,CONFLICT,SEC title 'BITWISE BITCOIN STD CORP ETF' -> ['BITB'] != OpenFIGI OWNB,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,092501105,BLACKROCK ENHANCED GLOBAL,AMBIGUOUS,"multiple distinct US tickers: ['BOE', 'XBOEX']",4,O0,H0_dev,resolve ambiguity
+,09254V105,BLACKROCK MUNIYIELD MICH QU,AMBIGUOUS,"multiple distinct US tickers: ['MIY', 'XMIYX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09255E102,BLACKROCK MUNIYIELD N Y QUAL,AMBIGUOUS,"multiple distinct US tickers: ['MYN', 'XMYNX']",4,O0,H0_dev,resolve ambiguity
+,09257P105,BLACKROCK MUN TARGET TERM TR,AMBIGUOUS,"multiple distinct US tickers: ['BTT', 'XBTTX']",4,O0,H3_security_holdout,resolve ambiguity
+,09257R101,BLACKSTONE STRATEGIC CRED 20,AMBIGUOUS,"multiple distinct US tickers: ['BGB', 'XBGBX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,124155110,BUTTERFLY NETWORK INC,CONFLICT,SEC unique ticker BFLY != OpenFIGI BFLYW,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,review conflict evidence
+,12504G100,CBRE GBL REAL ESTATE INC FD,AMBIGUOUS,"multiple distinct US tickers: ['IGR', 'XIGRX']",4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,12811L107,CALAMOS GBL DYN INCOME FUND,AMBIGUOUS,"multiple distinct US tickers: ['CHW', 'XCHWX']",4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,12812C106,CALAMOS LNG SHR EQT DYNAMIC,AMBIGUOUS,"multiple distinct US tickers: ['CPZ', 'XCPZX']",4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,15130G881,CEMTREX INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,16934Q208,CHIMERA INVT CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H3_security_holdout,resolve ambiguity
+,23306J101,DBV TECHNOLOGIES S A,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,26923N389,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG HOD DLY TAR ETF' -> ['TRXA'] != OpenFIGI ROBN,4,O0,H1_time_holdout,review conflict evidence
+,26923N595,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG ALPHABET DLY' -> ['TRXA'] != OpenFIGI GOOX,4,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923Q614,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG CRCL D TRGT ETF' -> ['TRXA'] != OpenFIGI CCUP,4,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923Q721,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LONG GME DLY TA ETF' -> ['TRXA'] != OpenFIGI GMEU,4,O0,H3_security_holdout,review conflict evidence
+,269808101,EAGLE POINT CR CO,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,27827X101,EATON VANCE MUN BD FD,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,27829F108,EATON VANCE TAX-MANAGED GLOB,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,320703101,CALIDI BIOTHERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev,resolve ambiguity
+,33718W103,FIRST TR INTER DURATN PFD &,AMBIGUOUS,"multiple distinct US tickers: ['FPF', 'XFPFX']",4,O0,H0_dev,resolve ambiguity
+,33848E106,FLAHERTY & CRUMRINE PFD INCO,AMBIGUOUS,"multiple distinct US tickers: ['PFO', 'XPFOX']",4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,345510119,FOREMOST CLEAN ENERGY LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,36242H104,GABELLI DIVID & INCOME TR,AMBIGUOUS,"multiple distinct US tickers: ['GDV', 'XGDVX']",4,O0;O1_2Q,H0_dev,resolve ambiguity
+,36465E101,GAMCO NAT RES GOLD & INCOME,AMBIGUOUS,"multiple distinct US tickers: ['GNT', 'XGNTX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,45791D109,INNOVATIVE EYEWEAR INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev,resolve ambiguity
+,46137Y609,INVESCO EXCHANGE TRADED FD T,CONFLICT,SEC title 'INVESCO S&P 500 EQUAL WEIG C' -> ['VVR'] != OpenFIGI RSPC,4,O0,H0_dev,review conflict evidence
+,46144X115,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],4,O0,H1_time_holdout,review conflict evidence
+,500767181,KRANESHARES TRUST,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],4,O0;O1_2Q;O1_3Q,,review conflict evidence
+,53656H835,LISTED FDS TR,CONFLICT,SEC title 'HORIZON KINETICS JAPAN OWNER' -> ['HKHC'] != OpenFIGI JAPN,4,O0;O1_2Q,,review conflict evidence
+,56064K100,NYLI MACKAY DEFINEDTERM MUNI,AMBIGUOUS,"multiple distinct US tickers: ['MMD', 'XMMDX']",4,O0,H0_dev,resolve ambiguity
+,60879E200,MOMENTUS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev,resolve ambiguity
+,64135A101,NEUBERGER BERMAN ETF TRUST,CONFLICT,SEC title 'NEUBERGER ENERGY TRANSITION' -> ['NML'] != OpenFIGI NBET,4,O0,H3_security_holdout,review conflict evidence
+,67061E104,NUVEEN MASS QUALITY MUN INC,AMBIGUOUS,"multiple distinct US tickers: ['NMT', 'XNMTX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,67066V101,NUVEEN QUALITY MUNCP INCOME,AMBIGUOUS,"multiple distinct US tickers: ['NAD', 'XNADX']",4,O0,H0_dev,resolve ambiguity
+,67644C112,OCEAN BIOMEDICAL INC,CONFLICT,SEC unique ticker OCEA != OpenFIGI OCEAW,4,O0,H0_dev,review conflict evidence
+,72200N106,PIMCO CALIF MUN INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['PCQ', 'XPCQX']",4,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,74841A204,QUETTA ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,86164T107,VIRTUS STONE HBR EMRG MKTS I,AMBIGUOUS,"multiple distinct US tickers: ['EDF', 'XEDFX']",4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,87283Q107,T ROWE PRICE ETF INC,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TCHP,4,O0,H0_dev;H1_time_holdout,review conflict evidence
+,87283Q503,T ROWE PRICE ETF INC,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TSPA,4,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,87283Q735,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TIER,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,87283Q743,T ROWE PRICE ETF INC,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TURF,4,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,review conflict evidence
+,92540Q114,VERSUS SYSTEMS INC,CONFLICT,SEC unique ticker VS != OpenFIGI VSSYW,4,O0,H0_dev;H1_time_holdout,review conflict evidence
+,92561V109,VICARIOUS SURGICAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H3_security_holdout;H3_security_holdout;H3_security_holdout,resolve ambiguity
+,92891H606,VS TRUST,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,92912T100,VOYA GLBL EQTY DIV & PREM OP,AMBIGUOUS,"multiple distinct US tickers: ['IGD', 'XIGDX']",4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,94987D101,ALLSPRING MULTI SECTOR INCOM,AMBIGUOUS,"multiple distinct US tickers: ['ERC', 'XERCX']",4,O0,H0_dev,resolve ambiguity
+,95766B109,WESTERN ASSET GBL HIGH INC F,AMBIGUOUS,"multiple distinct US tickers: ['EHI', 'XEHIX']",4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,958435109,WESTERN ASSET INTER MUNI FD,AMBIGUOUS,"multiple distinct US tickers: ['SBI', 'XSBIX']",4,O0,H0_dev,resolve ambiguity
+,98148L753,WORLD FDS TR,CONFLICT,SEC title 'T-REX 2X LONG BITCOIN DAILY' -> ['TRXA'] != OpenFIGI BTCL,4,O0,H0_dev;H1_time_holdout,review conflict evidence
+,G0230C116,ALPHA STAR ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G0R38G104,ARMADA ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,,resolve ambiguity
+,G0R38G112,ARMADA ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1828E100,CANTOR EQUITY PARTNERS IV IN,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G19305120,CARTESIAN GROWTH CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G19307118,CARTESIAN GROWTH CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,G2254C105,COHEN CIRCLE ACQUISIT CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G2283U100,COLOMBIER ACQUISITION CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H3_security_holdout,resolve ambiguity
+,G2847J120,DRUGS MADE IN AMER ACQUTN CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G2949D104,DYNAMIX CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G3142E121,EUDA HEALTH HOLDINGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G3933N108,GLOBA TERRA ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H1_time_holdout,resolve ambiguity
+,G3R23E100,FST CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G4036C106,GRAF GLOBAL CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G5353S103,LAKESHORE ACQUISITION III CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,,resolve ambiguity
+,G5380J118,LANVIN GROUP HOLDINGS LIMITE,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev,resolve ambiguity
+,G5S86M126,LAUNCH ONE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H0_dev;H0_dev;H0_dev,resolve ambiguity
+,G5S87A105,LAUNCH TWO ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H3_security_holdout,resolve ambiguity
+,G5S87A121,LAUNCH TWO ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G6476A102,NEW PROVIDENCE ACQUISITION C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G6717R104,OAKTREE ACQUISITION CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G6757R105,1RT ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,,resolve ambiguity
+,G6757R121,1RT ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H1_time_holdout,resolve ambiguity
+,G6861F120,OYSTER ENTERPRISES II ACQUIS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H1_time_holdout,resolve ambiguity
+,G7134A104,PLUM ACQUISITION CORP IV,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G8089R100,PANTAGES CAPITAL ACQUISITION,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H3_security_holdout,resolve ambiguity
+,G81354105,SILVERBOX CORP IV,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G8316B118,SPARK I ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev,resolve ambiguity
+,G8431T101,SIM ACQUISITION CORP. I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G8431T127,SIM ACQUISITION CORP. I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G98659108,YORKVILLE ACQUISITION CORP.,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G9R39C103,WEN ACQUISITION CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,4,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,00302M106,ABRDN GLOBAL DYNAMIC DIVIDEN,AMBIGUOUS,"multiple distinct US tickers: ['AGD', 'XAGDX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,006212104,ADAMS DIVERSIFIED EQUITY FD,AMBIGUOUS,"multiple distinct US tickers: ['ADX', 'XADEX']",3,O0;O1_2Q,H1_time_holdout,resolve ambiguity
+,01864U106,ALLIANCEBERNSTEIN NATL MUN I,AMBIGUOUS,"multiple distinct US tickers: ['AFB', 'XAFBX']",3,O0,H1_time_holdout,resolve ambiguity
+,08178Q101,BENEFICIENT,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,09249E101,BLACKROCK CORE BD TR,AMBIGUOUS,"multiple distinct US tickers: ['BHK', 'XBHKX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09254J102,BLACKROCK MUNIASSETS FD INC,AMBIGUOUS,"multiple distinct US tickers: ['MUA', 'XMUAX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,09254L107,BLACKROCK MUNIHLDNGS CALI,AMBIGUOUS,"multiple distinct US tickers: ['MUC', 'XMUCX']",3,O0,H3_security_holdout,resolve ambiguity
+,09662W109,BNY MELLON MUN BD INFRASTRUC,AMBIGUOUS,"multiple distinct US tickers: ['DMB', 'XDMBX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,101507101,SRH TOTAL RETURN FUND INC,AMBIGUOUS,"multiple distinct US tickers: ['STEW', 'XSTEX', 'XXBIFXX']",3,O0;O1_2Q,,resolve ambiguity
+,155123102,CENTRAL SECS CORP,AMBIGUOUS,"multiple distinct US tickers: ['CET', 'XXCETXX']",3,O0,H3_security_holdout,resolve ambiguity
+,17144M110,CHURCHILL CAPITAL CORP VII,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,18913Y103,CLOUGH GLOBAL DIVID & INCOME,AMBIGUOUS,"multiple distinct US tickers: ['GLV', 'XGLVX']",3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,23306J200,DBV TECHNOLOGIES S A,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,25065A502,DESTRA MULTI-ALTERNATIVE FD,AMBIGUOUS,"multiple distinct US tickers: ['DMA', 'XDMAX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,26923N181,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X INVERSE TESLA DLY' -> ['TRXA'] != OpenFIGI TSLZ,3,O0,H1_time_holdout,review conflict evidence
+,26923N629,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG APPLE DLY TRGT' -> ['TRXA'] != OpenFIGI AAPX,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923Q275,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2XL CIFR DT ETF' -> ['TRXA'] != OpenFIGI CIFU,3,O0,H1_time_holdout,review conflict evidence
+,26923Q713,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LONG SNOW DT ETF' -> ['TRXA'] != OpenFIGI SNOU,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,278279104,EATON VANCE FLOATING RATE IN,AMBIGUOUS,"multiple distinct US tickers: ['EFT', 'XEFTX']",3,O0;O1_2Q;O1_3Q,,resolve ambiguity
+,27828G107,EATON VANCE TAX ADVT DIV INC,AMBIGUOUS,"multiple distinct US tickers: ['EVT', 'XEVTX']",3,O0,H1_time_holdout,resolve ambiguity
+,27829G106,EATON VANCE RISK-MANAGED DIV,AMBIGUOUS,"multiple distinct US tickers: ['ETJ', 'XETJX']",3,O0,H1_time_holdout,resolve ambiguity
+,33741Q107,FIRST TR HIGH YIELD OPPRT 20,AMBIGUOUS,"multiple distinct US tickers: ['FTHY', 'XFABX']",3,O0,H1_time_holdout,resolve ambiguity
+,355145103,FRANKLIN UNVL TR,AMBIGUOUS,"multiple distinct US tickers: ['FT', 'XFUTX']",3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,36239Q109,GABELLI MULTIMEDIA TR INC,AMBIGUOUS,"multiple distinct US tickers: ['GGT', 'XGGTX']",3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,36240A101,GABELLI UTIL TR,AMBIGUOUS,"multiple distinct US tickers: ['GUT', 'XGUTX']",3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,43010T104,HIGHLAND GLOBAL ALLOCATION F,AMBIGUOUS,"multiple distinct US tickers: ['HGLB', 'XHGLX']",3,O0,H3_security_holdout,resolve ambiguity
+,46092D681,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,46092D756,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,review conflict evidence
+,46131J103,INVESCO MUNICIPAL TRUST,AMBIGUOUS,"multiple distinct US tickers: ['VKQ', 'XVKQX']",3,O0,H4_combined,resolve ambiguity
+,46133G107,INVESCO QUALITY MUN INCOME T,AMBIGUOUS,"multiple distinct US tickers: ['IQI', 'XIQIX']",3,O0,H1_time_holdout,resolve ambiguity
+,46136K105,INVESCO HIGH INCOME 2024 TAR,CONFLICT,SEC unique ticker VLT != OpenFIGI XHTAX,3,O0;O1_2Q,H0_dev;H0_dev,review conflict evidence
+,46138E131,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO S&P SMALLCAP HIGH DI' -> ['VVR'] != OpenFIGI XSHD,3,O0,H0_dev;H1_time_holdout,review conflict evidence
+,46143U542,INVESTMENT MANAGERS SER TR,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0,,review conflict evidence
+,46152A452,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0;O1_2Q,,review conflict evidence
+,46152A494,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,46152A734,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],3,O0,H1_time_holdout,review conflict evidence
+,52886N117,LEXARIA BIOSCIENCE CORP,CONFLICT,SEC unique ticker LEXX != OpenFIGI LEXXW,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,53656G563,LISTED FD TR,CONFLICT,SEC title 'HORIZON KINETICS MEDICAL ETF' -> ['HKHC'] != OpenFIGI MEDX,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,553745126,MSP RECOVERY INC,CONFLICT,SEC unique ticker MSPR != OpenFIGI MSPRW,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,review conflict evidence
+,56064Q107,NYLI CBRE GBL INFR MEGTRNDS,AMBIGUOUS,"multiple distinct US tickers: ['MEGI', 'XMEGX']",3,O0,H1_time_holdout,resolve ambiguity
+,592834105,MEXICO EQUITY & INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['MXE', 'XMXEX']",3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,60742B102,MOBILICOM LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,655187201,ACLARION INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,67021W103,NUBURU INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,670651108,NUVEEN CALIF AMT FREE MUNI I,AMBIGUOUS,"multiple distinct US tickers: ['NKX', 'XNCMX']",3,O0,H1_time_holdout,resolve ambiguity
+,69323T101,PCM FD INC,AMBIGUOUS,"multiple distinct US tickers: ['PCM', 'XPCMX']",3,O0,H3_security_holdout,resolve ambiguity
+,69346N107,PIMCO DYNAMIC INCOME STRATEG,AMBIGUOUS,"multiple distinct US tickers: ['PDX', 'XPDDX']",3,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,69355J104,PGIM SHORT DUR HIG YLD OPP F,AMBIGUOUS,"multiple distinct US tickers: ['SDHY', 'XSDHX']",3,O0,H1_time_holdout,resolve ambiguity
+,70261F103,PASITHEA THERAPEUTICS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,722011103,PIMCO GLOBAL STOCKPLUS INCOM,AMBIGUOUS,"multiple distinct US tickers: ['PGP', 'XPGPX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,72201J104,PIMCO INCOME STRATEGY FD II,AMBIGUOUS,"multiple distinct US tickers: ['PFN', 'XPFNX']",3,O0,H3_security_holdout,resolve ambiguity
+,74449F209,PSYENCE BIOMEDICAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,756158101,REAVES UTIL INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['UTG', 'XUTGX']",3,O0;O1_2Q,H2_manager_holdout,resolve ambiguity
+,76135L309,REVELATION BIOSCIENCES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,76135L705,REVELATION BIOSCIENCES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H4_combined,resolve ambiguity
+,78518H202,SABA CAPITAL INCOME & OPRNT,AMBIGUOUS,"multiple distinct US tickers: ['BRW', 'XBRWX']",3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,87261Y114,TMC THE METALS COMPANY INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H3_security_holdout,resolve ambiguity
+,890930209,TORTOISE CAPITAL SERIES TRUS,CONFLICT,SEC title 'TORTOISE ENERGY ETF' -> ['TYG'] != OpenFIGI TNGY,3,O0,,review conflict evidence
+,89147L886,TORTOISE ENERGY INFRA CORP,AMBIGUOUS,"multiple distinct US tickers: ['TYG', 'XTYGX']",3,O0,H1_time_holdout;H2_manager_holdout,resolve ambiguity
+,90118T114,TWELVE SEAS INVESTMENT CO II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,92912P108,VOYA EMERGING MKTS HIGH DIVI,AMBIGUOUS,"multiple distinct US tickers: ['IHD', 'XIHDX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,95768B107,WESTERN ASSET HIGH YIELD OPP,AMBIGUOUS,"multiple distinct US tickers: ['HYI', 'XHYIX']",3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,95790B109,WESTERN ASSET MTG DEFINED OP,AMBIGUOUS,"multiple distinct US tickers: ['DMO', 'XDMOX']",3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,963025887,WHEELER REAL ESTATE INVT TR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,98400T304,XAI OCTAGN FLT RAT & ALT INM,AMBIGUOUS,"multiple distinct US tickers: ['XFLT', 'XFLTX']",3,O0,H1_time_holdout,resolve ambiguity
+,G0081J129,ACTIVATE ENERGY ACQUISIT COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G0231P108,ALPS GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,G1143H127,BITCOIN INFRASTRUCTURE ACQUI,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1281K114,SILEXION THERAPEUTICS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G1281K130,SILEXION THERAPEUTICS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,,resolve ambiguity
+,G1331A108,BLUE ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G1331A116,BLUE ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,G1331A124,BLUE ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G1331C104,BLUE GOLD LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H4_combined,resolve ambiguity
+,G2086N113,CHENGHE ACQUISITION III CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,G2283U118,COLOMBIER ACQUISITION CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev;H1_time_holdout,resolve ambiguity
+,G2296A125,COLUMBUS CIRCLE CAP CORP. I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G2662B111,CRITICAL METALS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G2867S109,COLLECTIVE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G2867S117,COLLECTIVE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,G2868C103,DIGITAL ASSET ACQUISITION CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G3730H106,COHEN CIRCLE ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G3730U107,FUTURECREST ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G4000K118,GORILLA TECHNOLOGY GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G4491L104,CANTOR EQUITY PARTNERS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H3_security_holdout,resolve ambiguity
+,G5251K129,KENSINGTON CAPITAL ACQUISITI,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G53151109,K WAVE MEDIA LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,G5352N113,LAKESHORE ACQUISITION II COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H3_security_holdout;H3_security_holdout,resolve ambiguity
+,G55032125,MICROCLOUD HOLOGRAM INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G63221124,M3-BRIGADE ACQUISITION VI CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G6375X120,NMP ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G6791A100,OTG ACQUISITION CORP. I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7134L118,PLUM ACQUISITION CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G7257A105,PROCAP ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,,resolve ambiguity
+,G7257A113,PROCAP ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7633M120,ROMAN DBDR ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G8193F125,SIZZLE ACQUISITION CORP. II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G82745129,SOULPOWER ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G8772L121,TEXAS VENTURES ACQUISITION I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G8901A129,TITAN ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G93Y0A120,UY SCUTI ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G9675P128,WILLOW LANE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,G9709D125,VINE HILL CAP INVTS CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G98301107,YD BIO LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q;O1_3Q,H1_time_holdout;H1_time_holdout;H1_time_holdout,resolve ambiguity
+,L18268117,CODERE ONLINE LUXEMBOURG S A,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,M0740A116,ALPHA TAU MEDICAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,M8186D114,RAIL VISION LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,N68722102,SCHMID GROUP N.V.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,,resolve ambiguity
+,N68722110,SCHMID GROUP N.V.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0;O1_2Q,H0_dev;H0_dev,resolve ambiguity
+,Y4000A102,HORIZON QUANTUM HOLDINGS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,3,O0,H1_time_holdout,resolve ambiguity
+,00326L100,ABRDN TOTAL DYNAMIC DIVIDEND,AMBIGUOUS,"multiple distinct US tickers: ['AOD', 'XAODX']",2,O0,,resolve ambiguity
+,00384X301,ABRDN FDS,CONFLICT,SEC title 'ABRDN EMERGING MAR DIV A ETF' -> ['AEF'] != OpenFIGI AGEM,2,O0;O1_2Q,,review conflict evidence
+,00764C109,ADVENT CONV & INCOME FD,AMBIGUOUS,"multiple distinct US tickers: ['AVK', 'XAVKX']",2,O0,H0_dev,resolve ambiguity
+,00902F204,AINOS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,00902F303,AINOS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,02008G102,ALLURION TECHNOLOGIES INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H2_manager_holdout,resolve ambiguity
+,02157G101,ALTERNUS CLEAN ENERGY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,059695106,BANCROFT FD LTD,AMBIGUOUS,"multiple distinct US tickers: ['BCV', 'XBCVX']",2,O0,H0_dev,resolve ambiguity
+,06682J308,BANZAI INTERNATIONAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H2_manager_holdout,resolve ambiguity
+,06682J407,BANZAI INTERNATIONAL INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,08774B102,BETTER HOME & FINANCE HOLDIN,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,09247F209,BLACKROCK INCOME TR INC,AMBIGUOUS,"multiple distinct US tickers: ['BKT', 'XBKTX']",2,O0,H1_time_holdout,resolve ambiguity
+,09248E102,BLACKROCK CALIF MUN INCOME T,CONFLICT,SEC title 'BLACKROCK CA MUNI INC TR' -> ['BCAT'] != OpenFIGI XBFZX,2,O0,H1_time_holdout,review conflict evidence
+,09248L106,BLACKROCK N Y MUN INCOME TRU,AMBIGUOUS,"multiple distinct US tickers: ['2655389D', 'XBNYX']",2,O0,,resolve ambiguity
+,09248X100,BLACKROCK TAX MUNICPAL BD TR,AMBIGUOUS,"multiple distinct US tickers: ['BBN', 'XBBNX']",2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,092508100,BLACKROCK CR ALLOCATION INCO,AMBIGUOUS,"multiple distinct US tickers: ['BTZ', 'XBTZX']",2,O0,H1_time_holdout,resolve ambiguity
+,09255R202,BLACKROCK DEBT STRATEGIES FD,AMBIGUOUS,"multiple distinct US tickers: ['DSU', 'XDSUX']",2,O0,H0_dev,resolve ambiguity
+,09257D102,BLACKSTONE LONG SHORT CR INC,AMBIGUOUS,"multiple distinct US tickers: ['BGX', 'XXBGX']",2,O0,H1_time_holdout,resolve ambiguity
+,098070402,BONE BIOLOGICS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,107930208,BRIACELL THERAPEUTICS CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,12430A102,BUZZFEED INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,128745106,ATLASCLEAR HOLDINGS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,17144M102,CHURCHILL CAPITAL CORP VII,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,17144T115,CHURCHILL CAPITAL CORP V,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,171756109,CID HOLDCO INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,,resolve ambiguity
+,182744300,KIDZ AI INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,19247L106,COHEN & STEERS QUALITY INCOM,AMBIGUOUS,"multiple distinct US tickers: ['RQI', 'XRQIX']",2,O0,H1_time_holdout,resolve ambiguity
+,19248C105,COHEN & STEERS LTD DURATION,AMBIGUOUS,"multiple distinct US tickers: ['LDP', 'XLDPX']",2,O0,,resolve ambiguity
+,19248P106,COHEN & STEERS CLOSED-END OP,AMBIGUOUS,"multiple distinct US tickers: ['FOF', 'XFOFX']",2,O0,H2_manager_holdout,resolve ambiguity
+,19248Y107,COHEN & STEERS SELECT PFD &,AMBIGUOUS,"multiple distinct US tickers: ['PSF', 'XPSFX']",2,O0,,resolve ambiguity
+,20678X403,CDT EQUITY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,231631300,NXG CUSHING MIDSTREAM ENERGY,AMBIGUOUS,"multiple distinct US tickers: ['SRV', 'XSRVX']",2,O0,H2_manager_holdout,resolve ambiguity
+,233368109,DWS MUN INCOME TR NEW,AMBIGUOUS,"multiple distinct US tickers: ['KTF', 'XKTFX']",2,O0,H1_time_holdout,resolve ambiguity
+,249845306,DERMATA THERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,26145B106,DRAGONFLY ENERGY HOLDINGS CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,26923N199,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X INVERSE NVIDIA DLY' -> ['TRXA'] != OpenFIGI NVDQ,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923N280,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG RBLX DLY TRGT' -> ['TRXA'] != OpenFIGI RBLU,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923N447,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LONG NFLX DT ETF' -> ['TRXA'] != OpenFIGI NFLU,2,O0,H0_dev,review conflict evidence
+,26923N579,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG MICROSOFT DLY' -> ['TRXA'] != OpenFIGI MSFX,2,O0,H1_time_holdout,review conflict evidence
+,26923Q218,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X L SBET DT ETF' -> ['TRXA'] != OpenFIGI SBTU,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,26923Q465,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X INV CRWV DA TAR ETF' -> ['TRXA'] != OpenFIGI CORD,2,O0,H1_time_holdout,review conflict evidence
+,26923Q663,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LNG BULL D TRGT ETF' -> ['TRXA'] != OpenFIGI BULU,2,O0,,review conflict evidence
+,27828Y108,EATON VANCE TAX-MANAGED BUY-,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,28059P402,EDIBLE GARDEN AG INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,28256A109,EINRIDE AB,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,29286X101,ENGENE THERAPEUTICS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,29415C119,EOS ENERGY ENTERPRISES INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,31423P108,FEDERATED HERMES PREM MUNI I,AMBIGUOUS,"multiple distinct US tickers: ['FMN', 'XFMNX']",2,O0,H1_time_holdout,resolve ambiguity
+,320703408,CALIDI BIOTHERAPEUTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,338479108,FLAHERTY & CRUMRINE TOTAL RE,AMBIGUOUS,"multiple distinct US tickers: ['FLC', 'XFLCX']",2,O0,H0_dev,resolve ambiguity
+,34546R100,FOREMOST CLEAN ENERGY LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,34960Q109,FORTRESS BIOTECH INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,35473P850,FRANKLIN TEMPLETON ETF TR,CONFLICT,SEC title 'FRANKLIN MUNICIPAL GREEN BON' -> ['PMO'] != OpenFIGI FLMB,2,O0,H1_time_holdout,review conflict evidence
+,361570104,GDL FD,AMBIGUOUS,"multiple distinct US tickers: ['GDL', 'XGDLX']",2,O0,H0_dev,resolve ambiguity
+,40170T106,GUGGENHEIM ACTIVE ALLOC FD,AMBIGUOUS,"multiple distinct US tickers: ['GUG', 'XGUGX']",2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,410123103,HANCOCK JOHN INCOME SECS TR,AMBIGUOUS,"multiple distinct US tickers: ['JHS', 'XJHSX']",2,O0,H0_dev,resolve ambiguity
+,454089103,ABERDEEN INDIA FD INC,AMBIGUOUS,"multiple distinct US tickers: ['IFN', 'XIFNX']",2,O0,H1_time_holdout,resolve ambiguity
+,46090A689,INVESCO ACTIVELY MANAGED EXC,CONFLICT,SEC title 'INVESCO QQQ INCOME ADV ETF' -> ['QQQ'] != OpenFIGI QQA,2,O0,,review conflict evidence
+,46092D129,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,46092D434,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0,H1_time_holdout,review conflict evidence
+,46131T101,INVESCO TR INVT GRADE NEW YO,AMBIGUOUS,"multiple distinct US tickers: ['VTN', 'XVTNX']",2,O0,H0_dev,resolve ambiguity
+,46132E103,INVESCO ADVANTAGE MUN INCOME,AMBIGUOUS,"multiple distinct US tickers: ['VKI', 'XVKIX']",2,O0,,resolve ambiguity
+,46152A429,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,46152A478,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0,H1_time_holdout,review conflict evidence
+,46152A528,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0,H1_time_holdout,review conflict evidence
+,46152A718,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0,H1_time_holdout,review conflict evidence
+,46152A759,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],2,O0,H1_time_holdout,review conflict evidence
+,553800111,M3 BRIGADE ACQUISITION II CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,590717104,MESOBLAST LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,61744H105,MORGAN STANLEY EMKT DBT FD I,AMBIGUOUS,"multiple distinct US tickers: ['MSD', 'XMSDX']",2,O0,,resolve ambiguity
+,617468103,MORGAN STANLEY CHINA A SH FD,AMBIGUOUS,"multiple distinct US tickers: ['CAF', 'XCAFX']",2,O0,H0_dev,resolve ambiguity
+,63911H108,NAUTICUS ROBOTICS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,64128C106,NEUBERGER BERMAN HIGH YIELD,AMBIGUOUS,"multiple distinct US tickers: ['NHS', 'XNHSX']",2,O0,H0_dev,resolve ambiguity
+,64129H104,NEUBERGER ENGY INFRSTR & INC,AMBIGUOUS,"multiple distinct US tickers: ['NML', 'XNMLX']",2,O0,H1_time_holdout,resolve ambiguity
+,67062F100,NUVEEN SELECT TAX-FREE INCOM,AMBIGUOUS,"multiple distinct US tickers: ['NXP', 'XNXPX']",2,O0,H1_time_holdout,resolve ambiguity
+,67066X107,NUVEEN NEW YORK QLT MUN INC,AMBIGUOUS,"multiple distinct US tickers: ['NAN', 'XNANX']",2,O0,H0_dev,resolve ambiguity
+,67066Y105,NUVEEN CA QUALTY MUN INCOME,AMBIGUOUS,"multiple distinct US tickers: ['NAC', 'XNACX']",2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,670695105,NUVEEN AMT-FREE MUN VALUE FD,AMBIGUOUS,"multiple distinct US tickers: ['NUW', 'XNUWX']",2,O0,,resolve ambiguity
+,670699107,NUVEEN NASDAQ 100 DYNAMIC OV,AMBIGUOUS,"multiple distinct US tickers: ['QQQX', 'XQQQX']",2,O0,,resolve ambiguity
+,670750108,NUVEEN MULTI ASSET INCOME FU,AMBIGUOUS,"multiple distinct US tickers: ['NMAI', 'XNMAX']",2,O0,,resolve ambiguity
+,67079Y118,NUVVE HOLDING CORP,CONFLICT,SEC unique ticker NVVE != OpenFIGI NVVEW,2,O0,H3_security_holdout,review conflict evidence
+,67080D103,NUVEEN CORE PLUS IMPACT FUND,AMBIGUOUS,"multiple distinct US tickers: ['NPCT', 'XNPCX']",2,O0,H0_dev,resolve ambiguity
+,67080R102,NUVEEN VRIABL RAT PFD & INM,AMBIGUOUS,"multiple distinct US tickers: ['NPFD', 'XNPFX']",2,O0,H4_combined,resolve ambiguity
+,69346J106,PGIM GLOBAL HIGH YIELD FD FO,AMBIGUOUS,"multiple distinct US tickers: ['GHY', 'XGHYX']",2,O0,H4_combined,resolve ambiguity
+,69420N205,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P500 BUF20 ETF JAN-US' -> ['SDHY'] != OpenFIGI PBJA,2,O0,H0_dev,review conflict evidence
+,69420N601,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P 500 BUFFER 20 ETF -' -> ['SDHY'] != OpenFIGI PBMR,2,O0,H0_dev,review conflict evidence
+,69420N809,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P 500 BUFFER 20 ETF -' -> ['SDHY'] != OpenFIGI PBAP,2,O0,H1_time_holdout,review conflict evidence
+,69420N825,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P 500 BUFFER 12 ETF -' -> ['SDHY'] != OpenFIGI AUGP,2,O0,H0_dev;H1_time_holdout,review conflict evidence
+,69420N833,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P 500 BUFFER 20 ETF -' -> ['SDHY'] != OpenFIGI PBJL,2,O0,H0_dev;H1_time_holdout,review conflict evidence
+,69420N858,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P500 BUF20 ETF JUN-US' -> ['SDHY'] != OpenFIGI PBJN,2,O0,H0_dev;H1_time_holdout,review conflict evidence
+,69420N874,PGIM ROCK ETF TR,CONFLICT,SEC title 'PGIM S&P 500 BUFFER 20 ETF -' -> ['SDHY'] != OpenFIGI PBMY,2,O0,H0_dev,review conflict evidence
+,72201C109,PIMCO CALIF MUN INCOME FD II,AMBIGUOUS,"multiple distinct US tickers: ['PZC', 'XPZCX']",2,O0,H0_dev,resolve ambiguity
+,72369H106,PIONEER HIGH INCOME FUND INC,AMBIGUOUS,"multiple distinct US tickers: ['PHT', 'XPHTX']",2,O0,H0_dev,resolve ambiguity
+,72369J102,PIONEER FLOATING RATE FUND I,CONFLICT,SEC unique ticker PHD != OpenFIGI XPHDX,2,O0,H1_time_holdout,review conflict evidence
+,73245B115,PONO CAP TWO INC,AMBIGUOUS,"multiple distinct US tickers: ['PTWOW', 'SBCWW']",2,O0,H0_dev,resolve ambiguity
+,74319X108,PROFUSA INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,74319X207,PROFUSA INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,74449F100,PSYENCE BIOMEDICAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,74933W445,RBB FD INC,CONFLICT,SEC title 'F/M OPPORTUNISTIC INC' -> ['FMBM'] != OpenFIGI ZHOG,2,O0,H0_dev,review conflict evidence
+,75973T101,RENALYTIX PLC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,76882G107,RIVERNORTH DOUBLELINE STRATE,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,78396V109,SCWORX CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,83006G203,60 DEGREES PHARMACEUTICALS I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,87283Q206,T ROWE PRICE ETF INC,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TEQI,2,O0,H0_dev,review conflict evidence
+,87283Q669,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TNXT,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,review conflict evidence
+,87283Q685,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TEMR,2,O0,H1_time_holdout,review conflict evidence
+,87283Q727,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TGLB,2,O0,H1_time_holdout,review conflict evidence
+,87911J103,ABRDN HEALTHCARE INVESTORS,AMBIGUOUS,"multiple distinct US tickers: ['HQH', 'XHQHX']",2,O0,,resolve ambiguity
+,87911L108,ABRDN WORLD HEALTHCARE FUND,AMBIGUOUS,"multiple distinct US tickers: ['THW', 'XTHWX']",2,O0,H0_dev,resolve ambiguity
+,880198106,SABA CAPITAL INCOME & OPPORT,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,88339Y102,2023 ETF SERIES TRUST,CONFLICT,SEC title 'EAGLE CAPITAL SELECT EQTY' -> ['GRF'] != OpenFIGI EAGL,2,O0,H1_time_holdout,review conflict evidence
+,885213108,THORNBURG INCM BUILDER OPP T,AMBIGUOUS,"multiple distinct US tickers: ['TBLD', 'XTBLX']",2,O0,H0_dev,resolve ambiguity
+,92829B101,VIRTUS GLOBAL MULTI-SECTOR I,AMBIGUOUS,"multiple distinct US tickers: ['VGI', 'XVGIX']",2,O0,H0_dev,resolve ambiguity
+,92838U801,VIRTUS CONVERTIBLE & INC FD,AMBIGUOUS,"multiple distinct US tickers: ['NCZ', 'XNCZX']",2,O0,,resolve ambiguity
+,92838X805,VIRTUS CONVERTIBLE & INCOME,AMBIGUOUS,"multiple distinct US tickers: ['NCV', 'XNCVX']",2,O0,,resolve ambiguity
+,92840N100,VIRTUS DIVERSIFIED INCM & CO,AMBIGUOUS,"multiple distinct US tickers: ['ACV', 'XACVX']",2,O0,H0_dev,resolve ambiguity
+,92840R101,VIRTUS DIVIDEND INTEREST & P,AMBIGUOUS,"multiple distinct US tickers: ['NFJ', 'XNFJX']",2,O0,,resolve ambiguity
+,92891H408,VS TRUST,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,92891Q119,VOCODIA HLDGS CORP,CONFLICT,SEC title 'VOCODIA HOLDINGS CORP-29' -> ['VHAI'] != OpenFIGI VHAIW,2,O0,H0_dev,review conflict evidence
+,92912X101,VOYA INFRASTRUCTURE INDLS &,AMBIGUOUS,"multiple distinct US tickers: ['IDE', 'XIDEX']",2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,95758L107,CYCURION INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,95766M105,WESTERN ASSET MANAGED MUNS F,AMBIGUOUS,"multiple distinct US tickers: ['MMU', 'XMMUX']",2,O0,,resolve ambiguity
+,95790C107,WESTERN ASSET GLOBAL CORP DE,AMBIGUOUS,"multiple distinct US tickers: ['GDO', 'XGDOX']",2,O0,H0_dev,resolve ambiguity
+,98423B108,XOS INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,98954MAE1,ZILLOW GROUP INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G01558108,ALDEL FINL II INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G04537109,ARCHIMEDES TECH SPAC PARTNER,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G0544E204,NEWGENIVF GROUP LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G0567U101,ARQIT QUANTUM INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G0579E103,ART TECHNOLOGY ACQUISITION C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G0R21F121,APEX TECH ACQUISITION INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G0R38G120,ARMADA ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G1000R127,AA MISSION ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G1143H101,BITCOIN INFRASTRUCTURE ACQUI,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G1153L109,BLACK SPADE ACQUISITION II C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,G1169T104,BLEICHROEDER ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G1771C119,CALISA ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G1828R101,CANTOR EQUITY PARTNERS VI IN,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G1R59W127,BHAV ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G20873108,CHENGHE ACQUISITION II CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,G2254C121,COHEN CIRCLE ACQUISIT CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G2296A109,COLUMBUS CIRCLE CAP CORP. I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G2296A117,COLUMBUS CIRCLE CAP CORP. I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G2616F101,D. BORAL ARC ACQ I CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G2847J104,DRUGS MADE IN AMER ACQUTN CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G2868C129,DIGITAL ASSET ACQUISITION CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,G2949T125,DYNAMIX CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G3106N109,EQV VENTURES ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G3106Q110,EQV VENTURES AC CORP. II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G3226F127,EVOLUTION GLOBAL ACQUISITION,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G3302D111,FGI INDUSTRIES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G33033120,ARES ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G3303U112,ARES ACQUISITION CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H4_combined,resolve ambiguity
+,G37068106,FUTURE VISION II ACQUISITION,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G3730H122,COHEN CIRCLE ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G3730U123,FUTURECREST ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G38617117,GIBO HOLDINGS LTD.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G38617125,GIBO HOLDINGS LTD.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G3864J100,GIGCAPITAL8 CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,,resolve ambiguity
+,G42386105,HALL CHADWICK ACQUISITION CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G4791J122,INDIGO ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G4802J129,INFINITE EAGLE ACQUISITION C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G4R12K107,GSR IV ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G4R12K115,GSR IV ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G5345D123,LAFAYETTE DIGITAL ACQUISITIO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G5451A129,LEGATO MERGER CORP III,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G5501C117,LIONHEART HOLDINGS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G55032166,MICROCLOUD HOLOGRAM INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G6223S117,MOOLEC SCIENCE SA,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,,resolve ambiguity
+,G63113123,MOZAYYX ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G63221108,M3-BRIGADE ACQUISITION VI CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G63638111,NAMIB MINERALS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H2_manager_holdout,resolve ambiguity
+,G6476A128,NEW PROVIDENCE ACQUISITION C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G6757R113,1RT ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G7006A117,PERFECT CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G7010A129,PERIMETER ACQUISITION CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G7117W123,PIONEER ACQUISITION I CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G72245106,PRENETICS GLOBAL LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G7310E128,QDRO ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G7318R121,LEGATO MERGER CORP IV,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G7490F101,RENATUS TACTICAL ACQUIS,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G75398118,REZOLVE AI PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G8118C108,SIDDHI ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G8192J128,SILVER PEGASUS ACQUISITION C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G8316B100,SPARK I ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G8475V103,STELLAR V CAP CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,G85096124,STONEBRIDGE ACQUISITION II C,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G85727116,SUNCAR TECHNOLOGY GROUP INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G8772L105,TEXAS VENTURES ACQUISITION I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,H1_time_holdout;H1_time_holdout,resolve ambiguity
+,G87890128,THAYER VENTURES ACQ CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G8901A103,TITAN ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G8924F105,TNL MEDIAGENE,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G8T088125,SPACSPHERE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G9009S103,TRAILBLAZER ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G9009S129,TRAILBLAZER ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,G93Y09123,VINE HILL CAP INVT CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,G9503X111,WALDENCAST PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,G98659116,YORKVILLE ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0;O1_2Q,,resolve ambiguity
+,L64875104,MOOLEC SCIENCE SA,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,L64875120,MOOLEC SCIENCE SA,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,M1R95N118,ARBE ROBOTICS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,M6000J101,HUB CYBER SECURITY LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,M6000J200,HUB CYBER SECURITY LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,M68057112,MARIS TECH LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,M8186D106,RAIL VISION LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev,resolve ambiguity
+,M8186D122,RAIL VISION LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H0_dev;H1_time_holdout,resolve ambiguity
+,Q56120134,LOCAFY LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H1_time_holdout,resolve ambiguity
+,Y62197119,NAVIOS MARITIME HOLDINGS INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,2,O0,H3_security_holdout,resolve ambiguity
+,03210A206,AMPLIFY COMMODITY TRUST,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,091941104,BLACKROCK FLOATING RATE INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,09250W107,BLACKROCK HEALTH SCIENCES TR,AMBIGUOUS,"multiple distinct US tickers: ['BME', 'XBMEX']",1,O0,H1_time_holdout,resolve ambiguity
+,092524107,BLACKROCK ENHANCED INTL DIV,AMBIGUOUS,"multiple distinct US tickers: ['BGY', 'XBGYX']",1,O0,H1_time_holdout,resolve ambiguity
+,09258G104,BLACKROCK SCIENCE & TECHNOLO,AMBIGUOUS,"multiple distinct US tickers: ['BST', 'XBSTX']",1,O0,H1_time_holdout,resolve ambiguity
+,128118106,CALAMOS GLOBAL TOTAL RETURN,AMBIGUOUS,"multiple distinct US tickers: ['CGO', 'XCGOX']",1,O0,H1_time_holdout,resolve ambiguity
+,19247L122,COHEN & STEERS QUALITY INCOM,CONFLICT,SEC unique ticker RQI != OpenFIGI RQI-R,1,O0,H1_time_holdout,review conflict evidence
+,20678X502,CDT EQUITY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,231647207,NXG NEXTGEN INFRASTR INCM FD,AMBIGUOUS,"multiple distinct US tickers: ['NXG', 'XNXGX']",1,O0,,resolve ambiguity
+,23334J107,DTF TAX-FREE INCOME 2028 TER,AMBIGUOUS,"multiple distinct US tickers: ['DTF', 'XDTFX']",1,O0,H1_time_holdout,resolve ambiguity
+,258623107,DOUBLELINE OPPORTUNISTIC CR,AMBIGUOUS,"multiple distinct US tickers: ['DBL', 'XDBLX']",1,O0,H1_time_holdout,resolve ambiguity
+,26923Q515,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2XL KTOS D TARGET ETF' -> ['TRXA'] != OpenFIGI KTUP,1,O0,H1_time_holdout,review conflict evidence
+,26923Q580,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LONG GLXY DT ETF' -> ['TRXA'] != OpenFIGI GLXU,1,O0,H1_time_holdout,review conflict evidence
+,26923V621,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2XL SMR DT ETF' -> ['TRXA'] != OpenFIGI SMUP,1,O0,,review conflict evidence
+,26923W215,ETF OPPORTUNITIES TRUST,CONFLICT,SEC title 'T-REX 2X LG SNDK DT ETF' -> ['TRXA'] != OpenFIGI SNDU,1,O0,H1_time_holdout,review conflict evidence
+,27826F101,EATON VANCE CALIF MUN INCOM,AMBIGUOUS,"multiple distinct US tickers: ['CEV', 'XCEVX']",1,O0,H1_time_holdout,resolve ambiguity
+,27828U106,EATON VANCE TAX-ADVANTAGED G,AMBIGUOUS,"multiple distinct US tickers: ['ETO', 'XETOX']",1,O0,,resolve ambiguity
+,27828X100,EATON VANCE TAX MNGED BUY WR,AMBIGUOUS,"multiple distinct US tickers: ['ETB', 'XETBX']",1,O0,H1_time_holdout,resolve ambiguity
+,338478100,FLAHERTY & CRUMRIN PFD & INM,AMBIGUOUS,"multiple distinct US tickers: ['FFC', 'XFFCX']",1,O0,H1_time_holdout,resolve ambiguity
+,409735206,HANCOCK JOHN FINL OPPTYS,AMBIGUOUS,"multiple distinct US tickers: ['BTO', 'XBTOX']",1,O0,,resolve ambiguity
+,46092D160,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46092D376,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46092D590,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46092D632,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46132K109,INVESCO PA VALUE MUN INC TR,AMBIGUOUS,"multiple distinct US tickers: ['VPV', 'XVPVX']",1,O0,H1_time_holdout,resolve ambiguity
+,46132L107,INVESCO BD FD,AMBIGUOUS,"multiple distinct US tickers: ['VBF', 'XVBFX']",1,O0,H1_time_holdout,resolve ambiguity
+,46138G375,INVESCO EXCH TRADED FD TR II,CONFLICT,SEC title 'INVESCO QQQ EQUAL WEIGHT ETF' -> ['QQQ'] != OpenFIGI QEW,1,O0,H1_time_holdout,review conflict evidence
+,46143U534,INVESTMENT MANAGERS SER TR,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46152A312,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,46152A395,INVESTMENT MANAGERS SER TR I,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,53656H751,LISTED FDS TR,CONFLICT,13F title_of_class declares ADR but OpenFIGI securityType=['ETP'],1,O0,H1_time_holdout,review conflict evidence
+,583435409,STEAKHOLDER FOODS LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,670734102,NUVEEN MINN QUALITY MUN INM,AMBIGUOUS,"multiple distinct US tickers: ['NMS', 'XMNSX']",1,O0,,resolve ambiguity
+,76882H105,RIVERNORTH MANAGED DUR MUN I,AMBIGUOUS,"multiple distinct US tickers: ['RMM', 'XRMMX']",1,O0,H1_time_holdout,resolve ambiguity
+,83006G500,60 DEGREES PHARMACEUTICALS I,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,84856X205,BIMERGEN ENERGY CORP,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,86800UAF1,SUPER MICRO COMPUTER INC,AMBIGUOUS,openfigi error: transport_error:<urlopen error [WinError 10013] 以一种访问权限不允许的方式做了一个访问套接字的尝试。> | SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H4_combined,resolve ambiguity
+,87283Q784,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TCAL,1,O0,,review conflict evidence
+,87283Q818,T ROWE PRICE EXCHANGE-TRADED,CONFLICT,SEC unique ticker TKNZ != OpenFIGI TAXE,1,O0,H1_time_holdout,review conflict evidence
+,957664105,WESTERN ASSET PREMIER BD FD,AMBIGUOUS,"multiple distinct US tickers: ['WEA', 'XWEAX']",1,O0,H1_time_holdout,resolve ambiguity
+,95766N103,WESTERN ASSET MUN HIGH INCOM,AMBIGUOUS,"multiple distinct US tickers: ['MHF', 'XMHFX']",1,O0,H1_time_holdout,resolve ambiguity
+,95766T100,WESTERN ASSET INVESTMENT GRA,AMBIGUOUS,"multiple distinct US tickers: ['PAI', 'XPAIX']",1,O0,H1_time_holdout,resolve ambiguity
+,963025754,WHEELER REAL ESTATE INVT TR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G0113G127,ACP HOLDINGS ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G0136H128,AERIES TECHNOLOGY INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G0344N107,AMPERCAP ACQUISITION CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G0344N123,AMPERCAP ACQUISITION CO,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G1810A124,BURTECH ACQUISITION CORP II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G1828W100,CANTOR EQUITY PARTNERS VII I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G22741121,COLLECTIVE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G22845104,OCTAVE INTELLIGENCE PLC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G2295P107,COLUMBUS ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G2946P100,EGH ACQUISITION CORP.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G3106Q102,EQV VENTURES AC CORP. II,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G3700S124,FUTURE MONEY ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G3R95P124,OIO GROUP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G4124C117,GRAB HOLDINGS LIMITED,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G55032174,MICROCLOUD HOLOGRAM INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G5T117128,MAYWOOD ACQUISITION CORP 2,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G6209W124,MKDWELL TECH INC,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G6301L109,MOUNTAIN LAKE ACQUISIT CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G6693P122,ROBO.AI INC.,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G7314B104,QUARTZSEA ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G7315L127,QUASAREDGE ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G73167101,QUANTUM LEAP ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G73167127,QUANTUM LEAP ACQUISITION COR,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G7633M104,ROMAN DBDR ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G8089R126,PANTAGES CAPITAL ACQUISITION,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G82745103,SOULPOWER ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G8443M102,STARLINK AI ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G8443M128,STARLINK AI ACQUISITION CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,G9582G104,VIKING ACQUISITION CORP I,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,G9640P120,WILCO 63 CORP,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity
+,M97838409,WEARABLE DEVICES LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,,resolve ambiguity
+,Q6297L120,MOBILICOM LTD,AMBIGUOUS,SEC issuer matched but multiple tickers; OpenFIGI unavailable,1,O0,H1_time_holdout,resolve ambiguity

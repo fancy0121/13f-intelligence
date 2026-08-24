@@ -6,6 +6,7 @@ Commands:
   pilot      - run the frozen blind pilot (Part A fixed + Part B hash sample)
   scaleup    - resolve the full R0/R1/R2 universe
   pricecheck - check historical availability (Yahoo chart meta) for VERIFIED symbols
+  availability - derive availability CSV from cached full price series
   coverage   - compute frozen coverage/bias gates from master + availability
 
 Reads FACT layer only; writes artifacts under reports/research/.
@@ -46,6 +47,7 @@ from thirteenf.research.resolution.models import ResolutionStatus
 from thirteenf.research.resolution.sources import (
     OpenFIGIClient,
     SECIndex,
+    price_cache_key,
 )
 
 PART_A = ["02079K305", "874039100", "852234103", "722304102", "G3643J108"]
@@ -59,6 +61,8 @@ def _db_securities(conn):
         SELECT s.cusip, s.issuer,
                (SELECT h.title_of_class FROM holdings h
                 WHERE h.cusip = s.cusip AND h.title_of_class != ''
+                GROUP BY h.title_of_class
+                ORDER BY COUNT(*) DESC, h.title_of_class ASC
                 LIMIT 1) AS title_of_class
         FROM securities s
         """
@@ -266,6 +270,42 @@ def cmd_pricecheck(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_availability(args: argparse.Namespace) -> int:
+    """Derive symbol_history_availability.csv from cached yahoo_full series."""
+    import glob
+
+    master = load_master(args.out / "security_resolution_master.csv")
+    verified = master[master["status"].map(
+        lambda s: s in {ResolutionStatus.VERIFIED_EXACT.value,
+                        ResolutionStatus.VERIFIED_MULTI_SOURCE.value,
+                        ResolutionStatus.VERIFIED_HISTORICAL.value}
+    )]
+    symbols = sorted({s for s in verified["symbol"] if s})
+    rows = []
+    for sym in symbols:
+        cache_file = args.cache / "yahoo_full" / f"{price_cache_key(sym)}.json"
+        if not cache_file.exists():
+            rows.append({"symbol": sym, "first_trade_date": "", "last_date": "", "http": None, "error": "NOT_FETCHED"})
+            continue
+        d = json.loads(cache_file.read_text(encoding="utf-8"))
+        if d.get("error"):
+            rows.append({"symbol": sym, "first_trade_date": "", "last_date": "", "http": None, "error": d["error"]})
+            continue
+        dates = d.get("dates") or []
+        rows.append({
+            "symbol": sym,
+            "first_trade_date": dates[0] if dates else "",
+            "last_date": dates[-1] if dates else "",
+            "http": 200,
+            "error": "",
+        })
+    df = pd.DataFrame(rows)
+    args.out.mkdir(parents=True, exist_ok=True)
+    df.to_csv(args.out / "symbol_history_availability.csv", index=False)
+    print("availability rows:", len(rows))
+    return 0
+
+
 def cmd_coverage(args: argparse.Namespace) -> int:
     conn = connect(args.db)
     frames = build_observation_frames(conn)
@@ -276,6 +316,11 @@ def cmd_coverage(args: argparse.Namespace) -> int:
     availability = load_availability(avail_path) if avail_path.exists() else None
     coverage = compute_coverage(frames, master, availability)
     gates = gate_evaluation(coverage)
+    verified_statuses = {
+        ResolutionStatus.VERIFIED_EXACT.value,
+        ResolutionStatus.VERIFIED_MULTI_SOURCE.value,
+        ResolutionStatus.VERIFIED_HISTORICAL.value,
+    }
 
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "security_resolution_coverage.json").write_text(
@@ -322,7 +367,146 @@ def cmd_coverage(args: argparse.Namespace) -> int:
     (args.out / "security_resolution_coverage.md").write_text(
         "\n".join(lines), encoding="utf-8"
     )
+
+    # ---- Bias audit ----
+    obs0 = frames["O0"]
+    obs_count = obs0.groupby("cusip").size()
+    min_info = obs0.groupby("cusip")["info_date"].min()
+    m = master.set_index("cusip")
+    m["obs_count"] = obs_count.reindex(m.index).fillna(0).astype(int)
+    m["earliest_info_date"] = min_info.reindex(m.index).fillna("")
+    avail_map = {}
+    if availability is not None and len(availability):
+        avail_map = dict(zip(availability["symbol"], availability["first_trade_date"]))
+    m["first_trade_date"] = m["symbol"].map(lambda s: avail_map.get(s, ""))
+    m["hist_ok"] = m.apply(
+        lambda r: bool(r["first_trade_date"]) and bool(r["earliest_info_date"])
+        and str(r["first_trade_date"]) <= str(r["earliest_info_date"]),
+        axis=1,
+    )
+    bias_lines = [
+        "# Security Resolution Bias Audit (v0.2.1)",
+        "",
+        f"> Generated: {datetime.now(timezone.utc).isoformat()}",
+        "",
+        "## Mapped vs unmapped",
+        "",
+    ]
+    ver = m[m["status"].isin(verified_statuses)]
+    unres = m[~m["status"].isin(verified_statuses)]
+    bias_lines.append(f"- securities VERIFIED: {len(ver)} / {len(m)} "
+                      f"({round(len(ver)/len(m)*100, 2)}%); UNRESOLVED/other: {len(unres)}")
+    bias_lines.append("")
+    bias_lines.append("## High- vs low-frequency securities (VERIFIED rate)")
+    bias_lines.append("")
+    med = float(m["obs_count"].median()) if len(m) else 0
+    high = m[m["obs_count"] >= med]
+    low = m[m["obs_count"] < med]
+    for name, sub in (("high-frequency", high), ("low-frequency", low)):
+        rate = sub["status"].isin(verified_statuses).mean() if len(sub) else None
+        bias_lines.append(f"- {name}: n={len(sub)} verified_rate={round(rate*100,2) if rate is not None else 'NA'}%")
+    bias_lines.append("")
+    bias_lines.append("## Common vs ADR (from OpenFIGI securityType)")
+    bias_lines.append("")
+    for st in ("Common Stock", "ADR", "ETP"):
+        sub = m[m["security_type"] == st]
+        rate = sub["status"].isin(verified_statuses).mean() if len(sub) else None
+        bias_lines.append(f"- {st}: n={len(sub)} verified_rate={round(rate*100,2) if rate is not None else 'NA'}%")
+    bias_lines.append("")
+    bias_lines.append("## Split / variant coverage")
+    bias_lines.append("")
+    for variant in ("O0", "O1_2Q", "O1_3Q"):
+        c = coverage[variant]
+        bias_lines.append(f"- {variant}: overall={c['observation_coverage']}% "
+                          f"pos={c['positive_activity']['coverage']}% "
+                          f"neg={c['negative_activity']['coverage']}%")
+    bias_lines.append("")
+    (args.out / "security_resolution_bias_audit.md").write_text(
+        "\n".join(bias_lines), encoding="utf-8"
+    )
+
+    # ---- Manual resolution queue ----
+    queue_statuses = {
+        ResolutionStatus.AMBIGUOUS.value,
+        ResolutionStatus.CONFLICT.value,
+        ResolutionStatus.HISTORICAL_IDENTITY_UNRESOLVED.value,
+    }
+    part_names_q = ("H0_dev", "H1_time_holdout", "H2_manager_holdout", "H3_security_holdout", "H4_combined")
+    variant_cusips = {v: set(frames[v]["cusip"]) for v in ("O0", "O1_2Q", "O1_3Q")}
+    part_cusips = {
+        v: {p: set(frames[v].loc[frames[v]["part"] == p, "cusip"]) for p in part_names_q}
+        for v in ("O0", "O1_2Q", "O1_3Q")
+    }
+    q = m[m["status"].isin(queue_statuses)].copy()
+    q = q.sort_values("obs_count", ascending=False)
+    q_rows = []
+    for cusip, r in q.iterrows():
+        q_rows.append(
+            {
+                "security_id": "",
+                "cusip": cusip,
+                "issuer": r.get("issuer", ""),
+                "reason": r.get("status", ""),
+                "conflicting_evidence": r.get("notes", ""),
+                "impacted_observation_count": int(r.get("obs_count", 0)),
+                "affected_variants": ";".join(
+                    v for v in ("O0", "O1_2Q", "O1_3Q")
+                    if cusip in variant_cusips[v]
+                ),
+                "affected_splits": ";".join(
+                    sorted(
+                        p
+                        for v in ("O0", "O1_2Q", "O1_3Q")
+                        for p in part_names_q
+                        if cusip in part_cusips[v][p]
+                    )
+                ),
+                "recommended_review_action": (
+                    "review conflict evidence"
+                    if r.get("status") == ResolutionStatus.CONFLICT.value
+                    else "resolve ambiguity"
+                    if r.get("status") == ResolutionStatus.AMBIGUOUS.value
+                    else "verify historical symbol/price availability"
+                ),
+            }
+        )
+    qdf = pd.DataFrame(q_rows)
+    qdf.to_csv(args.out / "manual_resolution_queue.csv", index=False)
+
+    # ---- Historical symbol audit ----
+    hist_lines = [
+        "# Historical Symbol Audit (v0.2.1)",
+        "",
+        f"> Generated: {datetime.now(timezone.utc).isoformat()}",
+        "",
+        "## Coverage of the observation window by current symbol",
+        "",
+        "Verified securities whose current-symbol price history does NOT reach the",
+        "earliest observation info date are HISTORICAL_IDENTITY_UNRESOLVED (excluded).",
+        "",
+    ]
+    hist_issues = m[(m["status"].isin(verified_statuses)) & (~m["hist_ok"])]
+    hist_lines.append(f"- verified with full history: {int(m[m['status'].isin(verified_statuses)]['hist_ok'].sum())}")
+    hist_lines.append(f"- verified but history does not reach earliest info date: {len(hist_issues)}")
+    if len(hist_issues):
+        hist_lines.append("")
+        hist_lines.append("| cusip | symbol | earliest_info | first_trade | obs |")
+        hist_lines.append("|---|---|---|---|---|")
+        for cusip, r in hist_issues.head(40).iterrows():
+            hist_lines.append(f"| {cusip} | {r['symbol']} | {r['earliest_info_date']} | {r['first_trade_date']} | {r['obs_count']} |")
+    hist_lines.append("")
+    hist_lines.append("## Rename / continuity cases (provider-continuity evidence)")
+    hist_lines.append("")
+    for sym in ("XYZ", "META", "GOOGL", "GOOG", "TSM", "PDD"):
+        s = availability[availability["symbol"] == sym] if availability is not None and len(availability) else None
+        if s is not None and len(s):
+            hist_lines.append(f"- {sym}: first_trade={s.iloc[0]['first_trade_date']} last={s.iloc[0]['last_date']} error={s.iloc[0]['error'] or 'OK'}")
+    (args.out / "historical_symbol_audit.md").write_text(
+        "\n".join(hist_lines), encoding="utf-8"
+    )
+
     print(json.dumps(gates, ensure_ascii=False, indent=2))
+    print("manual queue rows:", len(q_rows))
     return 0
 
 
@@ -348,6 +532,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_price.add_argument("--sleep", type=float, default=0.5)
     p_price.set_defaults(func=cmd_pricecheck)
 
+    p_avail = sub.add_parser("availability", help="Availability CSV from cached full series")
+    p_avail.set_defaults(func=cmd_availability)
+
     p_cov = sub.add_parser("coverage", help="Coverage/bias gates")
     p_cov.set_defaults(func=cmd_coverage)
     return parser
@@ -363,4 +550,3 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

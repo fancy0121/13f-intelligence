@@ -28,6 +28,24 @@ US_EXCHANGES = frozenset(
 )
 
 
+def price_symbol(symbol: str) -> str:
+    """Convert an OpenFIGI/SEC symbol to the Yahoo chart symbol format.
+
+    Class shares use a hyphen (BRK/B -> BRK-B, BF/A -> BF-A). Index symbols
+    keep their caret prefix. This is a deterministic format conversion, not a
+    mapping guess.
+    """
+    s = (symbol or "").strip()
+    if s.startswith("^"):
+        return s
+    return s.replace("/", "-")
+
+
+def price_cache_key(symbol: str) -> str:
+    """Filesystem-safe cache key for a price symbol."""
+    return price_symbol(symbol).replace("^", "_")
+
+
 def parse_openfigi_entry(entry: dict, id_type: str, id_value: str) -> OpenFIGIResponse:
     """Convert one OpenFIGI mapping response entry into a typed response."""
     if entry is None:

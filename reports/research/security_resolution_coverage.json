@@ -1,0 +1,161 @@
+{
+  "coverage": {
+    "O0": {
+      "eligible_observations": 233092,
+      "resolved_observations": 163095,
+      "observation_coverage": 69.97,
+      "H0_dev": {
+        "eligible": 75385,
+        "resolved": 46714,
+        "coverage": 61.967
+      },
+      "H1_time_holdout": {
+        "eligible": 38542,
+        "resolved": 25932,
+        "coverage": 67.282
+      },
+      "H2_manager_holdout": {
+        "eligible": 26451,
+        "resolved": 20929,
+        "coverage": 79.124
+      },
+      "H3_security_holdout": {
+        "eligible": 19111,
+        "resolved": 11927,
+        "coverage": 62.409
+      },
+      "H4_combined": {
+        "eligible": 11912,
+        "resolved": 9456,
+        "coverage": 79.382
+      },
+      "positive_activity": {
+        "eligible": 127906,
+        "resolved": 91155,
+        "coverage": 71.267
+      },
+      "negative_activity": {
+        "eligible": 94800,
+        "resolved": 64675,
+        "coverage": 68.223
+      }
+    },
+    "O1_2Q": {
+      "eligible_observations": 64262,
+      "resolved_observations": 47450,
+      "observation_coverage": 73.838,
+      "H0_dev": {
+        "eligible": 23536,
+        "resolved": 15579,
+        "coverage": 66.192
+      },
+      "H1_time_holdout": {
+        "eligible": 9880,
+        "resolved": 7306,
+        "coverage": 73.947
+      },
+      "H2_manager_holdout": {
+        "eligible": 5541,
+        "resolved": 4644,
+        "coverage": 83.812
+      },
+      "H3_security_holdout": {
+        "eligible": 5931,
+        "resolved": 3936,
+        "coverage": 66.363
+      },
+      "H4_combined": {
+        "eligible": 3218,
+        "resolved": 2679,
+        "coverage": 83.25
+      },
+      "positive_activity": {
+        "eligible": 37564,
+        "resolved": 28178,
+        "coverage": 75.013
+      },
+      "negative_activity": {
+        "eligible": 26698,
+        "resolved": 19272,
+        "coverage": 72.185
+      }
+    },
+    "O1_3Q": {
+      "eligible_observations": 19634,
+      "resolved_observations": 15186,
+      "observation_coverage": 77.345,
+      "H0_dev": {
+        "eligible": 7381,
+        "resolved": 5116,
+        "coverage": 69.313
+      },
+      "H1_time_holdout": {
+        "eligible": 2410,
+        "resolved": 1940,
+        "coverage": 80.498
+      },
+      "H2_manager_holdout": {
+        "eligible": 1773,
+        "resolved": 1549,
+        "coverage": 87.366
+      },
+      "H3_security_holdout": {
+        "eligible": 1837,
+        "resolved": 1268,
+        "coverage": 69.026
+      },
+      "H4_combined": {
+        "eligible": 1091,
+        "resolved": 922,
+        "coverage": 84.51
+      },
+      "positive_activity": {
+        "eligible": 12091,
+        "resolved": 9450,
+        "coverage": 78.157
+      },
+      "negative_activity": {
+        "eligible": 7543,
+        "resolved": 5736,
+        "coverage": 76.044
+      }
+    },
+    "security_level": {
+      "eligible_securities": 12794,
+      "resolved_securities": 6028,
+      "coverage": 47.116
+    }
+  },
+  "gates": {
+    "O0": {
+      "overall_coverage": 69.97,
+      "overall_gate": false,
+      "per_split_gate": false,
+      "differential_gate": false,
+      "directional_gate": true,
+      "PASS": false
+    },
+    "O1_2Q": {
+      "overall_coverage": 73.838,
+      "overall_gate": false,
+      "per_split_gate": false,
+      "differential_gate": false,
+      "directional_gate": true,
+      "PASS": false
+    },
+    "O1_3Q": {
+      "overall_coverage": 77.345,
+      "overall_gate": false,
+      "per_split_gate": false,
+      "differential_gate": false,
+      "directional_gate": true,
+      "PASS": false
+    },
+    "variant_differential_bias": {
+      "O0": 69.97,
+      "O1_2Q": 73.838,
+      "O1_3Q": 77.345,
+      "VARIANT_MAPPING_BIAS": true
+    }
+  }
+}

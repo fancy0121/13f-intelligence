@@ -1,0 +1,13 @@
+{
+  "protocol": "v0.2.1",
+  "resolved_count": 12794,
+  "status_counts": {
+    "UNRESOLVED": 5365,
+    "VERIFIED_MULTI_SOURCE": 3521,
+    "VERIFIED_EXACT": 2507,
+    "AMBIGUOUS": 743,
+    "NON_EQUITY_OR_UNSUPPORTED": 442,
+    "CONFLICT": 216
+  },
+  "generated_utc": "2026-08-24T15:07:31.535683+00:00"
+}
