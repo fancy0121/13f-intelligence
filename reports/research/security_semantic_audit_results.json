@@ -1,0 +1,2022 @@
+{
+  "q1_universe_composition": {
+    "security_level": [
+      {
+        "economic_type": "CLOSED_END_FUND",
+        "n": 280,
+        "pct": 2.189
+      },
+      {
+        "economic_type": "ETF",
+        "n": 3578,
+        "pct": 27.966
+      },
+      {
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 521,
+        "pct": 4.072
+      },
+      {
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 441,
+        "pct": 3.447
+      },
+      {
+        "economic_type": "OPERATING_ADR",
+        "n": 559,
+        "pct": 4.369
+      },
+      {
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 5733,
+        "pct": 44.81
+      },
+      {
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 156,
+        "pct": 1.219
+      },
+      {
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 191,
+        "pct": 1.493
+      },
+      {
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 22,
+        "pct": 0.172
+      },
+      {
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 214,
+        "pct": 1.673
+      },
+      {
+        "economic_type": "UNKNOWN",
+        "n": 1099,
+        "pct": 8.59
+      }
+    ],
+    "observation_level": [
+      {
+        "economic_type": "CLOSED_END_FUND",
+        "n": 1407,
+        "pct": 0.604
+      },
+      {
+        "economic_type": "ETF",
+        "n": 34305,
+        "pct": 14.717
+      },
+      {
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 3785,
+        "pct": 1.624
+      },
+      {
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 4054,
+        "pct": 1.739
+      },
+      {
+        "economic_type": "OPERATING_ADR",
+        "n": 10849,
+        "pct": 4.654
+      },
+      {
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 159604,
+        "pct": 68.473
+      },
+      {
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 1261,
+        "pct": 0.541
+      },
+      {
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 1164,
+        "pct": 0.499
+      },
+      {
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 221,
+        "pct": 0.095
+      },
+      {
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 6889,
+        "pct": 2.955
+      },
+      {
+        "economic_type": "UNKNOWN",
+        "n": 9553,
+        "pct": 4.098
+      }
+    ],
+    "security_total": 12794,
+    "observation_total": 233092
+  },
+  "q2_variant_composition": {
+    "O0": [
+      {
+        "economic_type": "CLOSED_END_FUND",
+        "n": 1407,
+        "pct": 0.604
+      },
+      {
+        "economic_type": "ETF",
+        "n": 34305,
+        "pct": 14.717
+      },
+      {
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 3785,
+        "pct": 1.624
+      },
+      {
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 4054,
+        "pct": 1.739
+      },
+      {
+        "economic_type": "OPERATING_ADR",
+        "n": 10849,
+        "pct": 4.654
+      },
+      {
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 159604,
+        "pct": 68.473
+      },
+      {
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 1261,
+        "pct": 0.541
+      },
+      {
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 1164,
+        "pct": 0.499
+      },
+      {
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 221,
+        "pct": 0.095
+      },
+      {
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 6889,
+        "pct": 2.955
+      },
+      {
+        "economic_type": "UNKNOWN",
+        "n": 9553,
+        "pct": 4.098
+      }
+    ],
+    "O1_2Q": [
+      {
+        "economic_type": "CLOSED_END_FUND",
+        "n": 162,
+        "pct": 0.252
+      },
+      {
+        "economic_type": "ETF",
+        "n": 7614,
+        "pct": 11.848
+      },
+      {
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 852,
+        "pct": 1.326
+      },
+      {
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 1034,
+        "pct": 1.609
+      },
+      {
+        "economic_type": "OPERATING_ADR",
+        "n": 3261,
+        "pct": 5.075
+      },
+      {
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 46157,
+        "pct": 71.826
+      },
+      {
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 315,
+        "pct": 0.49
+      },
+      {
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 337,
+        "pct": 0.524
+      },
+      {
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 53,
+        "pct": 0.082
+      },
+      {
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 2066,
+        "pct": 3.215
+      },
+      {
+        "economic_type": "UNKNOWN",
+        "n": 2411,
+        "pct": 3.752
+      }
+    ],
+    "O1_3Q": [
+      {
+        "economic_type": "CLOSED_END_FUND",
+        "n": 16,
+        "pct": 0.081
+      },
+      {
+        "economic_type": "ETF",
+        "n": 1626,
+        "pct": 8.282
+      },
+      {
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 216,
+        "pct": 1.1
+      },
+      {
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 273,
+        "pct": 1.39
+      },
+      {
+        "economic_type": "OPERATING_ADR",
+        "n": 1097,
+        "pct": 5.587
+      },
+      {
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 14779,
+        "pct": 75.272
+      },
+      {
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 92,
+        "pct": 0.469
+      },
+      {
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 126,
+        "pct": 0.642
+      },
+      {
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 14,
+        "pct": 0.071
+      },
+      {
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 686,
+        "pct": 3.494
+      },
+      {
+        "economic_type": "UNKNOWN",
+        "n": 709,
+        "pct": 3.611
+      }
+    ]
+  },
+  "q3_split_composition": {
+    "rows": [
+      {
+        "split": "H0_dev",
+        "economic_type": "CLOSED_END_FUND",
+        "n": 478,
+        "share_pct": 0.634,
+        "overall_share_pct": 0.604,
+        "delta_pp": 0.03
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "ETF",
+        "n": 14507,
+        "share_pct": 19.244,
+        "overall_share_pct": 14.717,
+        "delta_pp": 4.527
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 1802,
+        "share_pct": 2.39,
+        "overall_share_pct": 1.624,
+        "delta_pp": 0.767
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 593,
+        "share_pct": 0.787,
+        "overall_share_pct": 1.739,
+        "delta_pp": -0.953
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "OPERATING_ADR",
+        "n": 3807,
+        "share_pct": 5.05,
+        "overall_share_pct": 4.654,
+        "delta_pp": 0.396
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 47369,
+        "share_pct": 62.836,
+        "overall_share_pct": 68.473,
+        "delta_pp": -5.636
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 516,
+        "share_pct": 0.684,
+        "overall_share_pct": 0.541,
+        "delta_pp": 0.143
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 590,
+        "share_pct": 0.783,
+        "overall_share_pct": 0.499,
+        "delta_pp": 0.283
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 69,
+        "share_pct": 0.092,
+        "overall_share_pct": 0.095,
+        "delta_pp": -0.003
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 1993,
+        "share_pct": 2.644,
+        "overall_share_pct": 2.955,
+        "delta_pp": -0.312
+      },
+      {
+        "split": "H0_dev",
+        "economic_type": "UNKNOWN",
+        "n": 3661,
+        "share_pct": 4.856,
+        "overall_share_pct": 4.098,
+        "delta_pp": 0.758
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "CLOSED_END_FUND",
+        "n": 345,
+        "share_pct": 0.895,
+        "overall_share_pct": 0.604,
+        "delta_pp": 0.292
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "ETF",
+        "n": 8673,
+        "share_pct": 22.503,
+        "overall_share_pct": 14.717,
+        "delta_pp": 7.785
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 857,
+        "share_pct": 2.224,
+        "overall_share_pct": 1.624,
+        "delta_pp": 0.6
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 212,
+        "share_pct": 0.55,
+        "overall_share_pct": 1.739,
+        "delta_pp": -1.189
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "OPERATING_ADR",
+        "n": 1861,
+        "share_pct": 4.828,
+        "overall_share_pct": 4.654,
+        "delta_pp": 0.174
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 23195,
+        "share_pct": 60.181,
+        "overall_share_pct": 68.473,
+        "delta_pp": -8.291
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 348,
+        "share_pct": 0.903,
+        "overall_share_pct": 0.541,
+        "delta_pp": 0.362
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 165,
+        "share_pct": 0.428,
+        "overall_share_pct": 0.499,
+        "delta_pp": -0.071
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 40,
+        "share_pct": 0.104,
+        "overall_share_pct": 0.095,
+        "delta_pp": 0.009
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 987,
+        "share_pct": 2.561,
+        "overall_share_pct": 2.955,
+        "delta_pp": -0.395
+      },
+      {
+        "split": "H1_time_holdout",
+        "economic_type": "UNKNOWN",
+        "n": 1859,
+        "share_pct": 4.823,
+        "overall_share_pct": 4.098,
+        "delta_pp": 0.725
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "CLOSED_END_FUND",
+        "n": 47,
+        "share_pct": 0.178,
+        "overall_share_pct": 0.604,
+        "delta_pp": -0.426
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "ETF",
+        "n": 951,
+        "share_pct": 3.595,
+        "overall_share_pct": 14.717,
+        "delta_pp": -11.122
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 122,
+        "share_pct": 0.461,
+        "overall_share_pct": 1.624,
+        "delta_pp": -1.163
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 927,
+        "share_pct": 3.505,
+        "overall_share_pct": 1.739,
+        "delta_pp": 1.765
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "OPERATING_ADR",
+        "n": 1181,
+        "share_pct": 4.465,
+        "overall_share_pct": 4.654,
+        "delta_pp": -0.19
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 21381,
+        "share_pct": 80.832,
+        "overall_share_pct": 68.473,
+        "delta_pp": 12.36
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 108,
+        "share_pct": 0.408,
+        "overall_share_pct": 0.541,
+        "delta_pp": -0.133
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 51,
+        "share_pct": 0.193,
+        "overall_share_pct": 0.499,
+        "delta_pp": -0.307
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 29,
+        "share_pct": 0.11,
+        "overall_share_pct": 0.095,
+        "delta_pp": 0.015
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 885,
+        "share_pct": 3.346,
+        "overall_share_pct": 2.955,
+        "delta_pp": 0.39
+      },
+      {
+        "split": "H2_manager_holdout",
+        "economic_type": "UNKNOWN",
+        "n": 769,
+        "share_pct": 2.907,
+        "overall_share_pct": 4.098,
+        "delta_pp": -1.191
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "CLOSED_END_FUND",
+        "n": 131,
+        "share_pct": 0.685,
+        "overall_share_pct": 0.604,
+        "delta_pp": 0.082
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "ETF",
+        "n": 3736,
+        "share_pct": 19.549,
+        "overall_share_pct": 14.717,
+        "delta_pp": 4.832
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 363,
+        "share_pct": 1.899,
+        "overall_share_pct": 1.624,
+        "delta_pp": 0.276
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 188,
+        "share_pct": 0.984,
+        "overall_share_pct": 1.739,
+        "delta_pp": -0.756
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "OPERATING_ADR",
+        "n": 942,
+        "share_pct": 4.929,
+        "overall_share_pct": 4.654,
+        "delta_pp": 0.275
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 12195,
+        "share_pct": 63.811,
+        "overall_share_pct": 68.473,
+        "delta_pp": -4.661
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 55,
+        "share_pct": 0.288,
+        "overall_share_pct": 0.541,
+        "delta_pp": -0.253
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 123,
+        "share_pct": 0.644,
+        "overall_share_pct": 0.499,
+        "delta_pp": 0.144
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 3,
+        "share_pct": 0.016,
+        "overall_share_pct": 0.095,
+        "delta_pp": -0.079
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 527,
+        "share_pct": 2.758,
+        "overall_share_pct": 2.955,
+        "delta_pp": -0.198
+      },
+      {
+        "split": "H3_security_holdout",
+        "economic_type": "UNKNOWN",
+        "n": 848,
+        "share_pct": 4.437,
+        "overall_share_pct": 4.098,
+        "delta_pp": 0.339
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "CLOSED_END_FUND",
+        "n": 57,
+        "share_pct": 0.479,
+        "overall_share_pct": 0.604,
+        "delta_pp": -0.125
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "ETF",
+        "n": 882,
+        "share_pct": 7.404,
+        "overall_share_pct": 14.717,
+        "delta_pp": -7.313
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "MUTUAL_OR_POOLED_FUND",
+        "n": 88,
+        "share_pct": 0.739,
+        "overall_share_pct": 1.624,
+        "delta_pp": -0.885
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "NON_EQUITY_OR_UNSUPPORTED",
+        "n": 432,
+        "share_pct": 3.627,
+        "overall_share_pct": 1.739,
+        "delta_pp": 1.887
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "OPERATING_ADR",
+        "n": 481,
+        "share_pct": 4.038,
+        "overall_share_pct": 4.654,
+        "delta_pp": -0.616
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "OPERATING_COMMON_EQUITY",
+        "n": 9167,
+        "share_pct": 76.956,
+        "overall_share_pct": 68.473,
+        "delta_pp": 8.483
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "OPERATING_OTHER_EQUITY",
+        "n": 11,
+        "share_pct": 0.092,
+        "overall_share_pct": 0.541,
+        "delta_pp": -0.449
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "OTHER_13F_SECURITY",
+        "n": 29,
+        "share_pct": 0.243,
+        "overall_share_pct": 0.499,
+        "delta_pp": -0.256
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "PREFERRED_OR_HYBRID",
+        "n": 8,
+        "share_pct": 0.067,
+        "overall_share_pct": 0.095,
+        "delta_pp": -0.028
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "REIT_OR_SPECIAL_EQUITY",
+        "n": 412,
+        "share_pct": 3.459,
+        "overall_share_pct": 2.955,
+        "delta_pp": 0.503
+      },
+      {
+        "split": "H4_combined",
+        "economic_type": "UNKNOWN",
+        "n": 345,
+        "share_pct": 2.896,
+        "overall_share_pct": 4.098,
+        "delta_pp": -1.202
+      }
+    ],
+    "SECURITY_TYPE_SPLIT_SHIFT": true
+  },
+  "q4_resolution_by_type": {
+    "CLOSED_END_FUND": {
+      "securities": 280,
+      "resolver_verified": 21,
+      "resolution_rate_pct": 7.5,
+      "status_counts": {
+        "AMBIGUOUS": 240,
+        "UNRESOLVED": 15,
+        "VERIFIED_EXACT": 11,
+        "VERIFIED_MULTI_SOURCE": 10,
+        "CONFLICT": 4
+      }
+    },
+    "ETF": {
+      "securities": 3578,
+      "resolver_verified": 603,
+      "resolution_rate_pct": 16.853,
+      "status_counts": {
+        "UNRESOLVED": 2819,
+        "VERIFIED_EXACT": 558,
+        "CONFLICT": 155,
+        "VERIFIED_MULTI_SOURCE": 45,
+        "AMBIGUOUS": 1
+      }
+    },
+    "MUTUAL_OR_POOLED_FUND": {
+      "securities": 521,
+      "resolver_verified": 20,
+      "resolution_rate_pct": 3.839,
+      "status_counts": {
+        "UNRESOLVED": 488,
+        "VERIFIED_EXACT": 13,
+        "AMBIGUOUS": 13,
+        "VERIFIED_MULTI_SOURCE": 7
+      }
+    },
+    "NON_EQUITY_OR_UNSUPPORTED": {
+      "securities": 441,
+      "resolver_verified": 19,
+      "resolution_rate_pct": 4.308,
+      "status_counts": {
+        "NON_EQUITY_OR_UNSUPPORTED": 407,
+        "VERIFIED_EXACT": 19,
+        "UNRESOLVED": 12,
+        "AMBIGUOUS": 3
+      }
+    },
+    "OPERATING_ADR": {
+      "securities": 559,
+      "resolver_verified": 366,
+      "resolution_rate_pct": 65.474,
+      "status_counts": {
+        "VERIFIED_MULTI_SOURCE": 199,
+        "VERIFIED_EXACT": 167,
+        "UNRESOLVED": 146,
+        "CONFLICT": 30,
+        "AMBIGUOUS": 17
+      }
+    },
+    "OPERATING_COMMON_EQUITY": {
+      "securities": 5733,
+      "resolver_verified": 4295,
+      "resolution_rate_pct": 74.917,
+      "status_counts": {
+        "VERIFIED_MULTI_SOURCE": 3116,
+        "UNRESOLVED": 1278,
+        "VERIFIED_EXACT": 1179,
+        "AMBIGUOUS": 156,
+        "CONFLICT": 4
+      }
+    },
+    "OPERATING_OTHER_EQUITY": {
+      "securities": 156,
+      "resolver_verified": 38,
+      "resolution_rate_pct": 24.359,
+      "status_counts": {
+        "AMBIGUOUS": 76,
+        "UNRESOLVED": 42,
+        "VERIFIED_MULTI_SOURCE": 21,
+        "VERIFIED_EXACT": 17
+      }
+    },
+    "OTHER_13F_SECURITY": {
+      "securities": 191,
+      "resolver_verified": 99,
+      "resolution_rate_pct": 51.832,
+      "status_counts": {
+        "VERIFIED_EXACT": 99,
+        "UNRESOLVED": 44,
+        "NON_EQUITY_OR_UNSUPPORTED": 23,
+        "CONFLICT": 23,
+        "AMBIGUOUS": 2
+      }
+    },
+    "PREFERRED_OR_HYBRID": {
+      "securities": 22,
+      "resolver_verified": 0,
+      "resolution_rate_pct": 0.0,
+      "status_counts": {
+        "NON_EQUITY_OR_UNSUPPORTED": 12,
+        "UNRESOLVED": 10
+      }
+    },
+    "REIT_OR_SPECIAL_EQUITY": {
+      "securities": 214,
+      "resolver_verified": 193,
+      "resolution_rate_pct": 90.187,
+      "status_counts": {
+        "VERIFIED_MULTI_SOURCE": 123,
+        "VERIFIED_EXACT": 70,
+        "UNRESOLVED": 20,
+        "AMBIGUOUS": 1
+      }
+    },
+    "UNKNOWN": {
+      "securities": 1099,
+      "resolver_verified": 374,
+      "resolution_rate_pct": 34.031,
+      "status_counts": {
+        "UNRESOLVED": 491,
+        "VERIFIED_EXACT": 374,
+        "AMBIGUOUS": 234
+      }
+    }
+  },
+  "q5_failure_taxonomy": {
+    "total_non_verified": 6766,
+    "rows": [
+      {
+        "failure_reason": "FUND_OR_ETF_IDENTITY_PATH_MISSING",
+        "securities": 3322,
+        "pct": 49.098,
+        "top_status": {
+          "UNRESOLVED": 3322
+        }
+      },
+      {
+        "failure_reason": "UNKNOWN_REASON",
+        "securities": 1226,
+        "pct": 18.12,
+        "top_status": {
+          "UNRESOLVED": 1226
+        }
+      },
+      {
+        "failure_reason": "NAME_OR_ENTITY_CONFLICT",
+        "securities": 681,
+        "pct": 10.065,
+        "top_status": {
+          "AMBIGUOUS": 497
+        }
+      },
+      {
+        "failure_reason": "DELISTED_OR_TERMINATED",
+        "securities": 679,
+        "pct": 10.035,
+        "top_status": {
+          "UNRESOLVED": 679
+        }
+      },
+      {
+        "failure_reason": "NON_EQUITY",
+        "securities": 442,
+        "pct": 6.533,
+        "top_status": {
+          "NON_EQUITY_OR_UNSUPPORTED": 442
+        }
+      },
+      {
+        "failure_reason": "OPENFIGI_MULTI_MATCH",
+        "securities": 246,
+        "pct": 3.636,
+        "top_status": {
+          "AMBIGUOUS": 246
+        }
+      },
+      {
+        "failure_reason": "SEC_CORROBORATION_MISSING",
+        "securities": 138,
+        "pct": 2.04,
+        "top_status": {
+          "UNRESOLVED": 138
+        }
+      },
+      {
+        "failure_reason": "ADR_OR_ORDINARY_AMBIGUITY",
+        "securities": 32,
+        "pct": 0.473,
+        "top_status": {
+          "CONFLICT": 32
+        }
+      }
+    ]
+  },
+  "q6_operating_natural_resolution": {
+    "O0": {
+      "eligible_observations": 171714,
+      "resolved_observations": 145751,
+      "coverage_pct": 84.88,
+      "H0_dev": {
+        "n": 51692,
+        "resolved": 40970,
+        "coverage": 79.258
+      },
+      "H1_time_holdout": {
+        "n": 25404,
+        "resolved": 22452,
+        "coverage": 88.38
+      },
+      "H2_manager_holdout": {
+        "n": 22670,
+        "resolved": 19435,
+        "coverage": 85.73
+      },
+      "H3_security_holdout": {
+        "n": 13192,
+        "resolved": 10496,
+        "coverage": 79.563
+      },
+      "H4_combined": {
+        "n": 9659,
+        "resolved": 8631,
+        "coverage": 89.357
+      },
+      "positive": {
+        "n": 95102,
+        "coverage": 85.859
+      },
+      "negative": {
+        "n": 68950,
+        "coverage": 83.392
+      }
+    },
+    "O1_2Q": {
+      "eligible_observations": 49733,
+      "resolved_observations": 42853,
+      "coverage_pct": 86.166,
+      "H0_dev": {
+        "n": 17236,
+        "resolved": 13844,
+        "coverage": 80.32
+      },
+      "H1_time_holdout": {
+        "n": 7174,
+        "resolved": 6478,
+        "coverage": 90.298
+      },
+      "H2_manager_holdout": {
+        "n": 4927,
+        "resolved": 4345,
+        "coverage": 88.188
+      },
+      "H3_security_holdout": {
+        "n": 4380,
+        "resolved": 3535,
+        "coverage": 80.708
+      },
+      "H4_combined": {
+        "n": 2684,
+        "resolved": 2457,
+        "coverage": 91.542
+      },
+      "positive": {
+        "n": 29359,
+        "coverage": 87.057
+      },
+      "negative": {
+        "n": 20374,
+        "coverage": 84.883
+      }
+    },
+    "O1_3Q": {
+      "eligible_observations": 15968,
+      "resolved_observations": 13831,
+      "coverage_pct": 86.617,
+      "H0_dev": {
+        "n": 5743,
+        "resolved": 4602,
+        "coverage": 80.132
+      },
+      "H1_time_holdout": {
+        "n": 1915,
+        "resolved": 1739,
+        "coverage": 90.809
+      },
+      "H2_manager_holdout": {
+        "n": 1621,
+        "resolved": 1452,
+        "coverage": 89.574
+      },
+      "H3_security_holdout": {
+        "n": 1446,
+        "resolved": 1159,
+        "coverage": 80.152
+      },
+      "H4_combined": {
+        "n": 906,
+        "resolved": 844,
+        "coverage": 93.157
+      },
+      "positive": {
+        "n": 9907,
+        "coverage": 87.453
+      },
+      "negative": {
+        "n": 6061,
+        "coverage": 85.25
+      }
+    },
+    "security_level": {
+      "operating_securities": 6509,
+      "resolver_verified": 4699,
+      "rate_pct": 72.192
+    }
+  },
+  "q7_operating_vs_pooled": {
+    "groups": {
+      "OPERATING": {
+        "n_observations": 171714,
+        "action_rates": {
+          "NEW": 0.21218421328488069,
+          "ADD": 0.34165531057456,
+          "REDUCE": 0.3035046647332192,
+          "EXIT": 0.09803510488370197,
+          "UNCHANGED": 0.04462070652363814
+        },
+        "turnover_proxy": 0.324708,
+        "persistence_2q_rate": 0.289627,
+        "persistence_3q_rate": 0.092992,
+        "weight_mean": 0.001582,
+        "weight_median": 6e-06,
+        "weight_p25": 0.0,
+        "weight_p75": 8.3e-05,
+        "positions_per_filing_mean": 548.607,
+        "positions_per_filing_median": 37.0,
+        "managers_per_security_mean": 4.482,
+        "managers_per_security_median": 5.0,
+        "reversal_rate": 0.557464
+      },
+      "POOLED": {
+        "n_observations": 39497,
+        "action_rates": {
+          "NEW": 0.30376990657518294,
+          "ADD": 0.22935919183735473,
+          "REDUCE": 0.2200926652657164,
+          "EXIT": 0.2090032154340836,
+          "UNCHANGED": 0.03777502088766235
+        },
+        "turnover_proxy": 0.532904,
+        "persistence_2q_rate": 0.218447,
+        "persistence_3q_rate": 0.047042,
+        "weight_mean": 0.000164,
+        "weight_median": 1e-06,
+        "weight_p25": 1e-06,
+        "weight_p75": 6e-06,
+        "positions_per_filing_mean": 318.524,
+        "positions_per_filing_median": 10.5,
+        "managers_per_security_mean": 1.522,
+        "managers_per_security_median": 1.0,
+        "reversal_rate": 0.677441
+      }
+    },
+    "manager_control": [
+      {
+        "manager_id": 1,
+        "operating_positive_rate": 0.326087,
+        "pooled_positive_rate": 0.25,
+        "diff_pp": 7.609,
+        "n_operating": 368,
+        "n_pooled": 8
+      },
+      {
+        "manager_id": 5,
+        "operating_positive_rate": 0.377574,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": -12.243,
+        "n_operating": 437,
+        "n_pooled": 22
+      },
+      {
+        "manager_id": 6,
+        "operating_positive_rate": 0.435547,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": -6.445,
+        "n_operating": 512,
+        "n_pooled": 4
+      },
+      {
+        "manager_id": 7,
+        "operating_positive_rate": 0.470588,
+        "pooled_positive_rate": 0.166667,
+        "diff_pp": 30.392,
+        "n_operating": 153,
+        "n_pooled": 6
+      },
+      {
+        "manager_id": 11,
+        "operating_positive_rate": 0.476923,
+        "pooled_positive_rate": 0.583333,
+        "diff_pp": -10.641,
+        "n_operating": 65,
+        "n_pooled": 12
+      },
+      {
+        "manager_id": 12,
+        "operating_positive_rate": 0.497354,
+        "pooled_positive_rate": 0.454545,
+        "diff_pp": 4.281,
+        "n_operating": 945,
+        "n_pooled": 33
+      },
+      {
+        "manager_id": 13,
+        "operating_positive_rate": 0.524336,
+        "pooled_positive_rate": 0.352941,
+        "diff_pp": 17.14,
+        "n_operating": 2260,
+        "n_pooled": 170
+      },
+      {
+        "manager_id": 14,
+        "operating_positive_rate": 0.463511,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": -3.649,
+        "n_operating": 1014,
+        "n_pooled": 20
+      },
+      {
+        "manager_id": 15,
+        "operating_positive_rate": 0.335017,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": -16.498,
+        "n_operating": 594,
+        "n_pooled": 2
+      },
+      {
+        "manager_id": 17,
+        "operating_positive_rate": 0.527417,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": 2.742,
+        "n_operating": 4158,
+        "n_pooled": 2
+      },
+      {
+        "manager_id": 18,
+        "operating_positive_rate": 0.516129,
+        "pooled_positive_rate": 0.5,
+        "diff_pp": 1.613,
+        "n_operating": 248,
+        "n_pooled": 4
+      },
+      {
+        "manager_id": 22,
+        "operating_positive_rate": 0.317647,
+        "pooled_positive_rate": 0.368421,
+        "diff_pp": -5.077,
+        "n_operating": 255,
+        "n_pooled": 19
+      },
+      {
+        "manager_id": 23,
+        "operating_positive_rate": 0.508065,
+        "pooled_positive_rate": 0.452128,
+        "diff_pp": 5.594,
+        "n_operating": 10788,
+        "n_pooled": 188
+      },
+      {
+        "manager_id": 25,
+        "operating_positive_rate": 0.525442,
+        "pooled_positive_rate": 0.538078,
+        "diff_pp": -1.264,
+        "n_operating": 38931,
+        "n_pooled": 5620
+      },
+      {
+        "manager_id": 26,
+        "operating_positive_rate": 0.548902,
+        "pooled_positive_rate": 0.536969,
+        "diff_pp": 1.193,
+        "n_operating": 48699,
+        "n_pooled": 27672
+      },
+      {
+        "manager_id": 27,
+        "operating_positive_rate": 0.571511,
+        "pooled_positive_rate": 0.500772,
+        "diff_pp": 7.074,
+        "n_operating": 20675,
+        "n_pooled": 4535
+      },
+      {
+        "manager_id": 28,
+        "operating_positive_rate": 0.658998,
+        "pooled_positive_rate": 0.669291,
+        "diff_pp": -1.029,
+        "n_operating": 11780,
+        "n_pooled": 508
+      },
+      {
+        "manager_id": 29,
+        "operating_positive_rate": 0.608034,
+        "pooled_positive_rate": 0.534226,
+        "diff_pp": 7.381,
+        "n_operating": 26339,
+        "n_pooled": 672
+      }
+    ],
+    "manager_composition_confounded": "False",
+    "time_control": [
+      {
+        "quarter": "2023-09-30",
+        "operating_positive_rate": 0.994689,
+        "pooled_positive_rate": 0.997388,
+        "diff_pp": -0.27,
+        "n": 11265
+      },
+      {
+        "quarter": "2023-12-31",
+        "operating_positive_rate": 0.497272,
+        "pooled_positive_rate": 0.519892,
+        "diff_pp": -2.262,
+        "n": 13589
+      },
+      {
+        "quarter": "2024-03-31",
+        "operating_positive_rate": 0.4857,
+        "pooled_positive_rate": 0.5242,
+        "diff_pp": -3.85,
+        "n": 13741
+      },
+      {
+        "quarter": "2024-06-30",
+        "operating_positive_rate": 0.489978,
+        "pooled_positive_rate": 0.446199,
+        "diff_pp": 4.378,
+        "n": 13697
+      },
+      {
+        "quarter": "2024-09-30",
+        "operating_positive_rate": 0.471786,
+        "pooled_positive_rate": 0.508507,
+        "diff_pp": -3.672,
+        "n": 13266
+      },
+      {
+        "quarter": "2024-12-31",
+        "operating_positive_rate": 0.642268,
+        "pooled_positive_rate": 0.572718,
+        "diff_pp": 6.955,
+        "n": 17504
+      },
+      {
+        "quarter": "2025-03-31",
+        "operating_positive_rate": 0.458705,
+        "pooled_positive_rate": 0.510197,
+        "diff_pp": -5.149,
+        "n": 17690
+      },
+      {
+        "quarter": "2025-06-30",
+        "operating_positive_rate": 0.689202,
+        "pooled_positive_rate": 0.602596,
+        "diff_pp": 8.661,
+        "n": 27326
+      },
+      {
+        "quarter": "2025-09-30",
+        "operating_positive_rate": 0.508128,
+        "pooled_positive_rate": 0.474481,
+        "diff_pp": 3.365,
+        "n": 28227
+      },
+      {
+        "quarter": "2025-12-31",
+        "operating_positive_rate": 0.495929,
+        "pooled_positive_rate": 0.439176,
+        "diff_pp": 5.675,
+        "n": 28348
+      },
+      {
+        "quarter": "2026-03-31",
+        "operating_positive_rate": 0.501425,
+        "pooled_positive_rate": 0.527281,
+        "diff_pp": -2.586,
+        "n": 24097
+      },
+      {
+        "quarter": "2026-06-30",
+        "operating_positive_rate": 0.518527,
+        "pooled_positive_rate": 0.490429,
+        "diff_pp": 2.81,
+        "n": 24342
+      }
+    ],
+    "time_composition_sensitive": true
+  },
+  "selection_bias": {
+    "manager": [
+      {
+        "manager_key": 1,
+        "broad_share_pct": 0.178,
+        "operating_share_pct": 0.214,
+        "delta_pp": 0.036
+      },
+      {
+        "manager_key": 2,
+        "broad_share_pct": 0.049,
+        "operating_share_pct": 0.066,
+        "delta_pp": 0.016
+      },
+      {
+        "manager_key": 3,
+        "broad_share_pct": 0.045,
+        "operating_share_pct": 0.061,
+        "delta_pp": 0.016
+      },
+      {
+        "manager_key": 4,
+        "broad_share_pct": 0.143,
+        "operating_share_pct": 0.154,
+        "delta_pp": 0.011
+      },
+      {
+        "manager_key": 5,
+        "broad_share_pct": 0.212,
+        "operating_share_pct": 0.254,
+        "delta_pp": 0.043
+      },
+      {
+        "manager_key": 6,
+        "broad_share_pct": 0.267,
+        "operating_share_pct": 0.298,
+        "delta_pp": 0.031
+      },
+      {
+        "manager_key": 7,
+        "broad_share_pct": 0.072,
+        "operating_share_pct": 0.089,
+        "delta_pp": 0.017
+      },
+      {
+        "manager_key": 8,
+        "broad_share_pct": 0.099,
+        "operating_share_pct": 0.119,
+        "delta_pp": 0.02
+      },
+      {
+        "manager_key": 9,
+        "broad_share_pct": 0.526,
+        "operating_share_pct": 0.673,
+        "delta_pp": 0.147
+      },
+      {
+        "manager_key": 10,
+        "broad_share_pct": 0.173,
+        "operating_share_pct": 0.221,
+        "delta_pp": 0.047
+      },
+      {
+        "manager_key": 11,
+        "broad_share_pct": 0.038,
+        "operating_share_pct": 0.038,
+        "delta_pp": -0.0
+      },
+      {
+        "manager_key": 12,
+        "broad_share_pct": 0.436,
+        "operating_share_pct": 0.55,
+        "delta_pp": 0.114
+      },
+      {
+        "manager_key": 13,
+        "broad_share_pct": 1.286,
+        "operating_share_pct": 1.316,
+        "delta_pp": 0.03
+      },
+      {
+        "manager_key": 14,
+        "broad_share_pct": 0.471,
+        "operating_share_pct": 0.591,
+        "delta_pp": 0.12
+      },
+      {
+        "manager_key": 15,
+        "broad_share_pct": 0.272,
+        "operating_share_pct": 0.346,
+        "delta_pp": 0.074
+      },
+      {
+        "manager_key": 16,
+        "broad_share_pct": 0.248,
+        "operating_share_pct": 0.305,
+        "delta_pp": 0.057
+      },
+      {
+        "manager_key": 17,
+        "broad_share_pct": 1.862,
+        "operating_share_pct": 2.421,
+        "delta_pp": 0.559
+      },
+      {
+        "manager_key": 18,
+        "broad_share_pct": 0.115,
+        "operating_share_pct": 0.144,
+        "delta_pp": 0.029
+      },
+      {
+        "manager_key": 19,
+        "broad_share_pct": 0.151,
+        "operating_share_pct": 0.188,
+        "delta_pp": 0.037
+      },
+      {
+        "manager_key": 20,
+        "broad_share_pct": 0.049,
+        "operating_share_pct": 0.067,
+        "delta_pp": 0.018
+      },
+      {
+        "manager_key": 21,
+        "broad_share_pct": 0.082,
+        "operating_share_pct": 0.109,
+        "delta_pp": 0.027
+      },
+      {
+        "manager_key": 22,
+        "broad_share_pct": 0.175,
+        "operating_share_pct": 0.149,
+        "delta_pp": -0.027
+      },
+      {
+        "manager_key": 23,
+        "broad_share_pct": 4.921,
+        "operating_share_pct": 6.283,
+        "delta_pp": 1.362
+      },
+      {
+        "manager_key": 24,
+        "broad_share_pct": 0.053,
+        "operating_share_pct": 0.072,
+        "delta_pp": 0.019
+      },
+      {
+        "manager_key": 25,
+        "broad_share_pct": 20.647,
+        "operating_share_pct": 22.672,
+        "delta_pp": 2.025
+      },
+      {
+        "manager_key": 26,
+        "broad_share_pct": 36.4,
+        "operating_share_pct": 28.361,
+        "delta_pp": -8.04
+      },
+      {
+        "manager_key": 27,
+        "broad_share_pct": 12.186,
+        "operating_share_pct": 12.04,
+        "delta_pp": -0.146
+      },
+      {
+        "manager_key": 28,
+        "broad_share_pct": 5.675,
+        "operating_share_pct": 6.86,
+        "delta_pp": 1.186
+      },
+      {
+        "manager_key": 29,
+        "broad_share_pct": 13.167,
+        "operating_share_pct": 15.339,
+        "delta_pp": 2.172
+      }
+    ],
+    "quarter": [
+      {
+        "quarter_key": "2023-09-30",
+        "broad_share_pct": 4.833,
+        "operating_share_pct": 4.825,
+        "delta_pp": -0.008
+      },
+      {
+        "quarter_key": "2023-12-31",
+        "broad_share_pct": 5.83,
+        "operating_share_pct": 5.658,
+        "delta_pp": -0.172
+      },
+      {
+        "quarter_key": "2024-03-31",
+        "broad_share_pct": 5.895,
+        "operating_share_pct": 5.681,
+        "delta_pp": -0.214
+      },
+      {
+        "quarter_key": "2024-06-30",
+        "broad_share_pct": 5.876,
+        "operating_share_pct": 5.666,
+        "delta_pp": -0.21
+      },
+      {
+        "quarter_key": "2024-09-30",
+        "broad_share_pct": 5.691,
+        "operating_share_pct": 5.491,
+        "delta_pp": -0.201
+      },
+      {
+        "quarter_key": "2024-12-31",
+        "broad_share_pct": 7.509,
+        "operating_share_pct": 7.55,
+        "delta_pp": 0.041
+      },
+      {
+        "quarter_key": "2025-03-31",
+        "broad_share_pct": 7.589,
+        "operating_share_pct": 7.573,
+        "delta_pp": -0.016
+      },
+      {
+        "quarter_key": "2025-06-30",
+        "broad_share_pct": 11.723,
+        "operating_share_pct": 12.103,
+        "delta_pp": 0.379
+      },
+      {
+        "quarter_key": "2025-09-30",
+        "broad_share_pct": 12.11,
+        "operating_share_pct": 12.538,
+        "delta_pp": 0.428
+      },
+      {
+        "quarter_key": "2025-12-31",
+        "broad_share_pct": 12.162,
+        "operating_share_pct": 12.518,
+        "delta_pp": 0.356
+      },
+      {
+        "quarter_key": "2026-03-31",
+        "broad_share_pct": 10.338,
+        "operating_share_pct": 10.213,
+        "delta_pp": -0.124
+      },
+      {
+        "quarter_key": "2026-06-30",
+        "broad_share_pct": 10.443,
+        "operating_share_pct": 10.184,
+        "delta_pp": -0.259
+      }
+    ],
+    "direction": [
+      {
+        "direction_key": "negative",
+        "broad_share_pct": 40.671,
+        "operating_share_pct": 40.154,
+        "delta_pp": -0.517
+      },
+      {
+        "direction_key": "neutral",
+        "broad_share_pct": 4.456,
+        "operating_share_pct": 4.462,
+        "delta_pp": 0.006
+      },
+      {
+        "direction_key": "positive",
+        "broad_share_pct": 54.874,
+        "operating_share_pct": 55.384,
+        "delta_pp": 0.51
+      }
+    ],
+    "split": [
+      {
+        "split_key": "H0_dev",
+        "broad_share_pct": 32.341,
+        "operating_share_pct": 30.104,
+        "delta_pp": -2.238
+      },
+      {
+        "split_key": "H1_time_holdout",
+        "broad_share_pct": 16.535,
+        "operating_share_pct": 14.794,
+        "delta_pp": -1.741
+      },
+      {
+        "split_key": "H2_manager_holdout",
+        "broad_share_pct": 11.348,
+        "operating_share_pct": 13.202,
+        "delta_pp": 1.854
+      },
+      {
+        "split_key": "H3_security_holdout",
+        "broad_share_pct": 8.199,
+        "operating_share_pct": 7.683,
+        "delta_pp": -0.516
+      },
+      {
+        "split_key": "H4_combined",
+        "broad_share_pct": 5.11,
+        "operating_share_pct": 5.625,
+        "delta_pp": 0.515
+      },
+      {
+        "split_key": "OTHER",
+        "broad_share_pct": 26.466,
+        "operating_share_pct": 28.592,
+        "delta_pp": 2.126
+      }
+    ],
+    "position_size": {
+      "broad_mean": 0.00128,
+      "operating_mean": 0.001582,
+      "broad_median": 4e-06,
+      "operating_median": 6e-06
+    },
+    "frequency": {
+      "broad_mean_obs_per_security": 18.219,
+      "operating_mean_obs_per_security": 26.631
+    }
+  },
+  "missingness": {
+    "manager": [
+      {
+        "manager_key": 1,
+        "mapped": 304,
+        "unmapped": 64,
+        "missing_pct": 17.391
+      },
+      {
+        "manager_key": 2,
+        "mapped": 109,
+        "unmapped": 4,
+        "missing_pct": 3.54
+      },
+      {
+        "manager_key": 3,
+        "mapped": 94,
+        "unmapped": 11,
+        "missing_pct": 10.476
+      },
+      {
+        "manager_key": 4,
+        "mapped": 211,
+        "unmapped": 54,
+        "missing_pct": 20.377
+      },
+      {
+        "manager_key": 5,
+        "mapped": 416,
+        "unmapped": 21,
+        "missing_pct": 4.805
+      },
+      {
+        "manager_key": 6,
+        "mapped": 455,
+        "unmapped": 57,
+        "missing_pct": 11.133
+      },
+      {
+        "manager_key": 7,
+        "mapped": 132,
+        "unmapped": 21,
+        "missing_pct": 13.725
+      },
+      {
+        "manager_key": 8,
+        "mapped": 193,
+        "unmapped": 12,
+        "missing_pct": 5.854
+      },
+      {
+        "manager_key": 9,
+        "mapped": 1077,
+        "unmapped": 79,
+        "missing_pct": 6.834
+      },
+      {
+        "manager_key": 10,
+        "mapped": 373,
+        "unmapped": 6,
+        "missing_pct": 1.583
+      },
+      {
+        "manager_key": 11,
+        "mapped": 44,
+        "unmapped": 21,
+        "missing_pct": 32.308
+      },
+      {
+        "manager_key": 12,
+        "mapped": 852,
+        "unmapped": 93,
+        "missing_pct": 9.841
+      },
+      {
+        "manager_key": 13,
+        "mapped": 1833,
+        "unmapped": 427,
+        "missing_pct": 18.894
+      },
+      {
+        "manager_key": 14,
+        "mapped": 937,
+        "unmapped": 77,
+        "missing_pct": 7.594
+      },
+      {
+        "manager_key": 15,
+        "mapped": 576,
+        "unmapped": 18,
+        "missing_pct": 3.03
+      },
+      {
+        "manager_key": 16,
+        "mapped": 493,
+        "unmapped": 30,
+        "missing_pct": 5.736
+      },
+      {
+        "manager_key": 17,
+        "mapped": 3699,
+        "unmapped": 459,
+        "missing_pct": 11.039
+      },
+      {
+        "manager_key": 18,
+        "mapped": 236,
+        "unmapped": 12,
+        "missing_pct": 4.839
+      },
+      {
+        "manager_key": 19,
+        "mapped": 296,
+        "unmapped": 26,
+        "missing_pct": 8.075
+      },
+      {
+        "manager_key": 20,
+        "mapped": 70,
+        "unmapped": 45,
+        "missing_pct": 39.13
+      },
+      {
+        "manager_key": 21,
+        "mapped": 167,
+        "unmapped": 20,
+        "missing_pct": 10.695
+      },
+      {
+        "manager_key": 22,
+        "mapped": 211,
+        "unmapped": 44,
+        "missing_pct": 17.255
+      },
+      {
+        "manager_key": 23,
+        "mapped": 9844,
+        "unmapped": 944,
+        "missing_pct": 8.75
+      },
+      {
+        "manager_key": 24,
+        "mapped": 87,
+        "unmapped": 36,
+        "missing_pct": 29.268
+      },
+      {
+        "manager_key": 25,
+        "mapped": 31860,
+        "unmapped": 7071,
+        "missing_pct": 18.163
+      },
+      {
+        "manager_key": 26,
+        "mapped": 39613,
+        "unmapped": 9086,
+        "missing_pct": 18.657
+      },
+      {
+        "manager_key": 27,
+        "mapped": 18345,
+        "unmapped": 2330,
+        "missing_pct": 11.27
+      },
+      {
+        "manager_key": 28,
+        "mapped": 10261,
+        "unmapped": 1519,
+        "missing_pct": 12.895
+      },
+      {
+        "manager_key": 29,
+        "mapped": 22963,
+        "unmapped": 3376,
+        "missing_pct": 12.817
+      }
+    ],
+    "quarter": [
+      {
+        "quarter_key": "2023-09-30",
+        "mapped": 6397,
+        "unmapped": 1888,
+        "missing_pct": 22.788
+      },
+      {
+        "quarter_key": "2023-12-31",
+        "mapped": 7408,
+        "unmapped": 2307,
+        "missing_pct": 23.747
+      },
+      {
+        "quarter_key": "2024-03-31",
+        "mapped": 7592,
+        "unmapped": 2163,
+        "missing_pct": 22.173
+      },
+      {
+        "quarter_key": "2024-06-30",
+        "mapped": 7755,
+        "unmapped": 1974,
+        "missing_pct": 20.29
+      },
+      {
+        "quarter_key": "2024-09-30",
+        "mapped": 7657,
+        "unmapped": 1771,
+        "missing_pct": 18.784
+      },
+      {
+        "quarter_key": "2024-12-31",
+        "mapped": 10750,
+        "unmapped": 2215,
+        "missing_pct": 17.084
+      },
+      {
+        "quarter_key": "2025-03-31",
+        "mapped": 10904,
+        "unmapped": 2100,
+        "missing_pct": 16.149
+      },
+      {
+        "quarter_key": "2025-06-30",
+        "mapped": 17746,
+        "unmapped": 3036,
+        "missing_pct": 14.609
+      },
+      {
+        "quarter_key": "2025-09-30",
+        "mapped": 18599,
+        "unmapped": 2931,
+        "missing_pct": 13.614
+      },
+      {
+        "quarter_key": "2025-12-31",
+        "mapped": 19022,
+        "unmapped": 2473,
+        "missing_pct": 11.505
+      },
+      {
+        "quarter_key": "2026-03-31",
+        "mapped": 15850,
+        "unmapped": 1688,
+        "missing_pct": 9.625
+      },
+      {
+        "quarter_key": "2026-06-30",
+        "mapped": 16071,
+        "unmapped": 1417,
+        "missing_pct": 8.103
+      }
+    ],
+    "direction": [
+      {
+        "direction_key": "negative",
+        "mapped": 57499,
+        "unmapped": 11451,
+        "missing_pct": 16.608
+      },
+      {
+        "direction_key": "neutral",
+        "mapped": 6598,
+        "unmapped": 1064,
+        "missing_pct": 13.887
+      },
+      {
+        "direction_key": "positive",
+        "mapped": 81654,
+        "unmapped": 13448,
+        "missing_pct": 14.141
+      }
+    ],
+    "split": [
+      {
+        "split_key": "H0_dev",
+        "mapped": 40970,
+        "unmapped": 10722,
+        "missing_pct": 20.742
+      },
+      {
+        "split_key": "H1_time_holdout",
+        "mapped": 22452,
+        "unmapped": 2952,
+        "missing_pct": 11.62
+      },
+      {
+        "split_key": "H2_manager_holdout",
+        "mapped": 19435,
+        "unmapped": 3235,
+        "missing_pct": 14.27
+      },
+      {
+        "split_key": "H3_security_holdout",
+        "mapped": 10496,
+        "unmapped": 2696,
+        "missing_pct": 20.437
+      },
+      {
+        "split_key": "H4_combined",
+        "mapped": 8631,
+        "unmapped": 1028,
+        "missing_pct": 10.643
+      },
+      {
+        "split_key": "OTHER",
+        "mapped": 43767,
+        "unmapped": 5330,
+        "missing_pct": 10.856
+      }
+    ],
+    "overall": {
+      "operating_observations": 171714,
+      "unmapped_observations": 25963,
+      "missing_pct": 15.12,
+      "OPERATING_EQUITY_MISSINGNESS_STATUS": "MODERATE_CONCERN"
+    }
+  },
+  "variant_bias_decomposition": {
+    "O0": {
+      "overall": 69.97,
+      "within_type": {
+        "CLOSED_END_FUND": 11.443,
+        "ETF": 16.861,
+        "MUTUAL_OR_POOLED_FUND": 8.454,
+        "NON_EQUITY_OR_UNSUPPORTED": 4.021,
+        "OPERATING_ADR": 80.229,
+        "OPERATING_COMMON_EQUITY": 85.429,
+        "OPERATING_OTHER_EQUITY": 55.432,
+        "OTHER_13F_SECURITY": 5.842,
+        "PREFERRED_OR_HYBRID": 0.0,
+        "REIT_OR_SPECIAL_EQUITY": 92.844,
+        "UNKNOWN": 46.603
+      }
+    },
+    "O1_2Q": {
+      "overall": 73.838,
+      "within_type": {
+        "CLOSED_END_FUND": 17.284,
+        "ETF": 17.31,
+        "MUTUAL_OR_POOLED_FUND": 10.329,
+        "NON_EQUITY_OR_UNSUPPORTED": 3.675,
+        "OPERATING_ADR": 80.589,
+        "OPERATING_COMMON_EQUITY": 86.732,
+        "OPERATING_OTHER_EQUITY": 60.952,
+        "OTHER_13F_SECURITY": 3.561,
+        "PREFERRED_OR_HYBRID": 0.0,
+        "REIT_OR_SPECIAL_EQUITY": 93.369,
+        "UNKNOWN": 49.108
+      }
+    },
+    "O1_3Q": {
+      "overall": 77.345,
+      "within_type": {
+        "CLOSED_END_FUND": 31.25,
+        "ETF": 18.327,
+        "MUTUAL_OR_POOLED_FUND": 16.204,
+        "NON_EQUITY_OR_UNSUPPORTED": 4.396,
+        "OPERATING_ADR": 79.581,
+        "OPERATING_COMMON_EQUITY": 87.252,
+        "OPERATING_OTHER_EQUITY": 68.478,
+        "OTHER_13F_SECURITY": 3.968,
+        "PREFERRED_OR_HYBRID": 0.0,
+        "REIT_OR_SPECIAL_EQUITY": 94.169,
+        "UNKNOWN": 49.929
+      }
+    }
+  },
+  "generated_utc": "2026-08-24T17:50:56.090462+00:00"
+}

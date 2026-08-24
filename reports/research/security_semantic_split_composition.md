@@ -1,0 +1,61 @@
+# Security Semantic Split Composition (v0.2.2)
+
+SECURITY_TYPE_SPLIT_SHIFT=True
+
+| split | economic_type | n | share_pct | overall_share_pct | delta_pp |
+|---|---|---|---|---|---|
+| H0_dev | CLOSED_END_FUND | 478 | 0.634 | 0.604 | 0.03 |
+| H0_dev | ETF | 14507 | 19.244 | 14.717 | 4.527 |
+| H0_dev | MUTUAL_OR_POOLED_FUND | 1802 | 2.39 | 1.624 | 0.767 |
+| H0_dev | NON_EQUITY_OR_UNSUPPORTED | 593 | 0.787 | 1.739 | -0.953 |
+| H0_dev | OPERATING_ADR | 3807 | 5.05 | 4.654 | 0.396 |
+| H0_dev | OPERATING_COMMON_EQUITY | 47369 | 62.836 | 68.473 | -5.636 |
+| H0_dev | OPERATING_OTHER_EQUITY | 516 | 0.684 | 0.541 | 0.143 |
+| H0_dev | OTHER_13F_SECURITY | 590 | 0.783 | 0.499 | 0.283 |
+| H0_dev | PREFERRED_OR_HYBRID | 69 | 0.092 | 0.095 | -0.003 |
+| H0_dev | REIT_OR_SPECIAL_EQUITY | 1993 | 2.644 | 2.955 | -0.312 |
+| H0_dev | UNKNOWN | 3661 | 4.856 | 4.098 | 0.758 |
+| H1_time_holdout | CLOSED_END_FUND | 345 | 0.895 | 0.604 | 0.292 |
+| H1_time_holdout | ETF | 8673 | 22.503 | 14.717 | 7.785 |
+| H1_time_holdout | MUTUAL_OR_POOLED_FUND | 857 | 2.224 | 1.624 | 0.6 |
+| H1_time_holdout | NON_EQUITY_OR_UNSUPPORTED | 212 | 0.55 | 1.739 | -1.189 |
+| H1_time_holdout | OPERATING_ADR | 1861 | 4.828 | 4.654 | 0.174 |
+| H1_time_holdout | OPERATING_COMMON_EQUITY | 23195 | 60.181 | 68.473 | -8.291 |
+| H1_time_holdout | OPERATING_OTHER_EQUITY | 348 | 0.903 | 0.541 | 0.362 |
+| H1_time_holdout | OTHER_13F_SECURITY | 165 | 0.428 | 0.499 | -0.071 |
+| H1_time_holdout | PREFERRED_OR_HYBRID | 40 | 0.104 | 0.095 | 0.009 |
+| H1_time_holdout | REIT_OR_SPECIAL_EQUITY | 987 | 2.561 | 2.955 | -0.395 |
+| H1_time_holdout | UNKNOWN | 1859 | 4.823 | 4.098 | 0.725 |
+| H2_manager_holdout | CLOSED_END_FUND | 47 | 0.178 | 0.604 | -0.426 |
+| H2_manager_holdout | ETF | 951 | 3.595 | 14.717 | -11.122 |
+| H2_manager_holdout | MUTUAL_OR_POOLED_FUND | 122 | 0.461 | 1.624 | -1.163 |
+| H2_manager_holdout | NON_EQUITY_OR_UNSUPPORTED | 927 | 3.505 | 1.739 | 1.765 |
+| H2_manager_holdout | OPERATING_ADR | 1181 | 4.465 | 4.654 | -0.19 |
+| H2_manager_holdout | OPERATING_COMMON_EQUITY | 21381 | 80.832 | 68.473 | 12.36 |
+| H2_manager_holdout | OPERATING_OTHER_EQUITY | 108 | 0.408 | 0.541 | -0.133 |
+| H2_manager_holdout | OTHER_13F_SECURITY | 51 | 0.193 | 0.499 | -0.307 |
+| H2_manager_holdout | PREFERRED_OR_HYBRID | 29 | 0.11 | 0.095 | 0.015 |
+| H2_manager_holdout | REIT_OR_SPECIAL_EQUITY | 885 | 3.346 | 2.955 | 0.39 |
+| H2_manager_holdout | UNKNOWN | 769 | 2.907 | 4.098 | -1.191 |
+| H3_security_holdout | CLOSED_END_FUND | 131 | 0.685 | 0.604 | 0.082 |
+| H3_security_holdout | ETF | 3736 | 19.549 | 14.717 | 4.832 |
+| H3_security_holdout | MUTUAL_OR_POOLED_FUND | 363 | 1.899 | 1.624 | 0.276 |
+| H3_security_holdout | NON_EQUITY_OR_UNSUPPORTED | 188 | 0.984 | 1.739 | -0.756 |
+| H3_security_holdout | OPERATING_ADR | 942 | 4.929 | 4.654 | 0.275 |
+| H3_security_holdout | OPERATING_COMMON_EQUITY | 12195 | 63.811 | 68.473 | -4.661 |
+| H3_security_holdout | OPERATING_OTHER_EQUITY | 55 | 0.288 | 0.541 | -0.253 |
+| H3_security_holdout | OTHER_13F_SECURITY | 123 | 0.644 | 0.499 | 0.144 |
+| H3_security_holdout | PREFERRED_OR_HYBRID | 3 | 0.016 | 0.095 | -0.079 |
+| H3_security_holdout | REIT_OR_SPECIAL_EQUITY | 527 | 2.758 | 2.955 | -0.198 |
+| H3_security_holdout | UNKNOWN | 848 | 4.437 | 4.098 | 0.339 |
+| H4_combined | CLOSED_END_FUND | 57 | 0.479 | 0.604 | -0.125 |
+| H4_combined | ETF | 882 | 7.404 | 14.717 | -7.313 |
+| H4_combined | MUTUAL_OR_POOLED_FUND | 88 | 0.739 | 1.624 | -0.885 |
+| H4_combined | NON_EQUITY_OR_UNSUPPORTED | 432 | 3.627 | 1.739 | 1.887 |
+| H4_combined | OPERATING_ADR | 481 | 4.038 | 4.654 | -0.616 |
+| H4_combined | OPERATING_COMMON_EQUITY | 9167 | 76.956 | 68.473 | 8.483 |
+| H4_combined | OPERATING_OTHER_EQUITY | 11 | 0.092 | 0.541 | -0.449 |
+| H4_combined | OTHER_13F_SECURITY | 29 | 0.243 | 0.499 | -0.256 |
+| H4_combined | PREFERRED_OR_HYBRID | 8 | 0.067 | 0.095 | -0.028 |
+| H4_combined | REIT_OR_SPECIAL_EQUITY | 412 | 3.459 | 2.955 | 0.503 |
+| H4_combined | UNKNOWN | 345 | 2.896 | 4.098 | -1.202 |
