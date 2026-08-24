@@ -26,3 +26,15 @@ Security Resolution Validation & Frozen Outcome Unlock:
 | Lower coverage thresholds to "make it run" | REJECTED | Protocol freeze; correctness > convenience |
 | OpenFIGI-only fund verification (no SEC corroboration) | NEXT_PROTOCOL_CANDIDATE | Not allowed in v0.2.1; needs external approval as new protocol |
 | Curated Tier-4 fund table for top funds | NEXT_PROTOCOL_CANDIDATE | Would recover only part of ~25% fund observations |
+
+## v0.2.2 Addendum (2026-08-24) — semantic audit governance
+
+Security Semantic Audit (outcome-blind):
+
+| Idea | Status | Reason |
+|---|---|---|
+| Operating-Equity-only research universe (v0.3) | NEXT_PROTOCOL_CANDIDATE | JUSTIFIED_FOR_NEW_PREREGISTRATION (J1-J5), but must be a fresh external-approved preregistration; NOT started |
+| Excluding pooled vehicles to improve coverage | REJECTED | Hypothesis-specification overfitting; classification must be semantic, not convenience |
+| Using higher operating resolution as justification alone | REJECTED | Coverage is technical convenience, not economic semantics (J3) |
+| Re-running broad O0/O1/O2 with new denominator | REJECTED | v0.2.1 conclusion preserved |
+| Predictive-signal search beyond frozen tests (4Q/5Q persistence, manager scores, ML) | FROZEN | Research Stop Rule (docs/research_stop_rule.md) |
