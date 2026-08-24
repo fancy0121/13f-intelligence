@@ -1,10 +1,6 @@
-# Manager universe for v0.1. Validated against SEC EDGAR on 2026-08-24.
-# Only rows with validation_status=VERIFIED and a CIK are eligible for ingestion.
-# REQUIRES_REVIEW rows are recorded but NOT ingested until human/owner review.
-# Status: VERIFIED | REQUIRES_REVIEW | UNRESOLVED
 label,search_aliases,official_filer_name,cik,validation_status,notes
 Berkshire Hathaway,,BERKSHIRE HATHAWAY INC,1067983,VERIFIED,44 13F filings; latest report 2026-06-30
-Pershing Square Capital Management,Pershing Square,,,REQUIRES_REVIEW,entity ambiguity: Pershing Square Capital Management L.P. (CIK 1336528) vs PERSHING SQUARE INC (CIK 2026053, active since 2025-08)
+Pershing Square Capital Management,Pershing Square,,,REQUIRES_REVIEW,"entity ambiguity: Pershing Square Capital Management L.P. (CIK 1336528) vs PERSHING SQUARE INC (CIK 2026053, active since 2025-08)"
 Himalaya Capital Management,,Himalaya Capital Management LLC,1709323,VERIFIED,36 13F filings; latest report 2026-06-30
 The Baupost Group,Baupost,BAUPOST GROUP LLC/MA,1061768,VERIFIED,109 13F filings; latest report 2026-06-30
 Appaloosa Management,Appaloosa,,,REQUIRES_REVIEW,name/entity change: APPALOOSA MANAGEMENT LP (CIK 1006438) stale since 2015; Appaloosa LP (CIK 1656456) active since 2016
@@ -21,15 +17,15 @@ Coatue Management,,COATUE MANAGEMENT LLC,1135730,VERIFIED,99 13F filings; latest
 Tiger Global Management,,TIGER GLOBAL MANAGEMENT LLC,1167483,VERIFIED,102 13F filings; latest report 2026-06-30
 D1 Capital Partners,,D1 Capital Partners L.P.,1747057,VERIFIED,31 13F filings; latest report 2026-06-30
 Maverick Capital,,MAVERICK CAPITAL LTD,934639,VERIFIED,116 13F filings; latest report 2026-06-30
-Altimeter Capital Management,,Altimeter Capital Management, LP,1541617,VERIFIED,62 13F filings; latest report 2026-06-30
-Dragoneer Investment Group,,Dragoneer Investment Group, LLC,1602189,VERIFIED,47 13F filings; latest report 2026-06-30
-Trian Fund Management,Trian,TRIAN FUND MANAGEMENT, L.P.,1345471,VERIFIED,74 13F filings; latest report 2026-06-30
+Altimeter Capital Management,,"Altimeter Capital Management, LP",1541617,VERIFIED,62 13F filings; latest report 2026-06-30
+Dragoneer Investment Group,,"Dragoneer Investment Group, LLC",1602189,VERIFIED,47 13F filings; latest report 2026-06-30
+Trian Fund Management,Trian,"TRIAN FUND MANAGEMENT, L.P.",1345471,VERIFIED,74 13F filings; latest report 2026-06-30
 ValueAct Capital,ValueAct,,,REQUIRES_REVIEW,current filer is ValueAct Holdings L.P. (CIK 1418814) but name similarity to label is low; needs owner confirmation
 Elliott Investment Management,,Elliott Investment Management L.P.,1791786,VERIFIED,30 13F filings; latest report 2026-06-30
-Bridgewater Associates,,Bridgewater Associates, LP,1350694,VERIFIED,98 13F filings; latest report 2026-06-30
+Bridgewater Associates,,"Bridgewater Associates, LP",1350694,VERIFIED,98 13F filings; latest report 2026-06-30
 TCI Fund Management,,TCI Fund Management Ltd,1647251,VERIFIED,45 13F filings; latest report 2026-06-30
 Renaissance Technologies,,RENAISSANCE TECHNOLOGIES LLC,1037389,VERIFIED,27 13F filings; latest report 2026-06-30
 Citadel Advisors,,CITADEL ADVISORS LLC,1423053,VERIFIED,65 13F filings; latest report 2026-06-30
-BlackRock,BlackRock Inc,BlackRock, Inc.,2012383,VERIFIED,5 13F filings (new entity since 2025-08); latest report 2026-06-30
-Vanguard Group,Vanguard;Vanguard Group Inc,,,REQUIRES_REVIEW,fragmented 13F filings across many Vanguard entities (Advisers Inc, Fiduciary Trust, etc.); needs owner decision
+BlackRock,BlackRock Inc,"BlackRock, Inc.",2012383,VERIFIED,5 13F filings (new entity since 2025-08); latest report 2026-06-30
+Vanguard Group,Vanguard;Vanguard Group Inc,,,REQUIRES_REVIEW,"fragmented 13F filings across many Vanguard entities (Advisers Inc, Fiduciary Trust, etc.); needs owner decision"
 State Street,State Street Global Advisors;State Street Corp,STATE STREET CORP,93751,VERIFIED,7 13F filings (since 2025-02); latest report 2026-06-30
