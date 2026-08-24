@@ -1,0 +1,24 @@
+# Methodology version governing all deterministic analytics.
+# Any change to rules/thresholds MUST bump version and trigger recompute + retest.
+methodology_version: "0.1.0"
+
+position_change:
+  # Thresholds are intentionally strict for v0.1; no tolerance fuzz.
+  unchanged_shares_tolerance: 0
+
+portfolio_weight:
+  # Weight denominator: sum of all reported holding values for the filing.
+  denominator_scope: filing
+
+consensus:
+  change_scale_tanh_divisor: 0.5
+  significance_mode: min_prev_now
+
+trend:
+  windows:
+    - 1
+    - 4
+    - 8
+  stable_abs_threshold: 0.1
+  reversal_requires_quarters: 2
+

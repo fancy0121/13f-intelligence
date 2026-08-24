@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thirteenf"
+version = "0.1.0"
+description = "13F Institutional Intelligence System - deterministic SEC 13F evidence engine"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31",
+    "lxml>=4.9",
+    "streamlit>=1.36",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

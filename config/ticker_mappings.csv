@@ -1,0 +1,5 @@
+# Curated CUSIP -> ticker mapping. Manually maintained, source-tagged.
+# ticker must NEVER be treated as canonical security identity; CUSIP is canonical.
+# mapping_status: VERIFIED | UNRESOLVED | CONFLICT | RETIRED
+security_id,cusip,ticker,issuer,share_class,mapping_status,mapping_source,verified_at,verified_by,notes
+

@@ -1,0 +1,37 @@
+# Product-level candidate universe for v0.1.
+# NOTE: These are product labels, NOT verified SEC filer identities.
+# CIK and validation status must be resolved in Phase 0.5 (Manager Universe Validation)
+# via SEC EDGAR before any real ingestion.
+# Status: PENDING | VERIFIED | REQUIRES_REVIEW | UNRESOLVED
+label,official_filer_name,cik,validation_status,notes
+Berkshire Hathaway,,,,product label; filer entity TBD
+Pershing Square Capital Management,,,,product label; filer entity TBD
+Himalaya Capital Management,,,,product label; filer entity TBD
+The Baupost Group,,,,product label; filer entity TBD
+Appaloosa Management,,,,product label; filer entity TBD
+Third Point,,,,product label; filer entity TBD
+Scion Asset Management,,,,product label; filer entity TBD
+Pabrai Investment Funds,,,,product label; filer entity TBD
+Akre Capital Management,,,,product label; filer entity TBD
+Viking Global Investors,,,,product label; filer entity TBD
+Lone Pine Capital,,,,product label; filer entity TBD
+Greenlight Capital,,,,product label; filer entity TBD
+Duquesne Family Office,,,,product label; filer entity TBD
+Soros Fund Management,,,,product label; filer entity TBD
+Coatue Management,,,,product label; filer entity TBD
+Tiger Global Management,,,,product label; filer entity TBD
+D1 Capital Partners,,,,product label; filer entity TBD
+Maverick Capital,,,,product label; filer entity TBD
+Altimeter Capital Management,,,,product label; filer entity TBD
+Dragoneer Investment Group,,,,product label; filer entity TBD
+Trian Fund Management,,,,product label; filer entity TBD
+ValueAct Capital,,,,product label; filer entity TBD
+Elliott Investment Management,,,,product label; filer entity TBD
+Bridgewater Associates,,,,product label; filer entity TBD
+TCI Fund Management,,,,product label; filer entity TBD
+Renaissance Technologies,,,,product label; filer entity TBD
+Citadel Advisors,,,,product label; filer entity TBD
+BlackRock,,,,product label; filer entity TBD
+Vanguard Group,,,,product label; filer entity TBD
+State Street,,,,product label; filer entity TBD
+
