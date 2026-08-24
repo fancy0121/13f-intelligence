@@ -1,0 +1,4 @@
+# Curated historical market symbols (Tier 4 manual override; provenance required).
+# Only for observations where the CURRENT symbol is not valid at info_date.
+# cusip,symbol,valid_from,valid_to,source,notes
+
