@@ -1,0 +1,51 @@
+# Security Resolution Golden Audit (v0.2.1)
+
+> Generated: 2026-08-24
+> Gate R3: `known_false_verified = 0` required.
+> Method: every VERIFIED* pilot record was cross-checked against the raw
+> OpenFIGI response (cached), the SEC company-ticker title set, and the 13F
+> issuer/title_of_class from the FACT layer.
+
+## Verdict
+
+**Gate R3 PASS - known_false_verified = 0** (25/25 VERIFIED records consistent).
+
+## Audit table
+
+| CUSIP | Symbol | Status | OpenFIGI name (US) | SEC title(s) | 13F issuer | Verdict |
+|---|---|---|---|---|---|---|
+| 02079K305 | GOOGL | VERIFIED_EXACT | ALPHABET INC-CL A | Alphabet Inc. (GOOGL/GOOG/GOOGM/GOOGN) | ALPHABET INC | PASS |
+| 874039100 | TSM | VERIFIED_EXACT | TAIWAN SEMICONDUCTOR-SP ADR | TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD (TSM/TSMWF) | TAIWAN SEMICONDUCTOR MANUFAC | PASS |
+| 852234103 | XYZ | VERIFIED_EXACT | BLOCK INC | Block, Inc. (XYZ/BSQKZ) | BLOCK INC | PASS (current; history via continuity) |
+| 722304102 | PDD | VERIFIED_MULTI_SOURCE | PDD HOLDINGS INC (ADR) | PDD Holdings Inc. (PDD) | PDD HOLDINGS INC | PASS |
+| G3643J108 | FLUT | VERIFIED_EXACT | (none) | Flutter Entertainment plc (FLUT) | FLUTTER ENTMT PLC | PASS (Rule B) |
+| 55825T103 | MSGS | VERIFIED_EXACT | MADISON SQUARE GARDEN SPORTS | Madison Square Garden Sports Corp. (MSGS) | MADISON SQUARE GRDN SPRT COR | PASS |
+| 23249H105 | CYAB | VERIFIED_MULTI_SOURCE | CYABRA INC | Cyabra, Inc. (CYAB) | CYABRA INC | PASS |
+| G7S53R104 | PROK | VERIFIED_EXACT | (none) | PROKIDNEY CORP. (PROK) | PROKIDNEY CORP | PASS (Rule B) |
+| 343412102 | FLR | VERIFIED_MULTI_SOURCE | FLUOR CORP | FLUOR CORP (FLR) | FLUOR CORP | PASS |
+| 92346X206 | VRME | VERIFIED_MULTI_SOURCE | VERIFYME INC | VerifyMe, Inc. (VRME) | VERIFYME INC | PASS |
+| Y18284201 | CISS | VERIFIED_EXACT | (none) | C3is Inc. (CISS) | C3IS INC | PASS (Rule B) |
+| 577125784 | MKOR | VERIFIED_EXACT | MATTHEWS KOREA ACTIVE ETF (ETP) | (trust issuer, no SEC title match) | MATTHEWS ASIA FDS / title KOREA ACTIVE ETF | PASS (title_of_class) |
+| 07134L107 | BATL | VERIFIED_MULTI_SOURCE | BATTALION OIL CORP | BATTALION OIL CORP (BATL) | BATTALION OIL CORP | PASS |
+| 863167201 | STRS | VERIFIED_MULTI_SOURCE | STRATUS PROPERTIES INC | STRATUS PROPERTIES INC (STRS) | STRATUS PPTYS INC | PASS |
+| 74460D109 | PSA | VERIFIED_EXACT | PUBLIC STORAGE (REIT) | Public Storage (PSA + preferreds) | PUBLIC STORAGE | PASS |
+| 816851109 | SRE | VERIFIED_EXACT | SEMPRA | SEMPRA (SRE/SREA) | SEMPRA | PASS |
+| 934550203 | WMG | VERIFIED_MULTI_SOURCE | WARNER MUSIC GROUP CORP-CL A | Warner Music Group Corp. (WMG) | WARNER MUSIC GROUP CORP | PASS |
+| 709789101 | PEBO | VERIFIED_MULTI_SOURCE | PEOPLES BANCORP INC | PEOPLES BANCORP INC (PEBO) | PEOPLES BANCORP INC | PASS |
+| 420261109 | HWKN | VERIFIED_MULTI_SOURCE | HAWKINS INC | HAWKINS INC (HWKN) | HAWKINS INC | PASS |
+| 031001100 | ATLO | VERIFIED_MULTI_SOURCE | AMES NATIONAL CORP | AMES NATIONAL CORP (ATLO) | AMES NATL CORP | PASS |
+| 83192H106 | SDCCQ | VERIFIED_EXACT | SMILEDIRECTCLUB INC | (none) | SMILEDIRECTCLUB INC | PASS (delisted/OTC; pricecheck decides) |
+| 35953C106 | FIP | VERIFIED_MULTI_SOURCE | FTAI INFRASTRUCTURE INC | FTAI Infrastructure Inc. (FIP) | FTAI INFRASTRUCTURE INC | PASS |
+| 89832Q109 | TFC | VERIFIED_EXACT | TRUIST FINANCIAL CORP | TRUIST FINANCIAL CORP (TFC + preferreds) | TRUIST FINL CORP | PASS |
+| 78781J109 | SAIL | VERIFIED_MULTI_SOURCE | SAILPOINT INC | SailPoint, Inc. (SAIL) | SAILPOINT INC | PASS |
+| 778920306 | SHAZ | VERIFIED_EXACT | SHARONAI HOLDINGS INC | SharonAI Holdings Inc. (SHAZ/SHAZW) | SHARONAI HOLDINGS INC | PASS |
+
+## Honesty checks
+
+- Multi-ticker issuers (Alphabet, Block, Taiwan Semi, Sempra, Public Storage,
+  Truist) were resolved by CUSIP -> share class, never merged by issuer name.
+- ETFs with trust-only issuers and no matching SEC fund title stayed
+  UNRESOLVED (iShares 46436E692 OpenFIGI returned 0; WisdomTree WTAI had no
+  SEC fund-title match in the pilot run and stayed UNRESOLVED).
+- Old tickers (SQ, FB) were not used as verified symbols.
+

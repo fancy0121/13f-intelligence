@@ -34,14 +34,17 @@ def _result(cusip, issuer, title_of_class, status, records=None, sources=None, n
 
 
 def _check_adr_consistency(title_of_class: str | None, sec_types: set[str]) -> str | None:
-    """Return a conflict note, or None when consistent."""
+    """Return a conflict note, or None when consistent.
+
+    'ADS' (American Depositary Shares) is treated as an ADR marker (TSM/PDD
+    filings use 'SPONSORED ADS'). A missing ADR marker in title_of_class is a
+    note, not a conflict, because filers commonly omit it (e.g. 'COM').
+    """
     t = (title_of_class or "").upper()
-    is_adr = "ADR" in t
+    is_adr = ("ADR" in t) or ("ADS" in t)
     of_is_adr = "ADR" in sec_types
     if t and is_adr and not of_is_adr:
         return f"13F title_of_class declares ADR but OpenFIGI securityType={sorted(sec_types)}"
-    if t and not is_adr and of_is_adr:
-        return f"OpenFIGI securityType=ADR but 13F title_of_class={title_of_class!r} has no ADR marker"
     return None
 
 
@@ -103,10 +106,12 @@ def resolve_cusip(
         if not us_tickers:
             return _result(
                 cusip, issuer, title_of_class,
-                ResolutionStatus.NON_EQUITY_OR_UNSUPPORTED.value,
+                ResolutionStatus.UNRESOLVED.value,
                 records=records,
                 sources=sources,
-                notes=notes + ["no US venue record; foreign listings only"],
+                notes=notes + [
+                    "no US venue record (possibly delisted/terminated or wrong CUSIP)"
+                ],
             )
         if len(us_tickers) > 1:
             return _result(
@@ -135,10 +140,21 @@ def resolve_cusip(
         if issuer and names_match(rep.name, issuer):
             corroborated = True
             sources.append("sec_13f_issuer")
+        # Fund/trust filings carry the issuer as the trust; the specific fund
+        # name appears in title_of_class (also SEC-derived filing text).
+        if not corroborated and title_of_class and names_match(rep.name, title_of_class):
+            corroborated = True
+            sources.append("sec_13f_title_of_class")
         if sec_index is not None:
             sec_recs = sec_index.lookup(issuer) if issuer else []
             if sec_recs:
                 if any(names_match(r.get("title"), issuer) or names_match(r.get("title"), rep.name) for r in sec_recs):
+                    corroborated = True
+                    sources.append("sec_ticker_file")
+                # SEC issuer set contains the OpenFIGI symbol (e.g., TSM in
+                # {TSM, TSMWF} for Taiwan Semiconductor) -> corroboration.
+                sec_issuer_tickers = {r.get("ticker") for r in sec_recs if r.get("ticker")}
+                if not corroborated and symbol in sec_issuer_tickers:
                     corroborated = True
                     sources.append("sec_ticker_file")
                 sec_unique = sec_index.unique_ticker(issuer)
@@ -149,6 +165,25 @@ def resolve_cusip(
                         records=records,
                         sources=sources,
                         notes=notes + [f"SEC unique ticker {sec_unique} != OpenFIGI {symbol}"],
+                    )
+            # SEC title (fund name) corroboration: SEC ticker file often holds
+            # the full fund name which matches OpenFIGI's returned name.
+            sec_title_tickers = sec_index.ticker_set_for_title(rep.name) if rep.name else set()
+            if sec_title_tickers:
+                if symbol in sec_title_tickers:
+                    if not corroborated:
+                        corroborated = True
+                        sources.append("sec_ticker_file")
+                elif len(sec_title_tickers) == 1:
+                    # A unique SEC fund title maps to a different ticker.
+                    return _result(
+                        cusip, issuer, title_of_class,
+                        ResolutionStatus.CONFLICT.value,
+                        records=records,
+                        sources=sources,
+                        notes=notes + [
+                            f"SEC title '{rep.name}' -> {sorted(sec_title_tickers)} != OpenFIGI {symbol}"
+                        ],
                     )
         if not corroborated:
             return _result(
@@ -177,10 +212,20 @@ def resolve_cusip(
             sources.append("openfigi")
         if hist:
             status = ResolutionStatus.VERIFIED_HISTORICAL.value
-        elif sec_index is not None and sec_index.unique_ticker(issuer) == symbol:
-            status = ResolutionStatus.VERIFIED_MULTI_SOURCE.value
         else:
-            status = ResolutionStatus.VERIFIED_EXACT.value
+            sec_agree = False
+            if sec_index is not None:
+                if sec_index.unique_ticker(issuer) == symbol:
+                    sec_agree = True
+                else:
+                    title_tickers = sec_index.ticker_set_for_title(rep.name) if rep.name else set()
+                    if title_tickers and len(title_tickers) == 1 and symbol in title_tickers:
+                        sec_agree = True
+            status = (
+                ResolutionStatus.VERIFIED_MULTI_SOURCE.value
+                if sec_agree
+                else ResolutionStatus.VERIFIED_EXACT.value
+            )
         return _result(
             cusip, issuer, title_of_class, status,
             records=records, sources=sources, notes=notes,
@@ -231,4 +276,3 @@ def resolve_cusip(
 
 def is_verified_status(status: str) -> bool:
     return status in VERIFIED_STATUSES
-

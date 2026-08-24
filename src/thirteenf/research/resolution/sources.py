@@ -326,6 +326,29 @@ class SECIndex:
         tickers = {r.get("ticker") for r in self.lookup(issuer) if r.get("ticker")}
         return next(iter(tickers)) if len(tickers) == 1 else None
 
+    def lookup_by_title(self, name: str | None) -> list[dict]:
+        """Find SEC records whose normalized title matches the given name."""
+        key = raw_norm(name)
+        if not key:
+            return []
+        out = self._by_raw.get(key, [])
+        if not out:
+            out = self._by_canonical.get(canonical_norm(name), [])
+        if not out:
+            toks = key.split()
+            if len(toks) >= 2:
+                prefix = " ".join(toks[:2])
+                out = [
+                    r
+                    for k, rs in self._by_raw.items()
+                    if k.startswith(prefix)
+                    for r in rs
+                ][:8]
+        return out
+
+    def ticker_set_for_title(self, name: str | None) -> set[str]:
+        return {r.get("ticker") for r in self.lookup_by_title(name) if r.get("ticker")}
+
     def corroborates(self, issuer: str | None, of_name: str | None) -> bool:
         """True when any SEC record title matches the issuer or OpenFIGI name."""
         if not issuer:

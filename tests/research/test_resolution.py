@@ -62,6 +62,7 @@ SEC_RECORDS = [
     {"cik": "1326801", "ticker": "META", "title": "Meta Platforms, Inc.", "exchange": ""},
     {"cik": "789019", "ticker": "MSFT", "title": "MICROSOFT CORP", "exchange": ""},
     {"cik": "1046179", "ticker": "TSM", "title": "TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD", "exchange": ""},
+    {"cik": "1046179", "ticker": "TSMWF", "title": "TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD", "exchange": ""},
     {"cik": "1512673", "ticker": "XYZ", "title": "Block, Inc.", "exchange": ""},
     {"cik": "1737806", "ticker": "PDD", "title": "PDD Holdings Inc.", "exchange": ""},
     {"cik": "1045810", "ticker": "NVDA", "title": "NVIDIA CORP", "exchange": ""},
@@ -199,7 +200,8 @@ def test_foreign_only_no_us_venue():
         "X", "ACME", "",
         response(rec("ACME", "GR", name="ACME CORP")), sec, {},
     )
-    assert res.status == ResolutionStatus.NON_EQUITY_OR_UNSUPPORTED.value
+    assert res.status == ResolutionStatus.UNRESOLVED.value
+    assert "no US venue record" in res.notes[0]
 
 
 def test_adr_mismatch_conflict():
@@ -274,7 +276,48 @@ def test_sec_index_abbreviation_and_ambiguity():
     assert sec.corroborates("MICROSOFT CORP", "MICROSOFT CORP")
 
 
-def test_openfigi_client_cache_and_batch():
+def test_tsm_adr_corroborated_via_sec_issuer_ticker_set():
+    sec = SECIndex(SEC_RECORDS)
+    res = resolve_cusip(
+        "874039100", "TAIWAN SEMICONDUCTOR MANUFAC", "SPONSORED ADS",
+        response(rec("TSM", "US", sec_type="ADR", name="TAIWAN SEMICONDUCTOR-SP ADR", scf="BBG001S5WWW4")),
+        sec, {},
+    )
+    assert res.status == ResolutionStatus.VERIFIED_EXACT.value
+    assert res.records[0].symbol == "TSM"
+    assert "sec_ticker_file" in res.sources
+
+
+def test_etf_corroborated_via_sec_title_lookup():
+    # SEC title (full fund name) matches OpenFIGI name; ticker agrees.
+    sec = SECIndex(
+        [
+            {"cik": "1", "ticker": "WTAI", "title": "WISDOMTREE ARTIFICIAL INTELLIGENCE AND INNOVATION FUND", "exchange": ""},
+            {"cik": "1", "ticker": "WTAI", "title": "WISDOMTREE ARTIFICIAL INTELLIGENCE AND INNOVATION FUND", "exchange": ""},
+        ]
+    )
+    res = resolve_cusip(
+        "97717Y543", "WISDOMTREE TR", "ARTIFICIAL INTEL",
+        response(rec("WTAI", "US", sec_type="ETP", name="WISDOMTREE ARTIFICIAL INTELLIGENCE AND INNOVATION FUND")),
+        sec, {},
+    )
+    assert res.status == ResolutionStatus.VERIFIED_MULTI_SOURCE.value
+    assert res.records[0].symbol == "WTAI"
+
+
+def test_etf_conflict_when_unique_sec_title_ticker_differs():
+    sec = SECIndex(
+        [{"cik": "1", "ticker": "OTHER", "title": "SOME FUND NAME", "exchange": ""}]
+    )
+    res = resolve_cusip(
+        "X", "SOME TRUST", "SOME FUND",
+        response(rec("AAA", "US", sec_type="ETP", name="SOME FUND NAME")),
+        sec, {},
+    )
+    assert res.status == ResolutionStatus.CONFLICT.value
+
+
+def test_openfigi_client_cache_and_batch(tmp_path):
     import json
     from thirteenf.research.resolution.sources import OpenFIGIClient
 
@@ -287,7 +330,7 @@ def test_openfigi_client_cache_and_batch():
             [{"data": [{"ticker": f"T{i}", "exchCode": "US"}]} for i in range(len(jobs))]
         ).encode("utf-8")
 
-    client = OpenFIGIClient(ROOT / ".pytest_tmp" / "ofcache", transport=transport, sleep_s=0)
+    client = OpenFIGIClient(tmp_path / "ofcache", transport=transport, sleep_s=0)
     jobs = [{"idType": "ID_CUSIP", "idValue": f"C{i:03d}"} for i in range(25)]
     res = client.mapping(jobs)
     assert len(res) == 25
@@ -298,7 +341,7 @@ def test_openfigi_client_cache_and_batch():
     assert res2[0].records[0].ticker == "T0"
 
 
-def test_openfigi_client_retry_on_429():
+def test_openfigi_client_retry_on_429(tmp_path):
     from thirteenf.research.resolution.sources import OpenFIGIClient
 
     attempts = {"n": 0}
@@ -309,7 +352,7 @@ def test_openfigi_client_retry_on_429():
             return 429, b""
         return 200, b'[{"data":[{"ticker":"T","exchCode":"US"}]}]'
 
-    client = OpenFIGIClient(ROOT / ".pytest_tmp" / "ofretry", transport=transport, sleep_s=0, max_retries=2)
+    client = OpenFIGIClient(tmp_path / "ofretry", transport=transport, sleep_s=0, max_retries=2)
     res = client.mapping([{"idType": "ID_CUSIP", "idValue": "C"}])
     assert res[0].records[0].ticker == "T"
     assert attempts["n"] == 2
