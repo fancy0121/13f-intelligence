@@ -32,6 +32,11 @@ from thirteenf.filings import (
 from thirteenf.parser import XmlParseError, parse_info_table
 from thirteenf.sec_client import SecClient, SecError
 from thirteenf.security_master import load_mappings, resolve
+from thirteenf.changes import (
+    compute_portfolio_weights,
+    compute_position_changes,
+)
+from thirteenf.quality import run_all as run_quality_checks
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -260,6 +265,24 @@ def cmd_normalize(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_analyze(args: argparse.Namespace) -> int:
+    """Run deterministic analytics over the normalized DB (offline)."""
+    db_path = Path(args.db_path)
+    methodology = args.methodology
+    conn = connect(db_path)
+    init_db(conn)
+
+    weighted = compute_portfolio_weights(conn)
+    changes = compute_position_changes(conn, methodology)
+    quality = run_quality_checks(conn, methodology)
+
+    conn.close()
+    print(f"portfolio_weight_rows={weighted}")
+    print(f"position_changes={changes}")
+    print(f"quality={quality}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -292,6 +315,13 @@ def build_parser() -> argparse.ArgumentParser:
     rebuild.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
     rebuild.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     rebuild.set_defaults(func=cmd_normalize)
+
+    analyze = sub.add_parser(
+        "analyze", help="Compute weights, position changes, and quality checks"
+    )
+    analyze.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
+    analyze.add_argument("--methodology", default="0.1.0")
+    analyze.set_defaults(func=cmd_analyze)
 
     return parser
 

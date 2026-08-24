@@ -11,7 +11,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 DDL = [
     """
@@ -106,6 +106,7 @@ DDL = [
         manager_id INTEGER NOT NULL,
         security_id INTEGER NOT NULL,
         report_period TEXT NOT NULL,
+        put_call TEXT NOT NULL DEFAULT '',
         change_type TEXT NOT NULL,
         shares_prev REAL,
         shares_now REAL,
@@ -115,7 +116,9 @@ DDL = [
         weight_now REAL,
         weight_change REAL,
         methodology_version TEXT NOT NULL,
-        UNIQUE(manager_id, security_id, report_period, methodology_version)
+        UNIQUE(
+            manager_id, security_id, put_call, report_period, methodology_version
+        )
     )
     """,
     """
@@ -123,13 +126,14 @@ DDL = [
         consensus_id INTEGER PRIMARY KEY,
         security_id INTEGER NOT NULL,
         report_period TEXT NOT NULL,
+        put_call TEXT NOT NULL DEFAULT '',
         manager_count INTEGER NOT NULL,
         high_quality_manager_count INTEGER,
         independent_strategy_count INTEGER,
         raw_contributions TEXT NOT NULL,
         consensus_score REAL NOT NULL,
         methodology_version TEXT NOT NULL,
-        UNIQUE(security_id, report_period, methodology_version)
+        UNIQUE(security_id, put_call, report_period, methodology_version)
     )
     """,
     """
@@ -137,11 +141,12 @@ DDL = [
         trend_id INTEGER PRIMARY KEY,
         security_id INTEGER NOT NULL,
         report_period TEXT NOT NULL,
+        put_call TEXT NOT NULL DEFAULT '',
         horizon TEXT NOT NULL,
         trend_label TEXT NOT NULL,
         trend_score REAL,
         methodology_version TEXT NOT NULL,
-        UNIQUE(security_id, report_period, horizon, methodology_version)
+        UNIQUE(security_id, put_call, report_period, horizon, methodology_version)
     )
     """,
     """
