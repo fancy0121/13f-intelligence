@@ -59,6 +59,12 @@ streamlit run app/app.py
 
 五个页面：总览 / 机构 / 个股 / 共识 / 我的组合（界面中文，标识符英文）。
 
+### Manager Scope（VERIFIED_WITH_SCOPE）
+
+同一品牌可能对应多个 SEC filing entity（如 PERSHING SQUARE INC 与 PSCM L.P.）。
+系统明确声明追踪的 filing entity，不合并平行/历史实体。详见
+`docs/manager_scope.md`；Managers 页面会展示 scope 备注。
+
 ## 运行测试
 
 ```powershell

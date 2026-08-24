@@ -33,6 +33,8 @@ def run() -> None:
     c2.metric("评分状态", summary.get("scoring_status") or "N/A")
     c3.metric("信号质量", summary.get("signal_quality") if summary.get("signal_quality") is not None else "NULL")
     c4.metric("方法版本", summary.get("methodology_version") or "N/A")
+    if summary.get("notes"):
+        st.caption(f"Scope / 备注：{summary['notes']}")
 
     st.divider()
     st.markdown("#### 最新季度动作")

@@ -55,7 +55,10 @@ def load_verified_managers(path: Path) -> list[dict]:
             (line for line in fh if not line.lstrip().startswith("#"))
         )
         for row in reader:
-            if (row.get("validation_status") or "").strip() == "VERIFIED":
+            status = (row.get("validation_status") or "").strip()
+            # VERIFIED_WITH_SCOPE has a tracked filing entity (CIK present)
+            # and is eligible for ingestion; EXCLUDED / REQUIRES_REVIEW are not.
+            if status in ("VERIFIED", "VERIFIED_WITH_SCOPE"):
                 rows.append(row)
     return rows
 

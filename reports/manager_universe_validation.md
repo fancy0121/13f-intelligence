@@ -241,3 +241,47 @@
 - CIK 0001520010 | State Street Global Advisors Europe Ltd | ticker=- | sim=0.4 | 13F=0 (A=0) | first= | last filing= | latest report period= | latest report period: N/A
 - CIK 0001714343 | State Street Global Advisors Trust Co | ticker=- | sim=0.4 | 13F=0 (A=0) | first= | last filing= | latest report period= | latest report period: N/A
 - CIK 0001975354 | State Street Saudi Arabia Financial Solutions | ticker=- | sim=0.333 | 13F=0 (A=0) | first= | last filing= | latest report period= | latest report period: N/A
+
+---
+
+## Task A — v0.1.1 Resolution of REQUIRES_REVIEW managers
+
+> Re-investigated on 2026-08-24 using SEC EDGAR submissions JSON (authoritative
+> filer names + 13F activity). Final statuses: VERIFIED / VERIFIED_WITH_SCOPE /
+> EXCLUDED / REQUIRES_REVIEW. No CIK was guessed; no lookalike entity was
+> silently substituted.
+
+| Product label | Final status | Official filer name (tracked) | CIK | Latest report period | Scope / reason |
+|---|---|---|---|---|---|
+| Pershing Square Capital Management | VERIFIED_WITH_SCOPE | Pershing Square Capital Management, L.P. | 1336528 | 2026-03-31 | Track PSCM L.P.; PERSHING SQUARE INC (2026053) is a separate active filer since 2025-08, not merged |
+| Appaloosa Management | VERIFIED_WITH_SCOPE | Appaloosa LP | 1656456 | 2026-06-30 | Track Appaloosa LP (active since 2016); APPALOOSA MANAGEMENT LP (1006438) is pre-2016 history |
+| Scion Asset Management | VERIFIED | Scion Asset Management, LLC | 1649339 | 2025-09-30 | Unique match (Burry); latest report stale |
+| Pabrai Investment Funds | EXCLUDED | (none) | - | 2011-12-31 | Only filer is individual PABRAI MOHNISH (1173334); no 13F since 2011; not an institutional filer for v0.1 |
+| Greenlight Capital | VERIFIED | GREENLIGHT CAPITAL INC | 1079114 | 2023-12-31 | Unique match (Einhorn); latest report stale |
+| Soros Fund Management | VERIFIED_WITH_SCOPE | SOROS FUND MANAGEMENT LLC | 1029160 | 2026-06-30 | Track SFM LLC; SOROS CAPITAL MANAGEMENT LLC (1748240) parallel filer since 2020, not merged |
+| ValueAct Capital | VERIFIED_WITH_SCOPE | ValueAct Holdings, L.P. | 1418814 | 2026-06-30 | Track ValueAct Holdings (active since 2008); ValueAct Capital Management L.P. (1351069) is pre-2008 history |
+| Vanguard Group | VERIFIED_WITH_SCOPE | VANGUARD GROUP INC | 102909 | 2025-12-31 | Track parent label; Vanguard 13F fragmented across many entities; parent began filing 2025-08 |
+
+### Evidence notes
+
+- Pershing Square: both CIK 1336528 (97 filings) and CIK 2026053 (5 filings)
+  are active; they are distinct legal entities with distinct CUSIP universes.
+- Appaloosa: entity renamed from APPALOOSA MANAGEMENT LP (last 2015-12-31) to
+  Appaloosa LP (first 2016-05-13); continuous brand, two CIKs.
+- Scion / Greenlight: single matching filer each; staleness flagged but
+  identity unambiguous.
+- Soros: SFM LLC (126 filings) and Soros Capital Management LLC (27 filings,
+  since 2020) both file; treated as separate entities to avoid conflation.
+- ValueAct: active filer is ValueAct Holdings L.P. (75 filings); old entity
+  stopped 2008.
+- Vanguard: the product label maps to the parent; its 13F history only starts
+  2025-08 (3 filings), and the broader Vanguard complex files across several
+  entities. Scope explicitly documented.
+
+### Final universe (ingestible)
+
+- VERIFIED: 15
+- VERIFIED_WITH_SCOPE: 7
+- EXCLUDED: 1 (Pabrai Investment Funds)
+- REQUIRES_REVIEW: 0
+- Total ingestible: 29 (previously 22)

@@ -93,7 +93,7 @@ def manager_summary(conn: sqlite3.Connection, manager_id: int) -> dict:
     m = conn.execute(
         """
         SELECT name, cik, strategy_type, scoring_status, signal_quality,
-               methodology_version
+               methodology_version, notes
         FROM managers WHERE manager_id=?
         """,
         (manager_id,),
@@ -107,6 +107,7 @@ def manager_summary(conn: sqlite3.Connection, manager_id: int) -> dict:
         "scoring_status": m[3],
         "signal_quality": m[4],
         "methodology_version": m[5],
+        "notes": m[6],
     }
 
 
@@ -210,4 +211,3 @@ def unresolved_count(conn: sqlite3.Connection) -> int:
     return conn.execute(
         "SELECT COUNT(*) FROM securities WHERE mapping_status='UNRESOLVED'"
     ).fetchone()[0]
-

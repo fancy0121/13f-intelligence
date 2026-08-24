@@ -70,3 +70,12 @@ consensus = Σ (weight_m × significance_m × change_score_m)
 系统暴露：stale filing、failed ingestion、unresolved CUSIP、amendment pending、
 duplicate filing、malformed filing、incomplete quarter、missing historical
 comparison。UI 总览页必须展示 Data Quality Status；数据缺失时页面不得假装正常。
+
+## 6. Manager Scope（v0.1.1）
+
+同一品牌可能对应多个 SEC filing entity。系统采用 `VERIFIED_WITH_SCOPE` 状态：
+
+- 明确声明追踪的 filing entity（见 `docs/manager_scope.md`）；
+- 平行实体（如 PERSHING SQUARE INC vs PSCM L.P.）不合并；
+- 历史实体（如 2016 年前的 APPALOOSA MANAGEMENT LP）不混入当前持仓；
+- ticker 或名称相似不构成合并依据；CUSIP 仍是 canonical identity。

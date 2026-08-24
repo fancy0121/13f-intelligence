@@ -81,3 +81,72 @@
 `V0_1_RELEASE_STATUS=DELIVERED`
 
 All v0.1 required gates satisfied (Gate 3 pending real-world validation).
+
+---
+
+# v0.1.1 Intelligence Activation — Execution Report
+
+> Generated: 2026-08-24
+> Baseline: v0.1 final commit `39710b1`; objective file received as
+> `goal-objective.md` (AUTONOMOUS EXECUTION MODE).
+
+## Task A — Resolve 8 REQUIRES_REVIEW managers
+
+Re-investigated via SEC EDGAR submissions JSON (authoritative filer names +
+13F activity). Final outcomes (evidence + scope in
+`reports/manager_universe_validation.md` Task A section):
+
+| Label | Final status | Tracked CIK |
+|---|---|---|
+| Pershing Square Capital Management | VERIFIED_WITH_SCOPE | 1336528 |
+| Appaloosa Management | VERIFIED_WITH_SCOPE | 1656456 |
+| Scion Asset Management | VERIFIED | 1649339 |
+| Pabrai Investment Funds | EXCLUDED | - |
+| Greenlight Capital | VERIFIED | 1079114 |
+| Soros Fund Management | VERIFIED_WITH_SCOPE | 1029160 |
+| ValueAct Capital | VERIFIED_WITH_SCOPE | 1418814 |
+| Vanguard Group | VERIFIED_WITH_SCOPE | 102909 |
+
+- Universe now: 29 ingestible (15 VERIFIED + 7 VERIFIED_WITH_SCOPE + 7
+  previously VERIFIED), 1 EXCLUDED (Pabrai), 0 REQUIRES_REVIEW.
+- `load_verified_managers` now accepts VERIFIED_WITH_SCOPE (tracked entity
+  with CIK) for ingestion.
+- Scope documented in `docs/manager_scope.md`; Managers UI shows scope notes.
+
+## Task B — Priority Security Mapping
+
+- `config/portfolio.csv` is **empty** (header/comment only). P0 therefore has
+  no securities to map.
+- No fabricated mappings: `config/ticker_mappings.csv` remains empty; every
+  security stays `UNRESOLVED` until a human-maintained, source-tagged mapping
+  row is added. This is conservative + explicit per the objective.
+
+## Low Coupling
+
+- Added `tests/test_module_boundaries.py` (5 static import-graph guards):
+  ingestion layer cannot import analytics; analytics cannot import UI/SEC;
+  security_master independent; UI read-mostly (no sec_client/filings import,
+  no direct DB writes).
+
+## Data after activation
+
+| Item | v0.1 | v0.1.1 |
+|---|---|---|
+| Ingestible managers | 22 | 29 |
+| Filings | 261 | 339 |
+| Holdings | 542,945 | 600,173 |
+| Position changes | 317,683 | 336,175 |
+| Amendments | 9 | 12 |
+| Unresolved securities | 12,896 | (rebuilt, all UNRESOLVED) |
+| Quality events | 522 | stale=3, incomplete=3 + unresolved |
+
+## Verification
+
+- `pytest`: **41 passed** (36 previous + 5 module-boundary guards).
+- Gate 1: **PASS** (150/150, coverage amendment/PUT-CALL/unresolved).
+- Gate 2: **PASS** (30 transitions, 0 mismatch, 2 weight-divergence cases).
+- Gate 3: **PENDING_REAL_WORLD_VALIDATION** (unchanged).
+
+## Release Status
+
+`V0_1_1_RELEASE_STATUS=DELIVERED`
