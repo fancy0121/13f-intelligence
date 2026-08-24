@@ -4,15 +4,34 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+from thirteenf.database import (
+    add_quality_event,
+    backfill_holding_tickers,
+    bulk_ensure_securities,
+    connect,
+    init_db,
+    replace_holdings,
+    upsert_filing,
+    upsert_manager,
+)
 from thirteenf.filings import (
     download_filing,
     parse_submissions,
     latest_n_quarters,
 )
+from thirteenf.parser import XmlParseError, parse_info_table
 from thirteenf.sec_client import SecClient, SecError
+from thirteenf.security_master import load_mappings, resolve
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -66,6 +85,181 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return 1 if failures else 0
 
 
+def cmd_normalize(args: argparse.Namespace) -> int:
+    """Build / refresh SQLite DB from raw cache (no network)."""
+    raw_root = Path(args.raw_root)
+    db_path = Path(args.db_path)
+    managers_path = Path(args.managers)
+    mappings_path = Path(args.mappings)
+    if db_path.exists() and args.clean:
+        db_path.unlink()
+
+    conn = connect(db_path)
+    init_db(conn)
+    mappings = load_mappings(mappings_path)
+    mapping_date = datetime.now(timezone.utc).date().isoformat()
+
+    verified = {
+        int(row["cik"]): row
+        for row in load_verified_managers(managers_path)
+    }
+    print(f"verified_managers={len(verified)}")
+
+    stats = {
+        "filings": 0,
+        "holdings": 0,
+        "amended": 0,
+        "unresolved_cusips": 0,
+        "malformed": 0,
+        "no_info_table": 0,
+        "failed_ingest": 0,
+    }
+
+    manager_ids: dict[int, int] = {}
+    for cik, row in verified.items():
+        mid = upsert_manager(
+            conn,
+            name=row.get("official_filer_name") or row["label"],
+            cik=cik,
+            notes=row.get("notes") or "",
+        )
+        manager_ids[cik] = mid
+
+    for cik in sorted(verified):
+        cik_dir = raw_root / str(cik)
+        if not cik_dir.exists():
+            continue
+        for accession_dir in sorted(cik_dir.iterdir()):
+            manifest_path = accession_dir / "manifest.json"
+            if not manifest_path.exists():
+                continue
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            mid = manager_ids[int(manifest.get("cik", cik))]
+            raw_path = accession_dir / "info_table.xml"
+            status = manifest.get("status", "")
+            if status == "NO_INFO_TABLE":
+                stats["no_info_table"] += 1
+                add_quality_event(
+                    conn,
+                    event_type="FAILED_INGESTION",
+                    severity="ERROR",
+                    message=f"no info table: {manifest.get('accession')}",
+                    manager_id=mid,
+                    report_period=manifest.get("report_date"),
+                )
+                continue
+            if status == "FAILED":
+                stats["failed_ingest"] += 1
+                add_quality_event(
+                    conn,
+                    event_type="FAILED_INGESTION",
+                    severity="ERROR",
+                    message=(
+                        f"download failed: {manifest.get('accession')} "
+                        f"{manifest.get('error', '')}"
+                    ),
+                    manager_id=mid,
+                    report_period=manifest.get("report_date"),
+                )
+                continue
+            if status != "OK" or not raw_path.exists():
+                continue
+
+            try:
+                rows = parse_info_table(raw_path.read_bytes())
+            except XmlParseError as exc:
+                stats["malformed"] += 1
+                add_quality_event(
+                    conn,
+                    event_type="MALFORMED_FILING",
+                    severity="ERROR",
+                    message=f"{manifest.get('accession')}: {exc}",
+                    manager_id=mid,
+                    report_period=manifest.get("report_date"),
+                )
+                continue
+
+            is_amendment = (manifest.get("form_type") or "") == "13F-HR/A"
+            fid = upsert_filing(
+                conn,
+                manager_id=mid,
+                report_period=manifest.get("report_date") or "",
+                filing_date=manifest.get("filing_date") or "",
+                accession_number=manifest.get("accession") or "",
+                form_type=manifest.get("form_type") or "",
+                is_amendment=is_amendment,
+                source_url=manifest.get("source_url") or "",
+                raw_checksum=manifest.get("checksum") or "",
+                raw_path=str(raw_path),
+                fetched_at_utc=manifest.get("fetched_at_utc"),
+                ingest_status="OK",
+            )
+            if is_amendment:
+                stats["amended"] += 1
+
+            replace_holdings(
+                conn,
+                filing_id=fid,
+                manager_id=mid,
+                report_period=manifest.get("report_date") or "",
+                rows=rows,
+                commit=False,
+            )
+            stats["holdings"] += len(rows)
+            stats["filings"] += 1
+
+            # Resolve securities + assign tickers (deterministic, no guessing).
+            security_rows: list[tuple] = []
+            unresolved_cusips: set[str] = set()
+            for row in rows:
+                if not row.cusip:
+                    continue
+                mapping = resolve(mappings, row.cusip)
+                security_rows.append(
+                    (
+                        mapping.cusip,
+                        mapping.ticker,
+                        mapping.issuer or (row.name_of_issuer or None),
+                        mapping.share_class or (row.title_of_class or None),
+                        mapping.mapping_status,
+                        mapping.mapping_source,
+                    )
+                )
+                if mapping.mapping_status == "UNRESOLVED":
+                    unresolved_cusips.add(mapping.cusip)
+            bulk_ensure_securities(
+                conn,
+                security_rows,
+                mapping_date=mapping_date,
+                commit=False,
+            )
+            backfill_holding_tickers(conn, filing_id=fid, commit=False)
+            if unresolved_cusips:
+                stats["unresolved_cusips"] += len(unresolved_cusips)
+                add_quality_event(
+                    conn,
+                    event_type="UNRESOLVED_CUSIP",
+                    severity="WARN",
+                    message=(
+                        f"{len(unresolved_cusips)} unresolved CUSIPs: "
+                        + ", ".join(sorted(unresolved_cusips)[:20])
+                    ),
+                    manager_id=mid,
+                    report_period=manifest.get("report_date"),
+                    filing_id=fid,
+                    commit=False,
+                )
+            conn.commit()
+
+    conn.close()
+    print(f"stats={stats}")
+    print(f"db={db_path}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -80,6 +274,25 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--max-retries", type=int, default=5)
     ingest.set_defaults(func=cmd_ingest)
 
+    normalize = sub.add_parser(
+        "normalize", help="Build SQLite DB from raw cache (offline)"
+    )
+    normalize.add_argument("--managers", default=str(ROOT / "config" / "managers.csv"))
+    normalize.add_argument("--mappings", default=str(ROOT / "config" / "ticker_mappings.csv"))
+    normalize.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
+    normalize.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
+    normalize.add_argument("--clean", action="store_true")
+    normalize.set_defaults(func=cmd_normalize)
+
+    rebuild = sub.add_parser(
+        "rebuild", help="Rebuild SQLite DB from raw cache (clean + normalize)"
+    )
+    rebuild.add_argument("--managers", default=str(ROOT / "config" / "managers.csv"))
+    rebuild.add_argument("--mappings", default=str(ROOT / "config" / "ticker_mappings.csv"))
+    rebuild.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
+    rebuild.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
+    rebuild.set_defaults(func=cmd_normalize)
+
     return parser
 
 
@@ -91,4 +304,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
