@@ -65,6 +65,19 @@ streamlit run app/app.py
 系统明确声明追踪的 filing entity，不合并平行/历史实体。详见
 `docs/manager_scope.md`；Managers 页面会展示 scope 备注。
 
+### 未解析证券优先级清单（人工审核用）
+
+系统不做自动 CUSIP→ticker 映射。需要人工维护映射时，可生成按“持有机构数 /
+最新季度总市值”排序的未解析清单（仅事实，不猜测）：
+
+```powershell
+python scripts/prioritize_unresolved.py
+```
+
+输出 `reports/unresolved_priority.md`。人工核对后，将已验证条目写入
+`config/ticker_mappings.csv`（带 mapping_source / verified_at / verified_by），
+再重新执行 `normalize` + `analyze`。
+
 ## 运行测试
 
 ```powershell
