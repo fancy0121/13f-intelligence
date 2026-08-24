@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import json
 from datetime import date
 from pathlib import Path
 
@@ -327,6 +328,87 @@ def write_final_manifest() -> None:
     )
 
 
+def write_machine_readable_manifest() -> None:
+    """Machine-readable outcome manifest (JSON) - facts only."""
+    # Eligible counts sourced from the committed v0.1 research_manifest.json.
+    v01 = json.loads((OUT / "research_manifest.json").read_text(encoding="utf-8"))
+    eligible = {}
+    for variant in ("A0", "A1_2Q", "A1_3Q"):
+        eligible[variant] = {
+            "H0_dev": v01["results"][variant]["H0_dev"]["eligible"],
+            "H1_time_holdout": v01["results"][variant]["H1_time_holdout"]["eligible"],
+            "H2_manager_holdout": v01["results"][variant]["H2_manager_holdout"]["eligible"],
+            "H3_security_holdout": v01["results"][variant]["H3_security_holdout"]["eligible"],
+            "H4_combined": v01["results"][variant]["H4_combined"]["eligible"],
+        }
+    manifest = {
+        "outcome_protocol_version": "v0.2",
+        "outcome_protocol_freeze_sha": "56b3404115aa00ebad739070b61d841890751412",
+        "provider": "NO_APPROVED_PROVIDER",
+        "forward_return_evaluation": "NOT_EVALUATED_NO_APPROVED_PROVIDER",
+        "null_seed": "13f-outcome-v0.2-null",
+        "null_repetitions": 200,
+        "outcome_status": "PARTIAL_NO_APPROVED_MARKET_DATA",
+        "product_methodology_status": "NO_RULE_APPROVED",
+        "product_candidate_status": "NO_CANDIDATE",
+        "real_world_decision_utility": "PENDING",
+        "eligible_observations_by_variant_and_split": eligible,
+        "pilot_mapping_summary": {
+            "probed_cusips": 20,
+            "price_resolved": 19,
+            "us_listed_auditable": 16,
+            "unresolved": 1,
+            "known_symbol_issues": [
+                "02079K305->1GOOGL.MI (foreign listing, should be US GOOGL)",
+                "874039100->0LCV.IL (foreign listing, should be US TSM)",
+                "852234103->XYZ (symbol-history: SQ renamed to XYZ 2026)",
+            ],
+        },
+        "generated": date.today().isoformat(),
+    }
+    (OUT / "outcome_research_manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def write_pilot_coverage_csv() -> None:
+    """Machine-readable pilot mapping coverage (CSV) - facts recorded from the
+    2026-08-24 pilot run against Yahoo Finance (research-only)."""
+    rows = [
+        ("023135106", 23, "AMZN", "NMS", 1255, "RESOLVED_US"),
+        ("02079K305", 21, "1GOOGL.MI", "MIL", 1271, "FOREIGN_LISTING_ISSUE"),
+        ("30303M102", 20, "META", "NMS", 1255, "RESOLVED_US"),
+        ("594918104", 19, "MSFT", "NMS", 1255, "RESOLVED_US"),
+        ("67066G104", 18, "NVDA", "NMS", 1255, "RESOLVED_US"),
+        ("92826C839", 17, "V", "NYQ", 1255, "RESOLVED_US"),
+        ("874039100", 17, "0LCV.IL", "IOB", 1216, "FOREIGN_LISTING_ISSUE"),
+        ("11135F101", 17, "AVGO", "NMS", 1255, "RESOLVED_US"),
+        ("G3643J108", 16, "FLUT", "NYQ", 1255, "RESOLVED_US"),
+        ("91324P102", 16, "UNH", "NYQ", 1255, "RESOLVED_US"),
+        ("852234103", 16, "XYZ", "NYQ", 1255, "SYMBOL_HISTORY_ISSUE"),
+        ("722304102", 16, "", "", 0, "UNRESOLVED"),
+        ("235851102", 16, "DHR", "NYQ", 1255, "RESOLVED_US"),
+        ("02079K107", 16, "GOOG", "NMS", 1255, "RESOLVED_US"),
+        ("90353T100", 15, "UBER", "NYQ", 1255, "RESOLVED_US"),
+        ("833445109", 15, "SNOW", "NYQ", 1255, "RESOLVED_US"),
+        ("79466L302", 15, "CRM", "NYQ", 1255, "RESOLVED_US"),
+        ("25809K105", 15, "DASH", "NMS", 1255, "RESOLVED_US"),
+        ("22266T109", 15, "CPNG", "NYQ", 1209, "RESOLVED_US"),
+        ("14040H105", 15, "COF", "NYQ", 1255, "RESOLVED_US"),
+    ]
+    lines = [
+        "# pilot mapping coverage recorded 2026-08-24 (Yahoo research-only; "
+        "not an approved provider)",
+        "cusip,holders,symbol,exchange,bars,status",
+    ]
+    for cusip, holders, symbol, exch, bars, status in rows:
+        lines.append(f"{cusip},{holders},{symbol},{exch},{bars},{status}")
+    (OUT / "outcome_pilot_mapping_coverage.csv").write_text(
+        "\n".join(lines), encoding="utf-8"
+    )
+
+
 def main() -> int:
     write_provider_audit()
     write_mapping_coverage()
@@ -338,10 +420,11 @@ def main() -> int:
     write_final_recommendation()
     write_frozen_ideas()
     write_final_manifest()
+    write_machine_readable_manifest()
+    write_pilot_coverage_csv()
     print("outcome reports generated in", OUT)
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

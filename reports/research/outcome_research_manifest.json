@@ -1,0 +1,47 @@
+{
+  "outcome_protocol_version": "v0.2",
+  "outcome_protocol_freeze_sha": "56b3404115aa00ebad739070b61d841890751412",
+  "provider": "NO_APPROVED_PROVIDER",
+  "forward_return_evaluation": "NOT_EVALUATED_NO_APPROVED_PROVIDER",
+  "null_seed": "13f-outcome-v0.2-null",
+  "null_repetitions": 200,
+  "outcome_status": "PARTIAL_NO_APPROVED_MARKET_DATA",
+  "product_methodology_status": "NO_RULE_APPROVED",
+  "product_candidate_status": "NO_CANDIDATE",
+  "real_world_decision_utility": "PENDING",
+  "eligible_observations_by_variant_and_split": {
+    "A0": {
+      "H0_dev": 75385,
+      "H1_time_holdout": 38542,
+      "H2_manager_holdout": 26451,
+      "H3_security_holdout": 19111,
+      "H4_combined": 11912
+    },
+    "A1_2Q": {
+      "H0_dev": 23536,
+      "H1_time_holdout": 9880,
+      "H2_manager_holdout": 5541,
+      "H3_security_holdout": 5931,
+      "H4_combined": 3218
+    },
+    "A1_3Q": {
+      "H0_dev": 7381,
+      "H1_time_holdout": 2410,
+      "H2_manager_holdout": 1773,
+      "H3_security_holdout": 1837,
+      "H4_combined": 1091
+    }
+  },
+  "pilot_mapping_summary": {
+    "probed_cusips": 20,
+    "price_resolved": 19,
+    "us_listed_auditable": 16,
+    "unresolved": 1,
+    "known_symbol_issues": [
+      "02079K305->1GOOGL.MI (foreign listing, should be US GOOGL)",
+      "874039100->0LCV.IL (foreign listing, should be US TSM)",
+      "852234103->XYZ (symbol-history: SQ renamed to XYZ 2026)"
+    ]
+  },
+  "generated": "2026-08-24"
+}
