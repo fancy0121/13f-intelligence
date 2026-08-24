@@ -37,6 +37,10 @@ from thirteenf.changes import (
     compute_position_changes,
 )
 from thirteenf.quality import run_all as run_quality_checks
+from thirteenf.manager_scoring import (
+    apply_scoring,
+    manager_counts,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -283,6 +287,24 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_score(args: argparse.Namespace) -> int:
+    """Apply the governed manager scoring file (offline)."""
+    db_path = Path(args.db_path)
+    scoring_path = Path(args.scoring)
+    conn = connect(db_path)
+    init_db(conn)
+    result = apply_scoring(
+        conn,
+        scoring_path,
+        methodology_version=args.methodology,
+    )
+    counts = manager_counts(conn)
+    conn.close()
+    print(f"scoring={result}")
+    print(f"manager_status={counts}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -322,6 +344,14 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     analyze.add_argument("--methodology", default="0.1.0")
     analyze.set_defaults(func=cmd_analyze)
+
+    score = sub.add_parser(
+        "score", help="Apply governed manager scoring (NOT_APPROVED by default)"
+    )
+    score.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
+    score.add_argument("--scoring", default=str(ROOT / "config" / "manager_scoring.yaml"))
+    score.add_argument("--methodology", default="0.1.0")
+    score.set_defaults(func=cmd_score)
 
     return parser
 

@@ -1,0 +1,26 @@
+# Manager scoring governance file (Phase 4).
+# 
+# v0.1 scoring is COARSE-GRAINED and INTERPRETABLE. No pseudo-precision scores
+# (e.g. 0.91) are allowed. A manager enters the Governed Interpretation Layer
+# (weighted consensus / high-quality count) ONLY when scoring_status=APPROVED.
+# 
+# Every change here MUST:
+#   - bump methodology_version
+#   - be documented in docs/manager_scoring.md
+#   - pass sensitivity review (see Phase 8)
+#
+# All 30 product labels are listed for completeness. Rows without a tier are
+# NOT_APPROVED and excluded from consensus until governance reviews them.
+
+methodology_version: "0.1.0"
+
+tiers:
+  # Tier -> consensus weight used by the governed layer.
+  HIGH: 1.0
+  MEDIUM: 0.7
+  LOW: 0.4
+  NON_SIGNAL: 0.0
+
+managers:
+  # label: {strategy_type, tier, rationale}
+  # No manager is pre-approved; governance must set scoring_status=APPROVED.
