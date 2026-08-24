@@ -1,0 +1,369 @@
+{
+  "protocol_version": "v0.1",
+  "git_sha": "69e728f0e1394c953d752add7d5f4a2cedcf7bea",
+  "run_timestamp_utc": "2026-08-24T11:05:12.116212+00:00",
+  "db_snapshot": "C:\\Users\\ASUS\\Documents\\挣钱项目组\\13f-intelligence\\data\\thirteenf.db",
+  "quarters_dev": [
+    "2023-09-30",
+    "2023-12-31",
+    "2024-03-31",
+    "2024-06-30",
+    "2024-09-30",
+    "2024-12-31",
+    "2025-03-31",
+    "2025-06-30"
+  ],
+  "quarters_holdout": [
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30"
+  ],
+  "variants": [
+    "A0",
+    "A1_2Q",
+    "A1_3Q",
+    "A2",
+    "A3"
+  ],
+  "results": {
+    "A0": {
+      "variant": "A0",
+      "score_col": "net_directional",
+      "H0_dev": {
+        "n_obs": 75385,
+        "eligible": 75385,
+        "signal_producing": 39010,
+        "security_coverage": 8270,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.31499707535413646,
+        "reversal_rate": 0.6850029246458635,
+        "n_pairs": 39321
+      },
+      "H1_time_holdout": {
+        "n_obs": 38542,
+        "eligible": 38542,
+        "signal_producing": 20292,
+        "security_coverage": 7859,
+        "quarter_coverage": 4,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.3081062315570213,
+        "reversal_rate": 0.6918937684429787,
+        "n_pairs": 17283
+      },
+      "H2_manager_holdout": {
+        "n_obs": 26451,
+        "eligible": 26451,
+        "signal_producing": 14122,
+        "security_coverage": 4720,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.3482684755444484,
+        "reversal_rate": 0.6517315244555516,
+        "n_pairs": 11204
+      },
+      "H3_security_holdout": {
+        "n_obs": 19111,
+        "eligible": 19111,
+        "signal_producing": 9736,
+        "security_coverage": 2072,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.3149908962168723,
+        "reversal_rate": 0.6850091037831276,
+        "n_pairs": 9886
+      },
+      "H4_combined": {
+        "n_obs": 11912,
+        "eligible": 11912,
+        "signal_producing": 3705,
+        "security_coverage": 1399,
+        "quarter_coverage": 4,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.4002226551628166,
+        "reversal_rate": 0.5997773448371835,
+        "n_pairs": 3593
+      },
+      "dominance": {
+        "flip_fraction": 1.5580328277516807e-05,
+        "n_comparisons": 128367,
+        "top_flip_manager": 11,
+        "top_flip_count": 2
+      }
+    },
+    "A1_2Q": {
+      "variant": "A1_2Q",
+      "score_col": "net_directional",
+      "H0_dev": {
+        "n_obs": 75385,
+        "eligible": 23536,
+        "signal_producing": 18407,
+        "security_coverage": 6203,
+        "quarter_coverage": 7,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.5765631961978316,
+        "reversal_rate": 0.4234368038021684,
+        "n_pairs": 13466
+      },
+      "H1_time_holdout": {
+        "n_obs": 38542,
+        "eligible": 9880,
+        "signal_producing": 7682,
+        "security_coverage": 4839,
+        "quarter_coverage": 3,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.6374570446735395,
+        "reversal_rate": 0.3625429553264605,
+        "n_pairs": 3492
+      },
+      "H2_manager_holdout": {
+        "n_obs": 26451,
+        "eligible": 5541,
+        "signal_producing": 4902,
+        "security_coverage": 2458,
+        "quarter_coverage": 7,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.722116482679863,
+        "reversal_rate": 0.27788351732013705,
+        "n_pairs": 2627
+      },
+      "H3_security_holdout": {
+        "n_obs": 19111,
+        "eligible": 5931,
+        "signal_producing": 4653,
+        "security_coverage": 1543,
+        "quarter_coverage": 7,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.5751901696898771,
+        "reversal_rate": 0.42480983031012287,
+        "n_pairs": 3418
+      },
+      "H4_combined": {
+        "n_obs": 11912,
+        "eligible": 3218,
+        "signal_producing": 1950,
+        "security_coverage": 1024,
+        "quarter_coverage": 3,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.669672131147541,
+        "reversal_rate": 0.330327868852459,
+        "n_pairs": 1220
+      },
+      "dominance": {
+        "flip_fraction": 0.012250161186331399,
+        "n_comparisons": 94611,
+        "top_flip_manager": 25,
+        "top_flip_count": 565
+      }
+    },
+    "A1_3Q": {
+      "variant": "A1_3Q",
+      "score_col": "net_directional",
+      "H0_dev": {
+        "n_obs": 75385,
+        "eligible": 7381,
+        "signal_producing": 6765,
+        "security_coverage": 3471,
+        "quarter_coverage": 6,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.78915313225058,
+        "reversal_rate": 0.21084686774941996,
+        "n_pairs": 3448
+      },
+      "H1_time_holdout": {
+        "n_obs": 38542,
+        "eligible": 2410,
+        "signal_producing": 2210,
+        "security_coverage": 1750,
+        "quarter_coverage": 2,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.8850574712643678,
+        "reversal_rate": 0.11494252873563215,
+        "n_pairs": 522
+      },
+      "H2_manager_holdout": {
+        "n_obs": 26451,
+        "eligible": 1773,
+        "signal_producing": 1686,
+        "security_coverage": 1111,
+        "quarter_coverage": 6,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.8391376451077943,
+        "reversal_rate": 0.16086235489220568,
+        "n_pairs": 603
+      },
+      "H3_security_holdout": {
+        "n_obs": 19111,
+        "eligible": 1837,
+        "signal_producing": 1694,
+        "security_coverage": 883,
+        "quarter_coverage": 6,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.7758007117437722,
+        "reversal_rate": 0.2241992882562278,
+        "n_pairs": 843
+      },
+      "H4_combined": {
+        "n_obs": 11912,
+        "eligible": 1091,
+        "signal_producing": 848,
+        "security_coverage": 600,
+        "quarter_coverage": 2,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.8701298701298701,
+        "reversal_rate": 0.1298701298701299,
+        "n_pairs": 308
+      },
+      "dominance": {
+        "flip_fraction": 0.0063512712107589,
+        "n_comparisons": 52273,
+        "top_flip_manager": 25,
+        "top_flip_count": 162
+      }
+    },
+    "A2": {
+      "variant": "A2",
+      "score_col": "net_weight_direction",
+      "H0_dev": {
+        "n_obs": 75385,
+        "eligible": 75385,
+        "signal_producing": 38852,
+        "security_coverage": 8270,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.2906589354289057,
+        "reversal_rate": 0.7093410645710942,
+        "n_pairs": 39321
+      },
+      "H1_time_holdout": {
+        "n_obs": 38542,
+        "eligible": 38542,
+        "signal_producing": 20284,
+        "security_coverage": 7859,
+        "quarter_coverage": 4,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.275762309784181,
+        "reversal_rate": 0.724237690215819,
+        "n_pairs": 17283
+      },
+      "H2_manager_holdout": {
+        "n_obs": 26451,
+        "eligible": 26451,
+        "signal_producing": 13303,
+        "security_coverage": 4720,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.26802927525883613,
+        "reversal_rate": 0.7319707247411639,
+        "n_pairs": 11204
+      },
+      "H3_security_holdout": {
+        "n_obs": 19111,
+        "eligible": 19111,
+        "signal_producing": 9709,
+        "security_coverage": 2072,
+        "quarter_coverage": 8,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.2943556544608537,
+        "reversal_rate": 0.7056443455391463,
+        "n_pairs": 9886
+      },
+      "H4_combined": {
+        "n_obs": 11912,
+        "eligible": 11912,
+        "signal_producing": 3572,
+        "security_coverage": 1399,
+        "quarter_coverage": 4,
+        "insufficient_data_rate": 0.0,
+        "stability": 0.3637628722516003,
+        "reversal_rate": 0.6362371277483997,
+        "n_pairs": 3593
+      },
+      "dominance": {
+        "flip_fraction": 7.790042767334792e-06,
+        "n_comparisons": 128369,
+        "top_flip_manager": 11,
+        "top_flip_count": 1
+      }
+    },
+    "A3": {
+      "variant": "A3",
+      "score_col": "net_weight_direction",
+      "buckets": {
+        "A3_filing_continuity_LOW": {
+          "feature": "filing_continuity",
+          "bucket": "LOW",
+          "eligible": 24113,
+          "signal_producing": 12805,
+          "security_coverage": 5892,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.21953578336557059,
+          "reversal_rate": 0.7804642166344294,
+          "n_pairs": 9306
+        },
+        "A3_filing_continuity_MEDIUM": {
+          "feature": "filing_continuity",
+          "bucket": "MEDIUM",
+          "eligible": 5406,
+          "signal_producing": 3185,
+          "security_coverage": 1001,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.3334439283344393,
+          "reversal_rate": 0.6665560716655607,
+          "n_pairs": 3014
+        },
+        "A3_filing_continuity_HIGH": {
+          "feature": "filing_continuity",
+          "bucket": "HIGH",
+          "eligible": 98559,
+          "signal_producing": 49017,
+          "security_coverage": 10334,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.29403154984550334,
+          "reversal_rate": 0.7059684501544967,
+          "n_pairs": 49192
+        },
+        "A3_avg_concentration_LOW": {
+          "feature": "avg_concentration",
+          "bucket": "LOW",
+          "eligible": 120595,
+          "signal_producing": 50952,
+          "security_coverage": 10746,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.2917705238389599,
+          "reversal_rate": 0.7082294761610402,
+          "n_pairs": 50149
+        },
+        "A3_avg_concentration_MEDIUM": {
+          "feature": "avg_concentration",
+          "bucket": "MEDIUM",
+          "eligible": 6015,
+          "signal_producing": 3829,
+          "security_coverage": 1112,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.321153297173851,
+          "reversal_rate": 0.678846702826149,
+          "n_pairs": 3503
+        },
+        "A3_avg_concentration_HIGH": {
+          "feature": "avg_concentration",
+          "bucket": "HIGH",
+          "eligible": 1468,
+          "signal_producing": 848,
+          "security_coverage": 272,
+          "quarter_coverage": 8,
+          "insufficient_data_rate": 0.0,
+          "stability": 0.4259818731117825,
+          "reversal_rate": 0.5740181268882175,
+          "n_pairs": 993
+        }
+      }
+    }
+  }
+}

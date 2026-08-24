@@ -22,3 +22,9 @@ data/raw/
 Thumbs.db
 build/
 
+
+# Research derived artifacts (reproducible via research CLI)
+reports/research/*_full.csv
+reports/research/A3_*_signals.csv
+reports/research_repro/
+

@@ -1,0 +1,24 @@
+# time split manifest
+period,part
+2021-03-31,holdout
+2021-06-30,holdout
+2021-09-30,holdout
+2021-12-31,holdout
+2022-03-31,holdout
+2022-06-30,holdout
+2022-09-30,holdout
+2022-12-31,holdout
+2023-03-31,holdout
+2023-06-30,holdout
+2023-09-30,development
+2023-12-31,development
+2024-03-31,development
+2024-06-30,development
+2024-09-30,development
+2024-12-31,development
+2025-03-31,development
+2025-06-30,development
+2025-09-30,holdout
+2025-12-31,holdout
+2026-03-31,holdout
+2026-06-30,holdout
