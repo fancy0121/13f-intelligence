@@ -41,6 +41,8 @@ from thirteenf.manager_scoring import (
     apply_scoring,
     manager_counts,
 )
+from thirteenf.consensus import compute_consensus
+from thirteenf.trends import compute_trends
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -278,11 +280,24 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
     weighted = compute_portfolio_weights(conn)
     changes = compute_position_changes(conn, methodology)
+    consensus = compute_consensus(
+        conn,
+        methodology_version=methodology,
+        change_scale_divisor=float(args.change_scale_divisor),
+        significance_mode=args.significance_mode,
+    )
+    trends = compute_trends(
+        conn,
+        methodology_version=methodology,
+        stable_abs_threshold=float(args.stable_abs_threshold),
+    )
     quality = run_quality_checks(conn, methodology)
 
     conn.close()
     print(f"portfolio_weight_rows={weighted}")
     print(f"position_changes={changes}")
+    print(f"consensus_rows={consensus}")
+    print(f"trend_rows={trends}")
     print(f"quality={quality}")
     return 0
 
@@ -343,6 +358,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     analyze.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     analyze.add_argument("--methodology", default="0.1.0")
+    analyze.add_argument("--change-scale-divisor", default="0.5")
+    analyze.add_argument("--significance-mode", default="min_prev_now")
+    analyze.add_argument("--stable-abs-threshold", default="0.1")
     analyze.set_defaults(func=cmd_analyze)
 
     score = sub.add_parser(
