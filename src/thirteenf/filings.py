@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -18,6 +19,7 @@ from pathlib import Path
 from thirteenf.sec_client import SecClient, SecError
 
 THIRTEEN_F_FORMS = ("13F-HR", "13F-HR/A")
+INFO_TABLE_RE = re.compile(rb"<\w*:?informationTable")
 
 
 @dataclass(frozen=True)
@@ -153,7 +155,11 @@ def download_filing(
 
     if not force and raw_path.exists() and manifest_path.exists():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if manifest.get("checksum") == _sha256(raw_path.read_bytes()):
+        cached = raw_path.read_bytes()
+        if (
+            manifest.get("checksum") == _sha256(cached)
+            and INFO_TABLE_RE.search(cached)
+        ):
             return RawFiling(
                 filing=filing,
                 raw_path=raw_path,
@@ -162,13 +168,8 @@ def download_filing(
                 source_url=manifest["source_url"],
             )
 
-    source_url = client.archive_url(
-        filing.cik, filing.accession_number, filing.primary_document
-    )
-    try:
-        resp = client.fetch_bytes(source_url)
-    except SecError as exc:
-        # Write a failed manifest so we can surface FAILED_INGESTION later.
+    source_url, body = _fetch_info_table(client, filing)
+    if body is None:
         manifest_path.write_text(
             json.dumps(
                 {
@@ -177,19 +178,19 @@ def download_filing(
                     "form_type": filing.form_type,
                     "filing_date": filing.filing_date,
                     "report_date": filing.report_date,
-                    "source_url": source_url,
-                    "status": "FAILED",
-                    "error": str(exc),
+                    "source_url": source_url or "",
+                    "status": "NO_INFO_TABLE",
+                    "error": "no INFORMATION TABLE XML found in accession",
                     "fetched_at_utc": None,
                 },
                 indent=2,
             ),
             encoding="utf-8",
         )
-        raise
+        raise SecError(f"No INFORMATION TABLE for {filing.accession_number}")
 
-    raw_path.write_bytes(resp.body)
-    checksum = _sha256(resp.body)
+    raw_path.write_bytes(body)
+    checksum = _sha256(body)
     manifest_path.write_text(
         json.dumps(
             {
@@ -201,7 +202,7 @@ def download_filing(
                 "source_url": source_url,
                 "status": "OK",
                 "checksum": checksum,
-                "fetched_at_utc": resp.fetched_at_utc,
+                "fetched_at_utc": None,
             },
             indent=2,
         ),
@@ -216,6 +217,54 @@ def download_filing(
     )
 
 
+def _fetch_info_table(
+    client: SecClient, filing: FilingRecord
+) -> tuple[str | None, bytes | None]:
+    """Locate and download the INFORMATION TABLE XML for a filing.
+
+    Strategy:
+      1. Try the primary document (some filers make it the info table).
+      2. If it is not an information table, list the accession directory and
+         try the largest .xml file (the info table is usually the big one).
+    Returns (source_url, body) or (None, None) when no info table is found.
+    """
+    # 1. primary document
+    primary_url = client.archive_url(
+        filing.cik, filing.accession_number, filing.primary_document
+    )
+    try:
+        resp = client.fetch_bytes(primary_url)
+        if INFO_TABLE_RE.search(resp.body):
+            return primary_url, resp.body
+    except SecError:
+        pass
+
+    # 2. accession directory index
+    try:
+        index_url = client.archive_index_url(filing.cik, filing.accession_number)
+        index = client.fetch_json(index_url)
+        items = index.get("directory", {}).get("item", [])
+    except SecError:
+        return None, None
+
+    xml_items = [
+        it for it in items if (it.get("name") or "").lower().endswith(".xml")
+    ]
+    # Prefer the largest .xml (the info table is the big one).
+    xml_items.sort(key=lambda it: int(it.get("size") or 0), reverse=True)
+    for item in xml_items:
+        name = item["name"]
+        if name == filing.primary_document:
+            continue
+        url = client.archive_url(filing.cik, filing.accession_number, name)
+        try:
+            resp = client.fetch_bytes(url)
+            if INFO_TABLE_RE.search(resp.body):
+                return url, resp.body
+        except SecError:
+            continue
+    return None, None
+
+
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
-

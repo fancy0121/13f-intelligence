@@ -124,3 +124,9 @@ class SecClient:
             f"{cik}/{accession_no_dashes}/{urllib.parse.quote(primary_document)}"
         )
 
+    def archive_index_url(self, cik: int, accession: str) -> str:
+        accession_no_dashes = accession.replace("-", "")
+        return (
+            "https://www.sec.gov/Archives/edgar/data/"
+            f"{cik}/{accession_no_dashes}/index.json"
+        )
