@@ -16,6 +16,8 @@ data/*.db
 data/*.db-*
 data/raw/
 !data/raw/.gitkeep
+# Provider resolution cache (downloadable; keep out of git)
+data/resolution_cache/
 
 # OS
 .DS_Store
