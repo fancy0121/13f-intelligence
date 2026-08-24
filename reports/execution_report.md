@@ -5,7 +5,9 @@
 
 ## 1. Repository
 
-- Final commit SHA: see `git log -1` in this checkout.
+- Final commit SHA: `68589539578c5780620fea61b684b74cb93c8023`
+- Commit history: 11 checkpoint commits (baseline -> phase 8), each phase
+  test-first with small diffs.
 - Git status: clean after release commit.
 - Dependency state: declared in `pyproject.toml` (Python >=3.11; requests,
   lxml, streamlit, pandas; dev: pytest). Local run uses the system Python
@@ -79,4 +81,3 @@
 `V0_1_RELEASE_STATUS=DELIVERED`
 
 All v0.1 required gates satisfied (Gate 3 pending real-world validation).
-
