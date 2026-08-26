@@ -38,3 +38,17 @@ Security Semantic Audit (outcome-blind):
 | Using higher operating resolution as justification alone | REJECTED | Coverage is technical convenience, not economic semantics (J3) |
 | Re-running broad O0/O1/O2 with new denominator | REJECTED | v0.2.1 conclusion preserved |
 | Predictive-signal search beyond frozen tests (4Q/5Q persistence, manager scores, ML) | FROZEN | Research Stop Rule (docs/research_stop_rule.md) |
+
+## v0.3 Addendum (2026-08-26) — operating equity outcome validation
+
+Operating Equity 13F Evidence Hypothesis (NEW_HYPOTHESIS_AFTER_OUTCOME_BLIND_
+SEMANTIC_AUDIT):
+
+| Idea | Status | Reason |
+|---|---|---|
+| O1_2Q persistence incremental value | FALSIFIED | No improvement over O0; null degenerate/fails; M3 missingness FAIL; time holdout materially worse |
+| O1_3Q persistence incremental value | FALSIFIED | No increment over O1; coverage cost |
+| Operating-equity predictive signal | STOPPED | SIMPLEST_SURVIVING_MODEL=O0; PREDICTIVE_RESEARCH_STOP_RULE=TRIGGERED |
+| Relax M3 (dev-vs-holdout missingness) to salvage O1 | REJECTED | Thresholds frozen pre-outcome |
+| Add mapping exceptions / re-hash holdouts for O1 | REJECTED | Resolver and holdouts frozen |
+| 4Q/5Q persistence / manager scores / sector tuning / ML | FROZEN | Research Stop Rule triggered |
