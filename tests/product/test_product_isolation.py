@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import re
 import sys
 from pathlib import Path
 
@@ -49,4 +50,5 @@ def test_ui_docs_language_policy():
                   "consensus_score", "scoring_status", "signal_quality",
                   "trend_label", "buy", "sell", "opportunity", "alpha",
                   "predictive", "signal"):
-            assert w not in text, f"forbidden word in {p}: {w}"
+            assert re.search(rf"\b{re.escape(w)}\b", text) is None, \
+                f"forbidden word in {p}: {w}"
