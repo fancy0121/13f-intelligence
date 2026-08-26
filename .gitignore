@@ -20,6 +20,9 @@ data/raw/
 data/resolution_cache/
 # Real-use observation episodes (local, user-generated; keep out of git)
 data/real_use/
+# Data update status artifact and log (regenerated on update)
+data/last_update.json
+data/last_update.log
 
 # OS
 .DS_Store
