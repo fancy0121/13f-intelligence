@@ -193,7 +193,9 @@ DDL = [
 
 
 def connect(db_path: Path | str) -> sqlite3.Connection:
-    conn = sqlite3.connect(str(db_path))
+    # check_same_thread=False: ProductStore is cached via streamlit.cache_resource
+    # and reused across script-runner threads (read-only UI access).
+    conn = sqlite3.connect(str(db_path), check_same_thread=False)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")
     return conn
