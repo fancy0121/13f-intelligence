@@ -16,6 +16,14 @@ from store import get_store
 
 def run() -> None:
     st.subheader("证券 - 哪些机构报告了该证券的变化")
+    with st.expander("如何使用本页"):
+        st.markdown(
+            "1. 输入 Ticker（如 GOOGL）、CUSIP（如 02079K305）或发行方名称（如 Alphabet）。\n"
+            "2. 如果找到多个候选，系统会全部列出，请你选择正确的证券。\n"
+            "3. 页面会显示：身份信息、数据新旧、当前持有机构及各自动作、增持/减持/退出计数、"
+            "连续两个季度同向的机构数、以及历史时间线。\n"
+            "4. 注意：这里展示的是「已披露事实」，不是推荐。"
+        )
     store = get_store()
     query = st.text_input("输入 Ticker / CUSIP / 机构名（发行方）查询").strip().upper()
     if not query:

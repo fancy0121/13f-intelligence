@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import sqlite3
+import csv
+import json
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -34,6 +36,33 @@ def _days_since(d: str) -> int | None:
         return (date.today() - date.fromisoformat(d)).days
     except ValueError:
         return None
+
+
+def load_portfolio_rows(path: Path | str) -> list[dict]:
+    """Read ticker,weight rows from the existing portfolio.csv contract."""
+    p = Path(path)
+    rows = []
+    if not p.exists():
+        return rows
+    with open(p, encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(line for line in fh if not line.lstrip().startswith("#"))
+        for r in reader:
+            ticker = (r.get("ticker") or "").strip().upper()
+            if not ticker:
+                continue
+            rows.append({"ticker": ticker, "weight": (r.get("weight") or "").strip()})
+    return rows
+
+
+def save_portfolio_rows(path: Path | str, rows: list[dict]) -> None:
+    """Persist ticker,weight rows to the portfolio.csv contract (idempotent)."""
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with open(p, "w", encoding="utf-8", newline="") as fh:
+        fh.write("# My Portfolio - user's actual holdings for cross-check.\n")
+        fh.write("ticker,weight\n")
+        for r in rows:
+            fh.write(f"{r['ticker']},{r.get('weight', '')}\n")
 
 
 @dataclass(frozen=True)
@@ -93,6 +122,7 @@ class ProductStore:
         managers_csv: Path | str,
     ) -> None:
         self.conn: sqlite3.Connection = connect(db_path)
+        self._root_dir = Path(db_path).resolve().parents[1]
         self.resolution = pd.read_csv(resolution_csv, dtype=str).fillna("")
         self.semantic = pd.read_csv(semantic_csv, dtype=str).fillna("")
         self.managers = pd.read_csv(managers_csv, dtype=str).fillna("")
@@ -129,6 +159,34 @@ class ProductStore:
             "SELECT MAX(report_period) FROM filings WHERE ingest_status='OK'"
         ).fetchone()
         return row[0] if row else None
+
+    def latest_filing_info(self) -> dict | None:
+        row = self.conn.execute(
+            """
+            SELECT accession_number, filing_date, report_period, form_type
+            FROM filings
+            WHERE ingest_status='OK'
+            ORDER BY filing_date DESC, filing_id DESC LIMIT 1
+            """
+        ).fetchone()
+        if not row:
+            return None
+        return {
+            "accession": row[0],
+            "filing_date": row[1],
+            "report_period": row[2],
+            "form_type": row[3],
+        }
+
+    def update_status(self, status_path: Path | str | None = None) -> dict | None:
+        """Read the local update-status artifact if present."""
+        p = Path(status_path) if status_path else Path(self._root_dir) / "data" / "last_update.json"
+        if not p.exists():
+            return None
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            return None
 
     def manager_update_counts(self, period: str) -> tuple[int, int]:
         total = self.conn.execute("SELECT COUNT(*) FROM managers").fetchone()[0]

@@ -27,6 +27,12 @@ METRICS = {
 
 def run() -> None:
     st.subheader("活动探索 - 描述性排序（非推荐榜）")
+    with st.expander("如何使用本页"):
+        st.markdown(
+            "1. 选择一种排序指标，例如「独立机构增持计数 (ADD)」。\n"
+            "2. 列表按该指标从高到低展示证券，并同时显示计数、解析状态、活动状态。\n"
+            "3. 这是中性事实排序：数字是「多少家已验证独立机构报告了该动作」，不是建议你买或卖。"
+        )
     store = get_store()
     metric_label = st.selectbox("排序指标", list(METRICS))
     rows = store.activity_explorer(METRICS[metric_label], limit=100)

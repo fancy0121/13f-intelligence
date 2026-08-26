@@ -22,6 +22,13 @@ def _fmt(x, pct=False, default="N/A"):
 
 def run() -> None:
     st.subheader("机构 - 该机构最近披露了什么变化")
+    with st.expander("如何使用本页"):
+        st.markdown(
+            "1. 在下拉框选择一家机构（例如 Berkshire Hathaway）。\n"
+            "2. 顶部显示这份披露的时间信息（报告季度、filing 日期、距今几天、是否修订）。\n"
+            "3. 「最新报告季度变化」分 NEW / ADD / REDUCE / EXIT 四张表，列出该机构增减持的证券。\n"
+            "4. 「Top 持仓」按报告价值列出最大持仓；「重复报告活动」显示连续至少两个季度同向的证券。"
+        )
     store = get_store()
     managers = store.managers_list()
     if not managers:
