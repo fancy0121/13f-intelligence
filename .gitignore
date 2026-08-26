@@ -18,6 +18,8 @@ data/raw/
 !data/raw/.gitkeep
 # Provider resolution cache (downloadable; keep out of git)
 data/resolution_cache/
+# Real-use observation episodes (local, user-generated; keep out of git)
+data/real_use/
 
 # OS
 .DS_Store
