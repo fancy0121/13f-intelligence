@@ -215,6 +215,7 @@ def concentration_audit(datasets: dict[str, pd.DataFrame], variant: str, horizon
     return {
         "variant": variant,
         "horizon": horizon,
+        "n_obs": len(dev),
         "base_median": base,
         "leave_one_manager_out": lomo,
         "top_securities": [

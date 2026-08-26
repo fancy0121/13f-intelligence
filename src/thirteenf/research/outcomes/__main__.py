@@ -3,6 +3,7 @@
 python -m thirteenf.research.outcomes <cmd>
   prices   - fetch full price series for VERIFIED symbols (Yahoo, cached)
   run      - compute the frozen O0/O1_2Q/O1_3Q evaluation grid + null + concentration
+  v03      - run the frozen v0.3 Operating Equity outcome validation
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ from thirteenf.research.outcomes.execution import (
     run_null,
 )
 from thirteenf.research.resolution.coverage import build_observation_frames
+from thirteenf.research.outcomes.v03 import falsify, run_v03, write_reports
 
 
 def cmd_prices(args: argparse.Namespace) -> int:
@@ -98,6 +100,30 @@ def cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_v03(args: argparse.Namespace) -> int:
+    conn = connect(args.db)
+    results = run_v03(
+        conn,
+        class_path=str(args.out / "security_semantic_classification.csv"),
+        master_path=str(args.out / "security_resolution_master.csv"),
+        avail_path=str(args.out / "symbol_history_availability.csv"),
+        cache_dir=args.cache,
+        out_dir=args.out,
+    )
+    conn.close()
+    verdict = falsify(
+        results["outcome_grid"], results["null"], results["concentration"], results["missingness"]
+    )
+    results["verdict"] = verdict
+    (args.out / "v0_3_results.json").write_text(
+        json.dumps(results, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
+    )
+    write_reports(results, args.out, verdict)
+    print(json.dumps(verdict, ensure_ascii=False, indent=2))
+    print("v0.3 artifacts written")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf.research.outcomes")
     parser.add_argument("--db", default=str(ROOT / "data" / "thirteenf.db"))
@@ -109,6 +135,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_prices)
     p2 = sub.add_parser("run")
     p2.set_defaults(func=cmd_run)
+    p3 = sub.add_parser("v03")
+    p3.set_defaults(func=cmd_v03)
     return parser
 
 
@@ -122,4 +150,3 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
