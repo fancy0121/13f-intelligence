@@ -3,6 +3,11 @@
 python -m thirteenf.product manifest   - build task dev/holdout manifest
 python -m thirteenf.product validate   - run dev/holdout tasks, write validation report
 python -m thirteenf.product snapshot   - deterministic query snapshot (reproducibility)
+python -m thirteenf.product obs-start  - create a real-use episode (pre-use)
+python -m thirteenf.product obs-finish - finish an episode (post-use)
+python -m thirteenf.product obs-list   - list episodes
+python -m thirteenf.product obs-report - aggregate + write observation status report
+python -m thirteenf.product obs-export - export episodes CSV/JSON
 """
 
 from __future__ import annotations
@@ -10,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
@@ -19,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
 from thirteenf.product.evidence import ProductStore
+from thirteenf.product.observation import ObservationStore
 from thirteenf.product.tasks import (
     build_task_universe,
     load_manifest,
@@ -157,6 +164,132 @@ def cmd_snapshot(args: argparse.Namespace) -> int:
     return 0
 
 
+def _obs_store(args) -> ObservationStore:
+    return ObservationStore(args.obs_dir)
+
+
+def cmd_obs_start(args: argparse.Namespace) -> int:
+    store = _obs_store(args)
+    ep = store.start_episode(
+        {
+            "target_type": args.target_type,
+            "target_id": args.target_id,
+            "target_label": args.target_label,
+            "is_portfolio_target": args.portfolio_target,
+            "familiarity_class": args.familiarity,
+            "research_question": args.question,
+            "pre_use_knowledge": args.knowledge,
+            "pre_use_assumptions": args.assumptions,
+            "pre_use_uncertainties": args.uncertainties,
+            "planned_next_step": args.next_step,
+            "baseline_method": args.baseline,
+            "episode_cluster_id": args.cluster,
+        }
+    )
+    print(json.dumps({"episode_id": ep["episode_id"], "created_at": ep["created_at"]}, ensure_ascii=False))
+    return 0
+
+
+def cmd_obs_finish(args: argparse.Namespace) -> int:
+    store = _obs_store(args)
+    flags = {
+        "new_fact_found": args.new_fact, "contradicting_fact_found": args.contradicting,
+        "stale_assumption_corrected": args.stale_corrected,
+        "quality_risk_discovered": args.quality_risk,
+        "research_path_changed": args.path_changed,
+        "research_time_saved": args.time_saved,
+        "no_incremental_information": args.no_incremental,
+        "estimated_manual_effort_bucket": args.effort_bucket,
+        "misuse_risk": args.misuse_risk,
+        "misuse_type": args.misuse_type,
+        "product_design_issue": args.design_issue,
+        "post_use_next_step": args.post_next,
+        "notes": args.notes,
+        "synthetic": args.synthetic,
+        "product_error": args.product_error,
+    }
+    ep = store.finish_episode(args.episode_id, flags)
+    if ep is None:
+        print("episode not found")
+        return 1
+    print(json.dumps({"episode_id": ep["episode_id"], "validity": ep["episode_validity"]}, ensure_ascii=False))
+    return 0
+
+
+def cmd_obs_list(args: argparse.Namespace) -> int:
+    store = _obs_store(args)
+    for e in store.episodes():
+        print(e["episode_id"], e["episode_validity"], e["target_type"], e.get("target_label", ""))
+    return 0
+
+
+def cmd_obs_report(args: argparse.Namespace) -> int:
+    store = _obs_store(args)
+    agg = store.aggregate()
+    verdict = agg["utility_verdict"]
+    lines = [
+        "# Real-Use Observation Status (v0.5)",
+        "",
+        f"> Generated: {datetime.now(timezone.utc).isoformat()}",
+        "",
+        f"VALID episodes: {agg['valid_episodes']} / target {20}",
+        f"Raw episodes: {agg['raw_episode_count']} | unique targets: {agg['unique_target_count']} "
+        f"| clustered effective: {agg['clustered_effective_count']}",
+        "",
+        f"REAL_WORLD_EVIDENCE_UTILITY={verdict}",
+        "",
+        "## Utility metrics (valid episodes only)",
+        "",
+        "| metric | value |",
+        "|---|---|",
+    ]
+    for k in (
+        "incremental_information_rate", "research_path_change_rate",
+        "no_incremental_information_rate", "contradiction_exposure_rate",
+        "quality_risk_discovery_rate", "stale_assumption_corrected_rate",
+        "portfolio_share",
+    ):
+        lines.append(f"| {k} | {agg[k]} |")
+    lines += [
+        "",
+        "## Scenario / familiarity / effort / misuse",
+        "",
+        f"- scenario: {agg['scenario_breakdown']}",
+        f"- familiarity: {agg['familiarity_breakdown']}",
+        f"- effort buckets: {agg['manual_effort_buckets']}",
+        f"- misuse risk: {agg['misuse_risk_counts']}",
+        f"- product-design-induced misuse: {agg['product_design_induced_misuse']}",
+        f"- product versions: {agg['product_version_breakdown']}",
+        "",
+        "## Observation mix",
+        "",
+        "- security >=8: " + ("OK" if agg["scenario_breakdown"].get("security", 0) >= 8 else "OBSERVATION_MIX_INCOMPLETE"),
+        "- manager >=4: " + ("OK" if agg["scenario_breakdown"].get("manager", 0) >= 4 else "OBSERVATION_MIX_INCOMPLETE"),
+        "- portfolio <=40%: " + ("OK" if agg["portfolio_share"] <= 0.4 else "OBSERVATION_MIX_INCOMPLETE"),
+        "- unfamiliar >=5: " + ("OK" if agg["familiarity_breakdown"].get("unfamiliar", 0) >= 5 else "OBSERVATION_MIX_INCOMPLETE"),
+        "",
+        "When fewer than 20 VALID episodes exist, no real-world utility "
+        "conclusion is drawn.",
+        "",
+    ]
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "real_use_observation_status.md").write_text("\n".join(lines), encoding="utf-8")
+    print(json.dumps(agg, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_obs_export(args: argparse.Namespace) -> int:
+    store = _obs_store(args)
+    args.out.mkdir(parents=True, exist_ok=True)
+    if args.csv:
+        store.export_csv(args.out / "real_use_episodes.csv")
+        print("exported CSV")
+    if args.json:
+        store.export_json(args.out / "real_use_episodes.json")
+        print("exported JSON")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="thirteenf.product")
     parser.add_argument("--out", default=str(ROOT / "reports" / "product"))
@@ -167,6 +300,49 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_manifest)
     sub.add_parser("validate").set_defaults(func=cmd_validate)
     sub.add_parser("snapshot").set_defaults(func=cmd_snapshot)
+    parser.add_argument("--obs-dir", default=str(ROOT / "data" / "real_use"))
+
+    p = sub.add_parser("obs-start")
+    p.add_argument("--target-type", required=True, choices=["security", "manager", "portfolio"])
+    p.add_argument("--target-id", default="")
+    p.add_argument("--target-label", default="")
+    p.add_argument("--portfolio-target", default="false")
+    p.add_argument("--familiarity", default="UNKNOWN", choices=["familiar", "unfamiliar", "UNKNOWN"])
+    p.add_argument("--question", required=True)
+    p.add_argument("--knowledge", default="UNKNOWN")
+    p.add_argument("--assumptions", default="UNKNOWN")
+    p.add_argument("--uncertainties", default="UNKNOWN")
+    p.add_argument("--next-step", default="UNKNOWN")
+    p.add_argument("--baseline", default="UNKNOWN")
+    p.add_argument("--cluster", default="")
+    p.set_defaults(func=cmd_obs_start)
+
+    p = sub.add_parser("obs-finish")
+    p.add_argument("--episode-id", required=True)
+    p.add_argument("--new-fact", default="false")
+    p.add_argument("--contradicting", default="false")
+    p.add_argument("--stale-corrected", default="false")
+    p.add_argument("--quality-risk", default="false")
+    p.add_argument("--path-changed", default="false")
+    p.add_argument("--time-saved", default="false")
+    p.add_argument("--no-incremental", default="false")
+    p.add_argument("--effort-bucket", default="UNKNOWN",
+                   choices=["<5", "5-15", "15-30", ">30", "UNKNOWN"])
+    p.add_argument("--misuse-risk", default="UNKNOWN", choices=["NONE", "LOW", "MODERATE", "HIGH", "UNKNOWN"])
+    p.add_argument("--misuse-type", default="")
+    p.add_argument("--design-issue", default="false")
+    p.add_argument("--post-next", default="UNKNOWN")
+    p.add_argument("--notes", default="")
+    p.add_argument("--synthetic", default="false")
+    p.add_argument("--product-error", default="false")
+    p.set_defaults(func=cmd_obs_finish)
+
+    sub.add_parser("obs-list").set_defaults(func=cmd_obs_list)
+    sub.add_parser("obs-report").set_defaults(func=cmd_obs_report)
+    p = sub.add_parser("obs-export")
+    p.add_argument("--csv", action="store_true")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_obs_export)
     return parser
 
 

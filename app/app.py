@@ -38,6 +38,7 @@ def main() -> None:
         st.Page("pages/activity.py", title="活动探索"),
         st.Page("pages/portfolio.py", title="我的组合"),
         st.Page("pages/methodology.py", title="方法论与限制"),
+        st.Page("pages/observation.py", title="研究观察"),
     ]
     pg = st.navigation(pages)
     pg.run()
