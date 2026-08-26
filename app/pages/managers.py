@@ -11,75 +11,92 @@ if str(ROOT / "src") not in sys.path:
 if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
-import db  # noqa: E402
+from store import get_store
+
+
+def _fmt(x, pct=False, default="N/A"):
+    if x is None:
+        return default
+    return f"{x:.4%}" if pct else f"{x:,.0f}"
 
 
 def run() -> None:
-    st.subheader("机构")
-    conn = db.db_conn()
-    managers = db.managers_list(conn)
+    st.subheader("机构 - 该机构最近披露了什么变化")
+    store = get_store()
+    managers = store.managers_list()
     if not managers:
-        st.info("暂无机构数据。")
-        conn.close()
+        st.info("INSUFFICIENT_DATA：暂无机构数据。")
+        return
+    names = {m["name"]: m["manager_id"] for m in managers}
+    selected = st.selectbox("选择机构", sorted(names))
+    ev = store.manager_evidence(names[selected])
+    if ev is None:
+        st.info("INSUFFICIENT_DATA。")
         return
 
-    names = {m[1]: m[0] for m in managers}
-    selected = st.selectbox("选择机构", sorted(names))
-    manager_id = names[selected]
-    summary = db.manager_summary(conn, manager_id)
-
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("策略类型", summary.get("strategy_type") or "未分类")
-    c2.metric("评分状态", summary.get("scoring_status") or "N/A")
-    c3.metric("信号质量", summary.get("signal_quality") if summary.get("signal_quality") is not None else "NULL")
-    c4.metric("方法版本", summary.get("methodology_version") or "N/A")
-    if summary.get("notes"):
-        st.caption(f"Scope / 备注：{summary['notes']}")
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("报告季度", ev.latest_report_period or "N/A")
+    c2.metric("filing 日期", ev.latest_filing_date or "N/A")
+    c3.metric("距今天数", ev.days_since_filing if ev.days_since_filing is not None else "N/A")
+    c4.metric("陈旧", "是" if ev.stale else "否")
+    c5.metric("修订", "是" if ev.amended else "否")
+    st.caption(f"验证状态：{ev.validation_status} | 持仓数：{ev.position_count} | "
+               f"报告总值：{ev.total_value if ev.total_value is not None else 'N/A'}")
 
     st.divider()
-    st.markdown("#### 最新季度动作")
-    activity = db.manager_activity(conn, manager_id)
-    if activity:
-        cols = st.columns(5)
-        for col, key in zip(cols, ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")):
-            col.metric(key, activity.get(key, 0))
+    st.markdown("#### 最新报告季度变化（NEW / ADD / REDUCE / EXIT）")
+    if any(ev.latest_changes.values()):
+        for ct in ("NEW", "ADD", "REDUCE", "EXIT"):
+            rows = ev.latest_changes.get(ct, [])
+            st.markdown(f"**{ct}** ({len(rows)})")
+            if rows:
+                st.dataframe(
+                    [
+                        {
+                            "CUSIP": r["cusip"],
+                            "Issuer": r["issuer"],
+                            "份额变化": r["shares_now"] if r["shares_prev"] is None else (r["shares_now"] - (r["shares_prev"] or 0)),
+                            "权重(前/后)": f"{r['weight_prev']} / {r['weight_now']}",
+                            "解析状态": r["resolution_status"],
+                        }
+                        for r in rows[:50]
+                    ],
+                    width='stretch',
+                )
     else:
-        st.info("该机构暂无动作数据。")
+        st.info("该机构最新报告季度无变化数据。")
 
     st.divider()
-    st.markdown("#### 最新季度 Top 持仓")
-    period = db.latest_period(conn)
-    top = db.manager_top_holdings(conn, manager_id, period or "")
-    if top:
+    st.markdown("#### Top 持仓（按报告价值）")
+    if ev.top_holdings:
         st.dataframe(
             [
                 {
-                    "Ticker": t or c,
-                    "CUSIP": c,
-                    "Issuer": i,
-                    "Shares": s,
-                    "Value": v,
-                    "Weight": f"{w:.4%}" if w is not None else None,
-                    "Put/Call": pc or "股票",
+                    "Ticker": r["ticker"] or r["cusip"],
+                    "CUSIP": r["cusip"],
+                    "Issuer": r["issuer"],
+                    "Shares": _fmt(r["shares"]),
+                    "Value": _fmt(r["value"]),
+                    "Weight": _fmt(r["weight"], pct=True),
+                    "Put/Call": r["put_call"] or "股票",
+                    "解析状态": r["resolution_status"],
                 }
-                for t, c, i, s, v, w, pc in top
+                for r in ev.top_holdings
             ],
             width='stretch',
         )
-    else:
-        st.info("暂无持仓数据。")
 
     st.divider()
-    st.markdown("#### 季度历史")
-    history = db.manager_history(conn, manager_id)
-    if history:
-        st.dataframe(
-            [{"报告季度": p, "filing 数": n} for p, n in history],
-            width='stretch',
-        )
-    conn.close()
+    st.markdown("#### 重复报告活动（连续 ≥2 个报告季度，缺失季度会中断）")
+    st.write(f"- 重复增持（≥2Q ADD）：{ev.repeated.get('repeated_add_manager_count', 0)} 个证券")
+    st.write(f"- 重复减持（≥2Q REDUCE）：{ev.repeated.get('repeated_reduce_manager_count', 0)} 个证券")
+
+    st.divider()
+    st.markdown("#### 数据质量")
+    st.write(f"- Top10 持仓中未解析/冲突：{ev.quality['unresolved_or_conflict_top10']}")
+    st.write(f"- 缺失报告季度数：{ev.quality['missing_periods']}")
+    st.write(f"- 修订：{ev.quality['amended']}；陈旧：{ev.quality['stale']}")
+    st.caption("注：重复活动是已披露行为的描述性事实，不代表预测性意义（见方法论页）。")
 
 
 run()
-
-
