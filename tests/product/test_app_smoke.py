@@ -50,3 +50,9 @@ def test_methodology_page_smoke():
     at = _run("methodology.py")
     assert not at.exception
 
+
+def test_observation_page_smoke():
+    at = _run("observation.py")
+    assert not at.exception
+    assert any(w.value == "INSUFFICIENT_OBSERVATION — 尚无足够的真实使用 episode，"
+               "当前不给出任何真实世界效用结论。" for w in at.warning)
