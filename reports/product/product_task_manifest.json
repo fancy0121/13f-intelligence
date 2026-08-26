@@ -1,0 +1,22 @@
+{
+  "total_tasks": 412,
+  "development": 277,
+  "holdout": 135,
+  "categories": [
+    "manager_amended",
+    "manager_concentrated",
+    "manager_current",
+    "manager_diversified",
+    "manager_historically_incomplete",
+    "manager_stale",
+    "security_adr",
+    "security_high_breadth",
+    "security_low_breadth",
+    "security_mixed_activity",
+    "security_persistent_activity",
+    "security_share_class",
+    "security_stale",
+    "security_unfamiliar",
+    "security_unresolved_or_ambiguous"
+  ]
+}

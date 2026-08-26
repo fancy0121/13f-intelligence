@@ -32,7 +32,7 @@ def _local_imports(path: Path) -> set[str]:
     return {
         n
         for n in _imports(path)
-        if n.startswith("thirteenf") or n.startswith("db")
+        if n.startswith("thirteenf") or n.startswith("db") or n.startswith("store")
     }
 
 
@@ -90,7 +90,7 @@ def test_ui_imports_only_allowed_modules():
         third_party = {
             n
             for n in imports
-            if not n.startswith(("thirteenf", "db", "streamlit"))
+            if not n.startswith(("thirteenf", "db", "store", "streamlit"))
             and n not in stdlib
         }
         assert not third_party, f"{path.name} imports {third_party}"
