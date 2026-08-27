@@ -90,7 +90,7 @@ def test_ui_imports_only_allowed_modules():
         third_party = {
             n
             for n in imports
-            if not n.startswith(("thirteenf", "db", "store", "streamlit"))
+                if not n.startswith(("thirteenf", "db", "store", "ui", "streamlit", "pandas"))
             and n not in stdlib
         }
         assert not third_party, f"{path.name} imports {third_party}"

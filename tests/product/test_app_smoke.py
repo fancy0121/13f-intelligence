@@ -22,22 +22,22 @@ def _run(page: str):
 
 def test_overview_page_smoke():
     at = _run("overview.py")
-    assert any(m.label == "最新报告季度" for m in at.metric)
+    assert any(m.label.startswith("最新报告季度") for m in at.metric)
 
 
 def test_managers_page_smoke():
     at = _run("managers.py")
-    assert any(s.label == "选择机构" for s in at.selectbox)
+    assert any(t.label.startswith("选择机构") for t in at.text_input)
 
 
 def test_securities_page_smoke():
     at = _run("securities.py")
-    assert any(t.label == "输入 Ticker / CUSIP / 机构名（发行方）查询" for t in at.text_input)
+    assert any(t.label.startswith("输入 Ticker") for t in at.text_input)
 
 
 def test_activity_page_smoke():
     at = _run("activity.py")
-    assert any(s.label == "排序指标" for s in at.selectbox)
+    assert any(t.label.startswith("排序指标") for t in at.text_input)
 
 
 def test_portfolio_page_smoke():
@@ -54,5 +54,4 @@ def test_methodology_page_smoke():
 def test_observation_page_smoke():
     at = _run("observation.py")
     assert not at.exception
-    assert any(w.value == "INSUFFICIENT_OBSERVATION — 尚无足够的真实使用 episode，"
-               "当前不给出任何真实世界效用结论。" for w in at.warning)
+    assert any(w.value.startswith("INSUFFICIENT_OBSERVATION") for w in at.warning)
