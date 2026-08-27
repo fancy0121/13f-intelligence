@@ -36,6 +36,7 @@ def _run(step: str, args: list[str]) -> tuple[int, str]:
         errors="replace",
     )
     output = (proc.stdout or "") + (proc.stderr or "")
+    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(LOG_PATH, "a", encoding="utf-8") as fh:
         fh.write(f"\n===== {step} ({datetime.now(timezone.utc).isoformat()}) =====\n")
         fh.write(output)
@@ -105,6 +106,7 @@ def main(argv: list[str] | None = None) -> int:
         errors.append(f"status read failed: {exc}")
 
     success = not errors
+    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
     status = {
         "last_update_started_at": started,
         "last_update_finished_at": datetime.now(timezone.utc).isoformat(),
