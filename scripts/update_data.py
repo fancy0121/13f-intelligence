@@ -41,6 +41,9 @@ def _run(step: str, args: list[str]) -> tuple[int, str]:
         fh.write(f"\n===== {step} ({datetime.now(timezone.utc).isoformat()}) =====\n")
         fh.write(output)
         fh.write(f"\n[exit {proc.returncode}]\n")
+    if proc.returncode != 0:
+        print(f"[{step}] exited {proc.returncode}; output tail:")
+        print(output[-4000:])
     return proc.returncode, output
 
 
