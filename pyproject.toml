@@ -12,6 +12,7 @@ dependencies = [
     "lxml>=4.9",
     "streamlit>=1.36",
     "pandas>=2.0",
+    "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]
