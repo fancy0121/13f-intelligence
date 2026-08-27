@@ -48,12 +48,19 @@ def _run(step: str, args: list[str]) -> tuple[int, str]:
 
 
 def _parse_int(output: str, key: str) -> int | None:
+    # cli.py prints stats like "raw_files=333 failures=6" on ONE line, so a
+    # naive line-start match for "failures=" fails and the ingest run is
+    # misclassified as a crash. Match any "<key>=<int>" token within a line.
+    needle = key + "="
     for line in output.splitlines():
-        if line.startswith(key + "="):
-            try:
-                return int(line.split("=", 1)[1].strip())
-            except ValueError:
-                return None
+        if needle not in line:
+            continue
+        for token in line.split():
+            if token.startswith(needle):
+                try:
+                    return int(token.split("=", 1)[1].strip())
+                except ValueError:
+                    return None
     return None
 
 
