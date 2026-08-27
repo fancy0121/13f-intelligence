@@ -20,6 +20,7 @@
 - `Dockerfile` — 构建期建库 + 启动看板
 - `render.yaml` — Render 一键配置
 - `scripts/update_data.py` — 复用现有 ingest/normalize/analyze（含 `--rate-limit`）
+- `deploy/hostinger_vps.md` — Hostinger VPS 部署手册（Docker + Caddy + HTTPS）
 
 ---
 
@@ -92,4 +93,3 @@ docker run --rm -p 8501:8501 thirteenf-evidence
   本地先跑 `python scripts/update_data.py --rate-limit 0.6` 确认能成功。
 - **SEC 下载慢/失败**：网络被限 → 提高 `--rate-limit` 到 1-2 秒重试。
 - **端口**：容器内 `$PORT` 由平台注入；本地默认 8501。
-
