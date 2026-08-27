@@ -68,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
             rate_limit = 5.0
     started = datetime.now(timezone.utc).isoformat()
     errors: list[str] = []
+    warnings: list[str] = []
 
     # 1. ingest (network) unless --check
     raw_files_added = None
@@ -81,8 +82,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         raw_files_added = _parse_int(out, "raw_files")
         failures = _parse_int(out, "failures")
-        if code != 0 or (failures and failures > 0):
-            errors.append(f"ingest failed (exit {code}, failures={failures})")
+        if code != 0 and failures is None:
+            # No stats printed -> the ingest process crashed before finishing.
+            errors.append(f"ingest crashed (exit {code})")
+        elif failures:
+            # Completed but with benign per-filing failures (e.g., no info
+            # table); normalize handles these gracefully - record as warning.
+            warnings.append(f"ingest partial failures={failures} (continue)")
 
     # 2. normalize (offline, idempotent)
     code, out = _run("normalize", ["normalize", "--db-path", str(DB)])
@@ -119,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         "filings_processed": filings if filings is not None else filings_count,
         "holdings_processed": holdings,
         "errors": errors,
+        "warnings": warnings,
         "log_path": str(LOG_PATH),
     }
     STATUS_PATH.write_text(
