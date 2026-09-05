@@ -242,7 +242,14 @@ def test_task10_update_script_present_and_references_existing_pipeline():
     script = ROOT / "scripts" / "update_data.py"
     assert script.exists()
     text = script.read_text(encoding="utf-8")
-    assert '"ingest"' in text and '"normalize"' in text and '"analyze"' in text
+    assert '"ingest"' in text and '"normalize"' in text
+    assert '"promoted"' in text and '"--release-mode"' in text
+    normalization = (ROOT / "src" / "thirteenf" / "normalization.py").read_text(
+        encoding="utf-8"
+    )
+    assert "compute_position_changes" in normalization
+    assert "compute_consensus" in normalization
+    assert "compute_trends" in normalization
     bat = (ROOT / "UPDATE_13F_DATA.bat").read_text(encoding="utf-8")
     assert "update_data.py" in bat
 

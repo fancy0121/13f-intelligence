@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sqlite3
 import sys
 from pathlib import Path
@@ -66,7 +67,9 @@ def test_rate_limit_rps_flag_is_forwarded(update_data, monkeypatch, tmp_path):
 
     def fake_run(step, args):
         calls.append((step, args))
-        return 0, "raw_files=1 failures=0 filings=1"
+        if step == "ingest":
+            return 0, "raw_files=1 failures=0"
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
 
     monkeypatch.setattr(update_data, "_run", fake_run)
     assert update_data.main(["--rate-limit-rps", "2.5"]) == 0
@@ -82,10 +85,48 @@ def test_absent_rate_flag_does_not_mask_environment(
 
     def fake_run(step, args):
         calls.append((step, args))
-        return 0, "raw_files=1 failures=0 filings=1"
+        if step == "ingest":
+            return 0, "raw_files=1 failures=0"
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
 
     monkeypatch.setattr(update_data, "_run", fake_run)
     assert update_data.main([]) == 0
     ingest_args = next(args for step, args in calls if step == "ingest")
     assert "--rate-limit-rps" not in ingest_args
     assert "--rate-limit-s" not in ingest_args
+
+
+def test_changed_filing_failure_blocks_release(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 1, "raw_files=2 failures=1 changed_failures=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--release-mode"]) == 1
+    assert [step for step, _ in calls] == ["ingest"]
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding="utf-8"))
+    assert status["releaseable"] is False
+
+
+def test_normalize_only_forwards_raw_root_and_database(
+    update_data, monkeypatch, tmp_path
+):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    raw_root = tmp_path / "raw"
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(
+        ["--normalize-only", "--raw-root", str(raw_root), "--db", str(update_data.DB)]
+    ) == 0
+    assert [step for step, _ in calls] == ["normalize"]
+    normalize_args = calls[0][1]
+    assert normalize_args[normalize_args.index("--raw-root") + 1] == str(raw_root)
+    assert normalize_args[normalize_args.index("--db-path") + 1] == str(update_data.DB)

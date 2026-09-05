@@ -49,6 +49,7 @@ class CoverMetadata:
     report_period: str
     amendment_number: int | None
     amendment_type: AmendmentType | None
+    submission_type: str
 
 
 @dataclass(frozen=True)
@@ -109,7 +110,7 @@ def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
     if not is_amendment:
         if amendment_number_text or amendment_type_nodes:
             raise XmlParseError("non-amendment cover contains amendment metadata")
-        return CoverMetadata(report_period, None, None)
+        return CoverMetadata(report_period, None, None, submission_type)
 
     if len(amendment_type_nodes) != 1:
         raise XmlParseError("amendment must contain exactly one amendment type")
@@ -126,7 +127,12 @@ def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
         amendment_type = AmendmentType.ADD_NEW_HOLDINGS
     else:
         raise XmlParseError(f"unsupported amendmentType {raw_type!r}")
-    return CoverMetadata(report_period, amendment_number, amendment_type)
+    return CoverMetadata(
+        report_period,
+        amendment_number,
+        amendment_type,
+        submission_type,
+    )
 
 
 def parse_info_table(xml_bytes: bytes) -> list[HoldingRow]:
