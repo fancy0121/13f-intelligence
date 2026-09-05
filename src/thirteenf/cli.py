@@ -69,7 +69,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     raw_root.mkdir(parents=True, exist_ok=True)
     client = SecClient(
         user_agent=args.ua,
-        rate_limit_s=args.rate_limit_s,
+        rate_limit_rps=args.rate_limit_rps,
         max_retries=args.max_retries,
     )
     managers = load_verified_managers(managers_path)
@@ -353,7 +353,7 @@ def build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--quarters", type=int, default=12)
     ingest.add_argument("--force", action="store_true")
     ingest.add_argument("--ua", default=None)
-    ingest.add_argument("--rate-limit-s", type=float, default=5.0)
+    ingest.add_argument("--rate-limit-rps", type=float, default=None)
     ingest.add_argument("--max-retries", type=int, default=5)
     ingest.set_defaults(func=cmd_ingest)
 

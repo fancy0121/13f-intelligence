@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -43,3 +44,48 @@ def test_parse_int_same_line(update_data):
 def test_parse_int_missing_and_invalid(update_data):
     assert update_data._parse_int("no stats here\n", "failures") is None
     assert update_data._parse_int("raw_files=333 failures=abc\n", "failures") is None
+
+
+def _prepare_update_paths(update_data, monkeypatch, tmp_path):
+    db_path = tmp_path / "thirteenf.db"
+    conn = sqlite3.connect(db_path)
+    conn.executescript(
+        "CREATE TABLE filings(filing_id INTEGER);"
+        "CREATE TABLE holdings(holding_id INTEGER);"
+    )
+    conn.commit()
+    conn.close()
+    monkeypatch.setattr(update_data, "DB", db_path)
+    monkeypatch.setattr(update_data, "STATUS_PATH", tmp_path / "last_update.json")
+    monkeypatch.setattr(update_data, "LOG_PATH", tmp_path / "last_update.log")
+
+
+def test_rate_limit_rps_flag_is_forwarded(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 0, "raw_files=1 failures=0 filings=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--rate-limit-rps", "2.5"]) == 0
+    ingest_args = next(args for step, args in calls if step == "ingest")
+    assert ingest_args[-2:] == ["--rate-limit-rps", "2.5"]
+
+
+def test_absent_rate_flag_does_not_mask_environment(
+    update_data, monkeypatch, tmp_path
+):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 0, "raw_files=1 failures=0 filings=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main([]) == 0
+    ingest_args = next(args for step, args in calls if step == "ingest")
+    assert "--rate-limit-rps" not in ingest_args
+    assert "--rate-limit-s" not in ingest_args

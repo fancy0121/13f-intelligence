@@ -67,12 +67,13 @@ def _parse_int(output: str, key: str) -> int | None:
 def main(argv: list[str] | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     check_only = "--check" in argv
-    rate_limit = 5.0
-    if "--rate-limit" in argv:
+    rate_limit_rps = None
+    if "--rate-limit-rps" in argv:
         try:
-            rate_limit = float(argv[argv.index("--rate-limit") + 1])
+            rate_limit_rps = float(argv[argv.index("--rate-limit-rps") + 1])
         except (IndexError, ValueError):
-            rate_limit = 5.0
+            print("--rate-limit-rps requires a numeric value")
+            return 1
     started = datetime.now(timezone.utc).isoformat()
     errors: list[str] = []
     warnings: list[str] = []
@@ -80,13 +81,12 @@ def main(argv: list[str] | None = None) -> int:
     # 1. ingest (network) unless --check
     raw_files_added = None
     if not check_only:
-        code, out = _run(
-            "ingest",
-            [
-                "ingest", "--managers", str(ROOT / "config" / "managers.csv"),
-                "--rate-limit-s", str(rate_limit),
-            ],
-        )
+        ingest_args = [
+            "ingest", "--managers", str(ROOT / "config" / "managers.csv")
+        ]
+        if rate_limit_rps is not None:
+            ingest_args.extend(["--rate-limit-rps", str(rate_limit_rps)])
+        code, out = _run("ingest", ingest_args)
         raw_files_added = _parse_int(out, "raw_files")
         failures = _parse_int(out, "failures")
         if code != 0 and failures is None:
