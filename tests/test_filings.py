@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from thirteenf.filings import (
     FilingRecord,
     dedupe_effective,
+    discover_filings,
     latest_n_quarters,
     parse_submissions,
 )
@@ -85,3 +86,87 @@ def test_dedupe_effective_keeps_both_periods():
     chosen = dedupe_effective(records)
     assert len(chosen) == 2
 
+
+class _DiscoveryClient:
+    def __init__(self, payloads):
+        self.payloads = payloads
+        self.urls = []
+
+    @staticmethod
+    def submissions_url(cik):
+        return f"https://data.sec.gov/submissions/CIK{cik:010d}.json"
+
+    def fetch_json(self, url):
+        self.urls.append(url)
+        return self.payloads[url]
+
+
+def _columns(*, accession, report_date, accepted_at, form="13F-HR"):
+    return {
+        "form": [form],
+        "accessionNumber": [accession],
+        "filingDate": [accepted_at[:10]],
+        "reportDate": [report_date],
+        "acceptanceDateTime": [accepted_at],
+        "primaryDocument": ["primary_doc.xml"],
+    }
+
+
+def test_discovery_follows_historical_submission_files():
+    main_url = "https://data.sec.gov/submissions/CIK0000000001.json"
+    history_name = "CIK0000000001-submissions-001.json"
+    history_url = f"https://data.sec.gov/submissions/{history_name}"
+    client = _DiscoveryClient(
+        {
+            main_url: {
+                "filings": {
+                    "recent": _columns(
+                        accession="0000000001-26-000002",
+                        report_date="2026-06-30",
+                        accepted_at="2026-08-14T12:00:00.000Z",
+                    ),
+                    "files": [{"name": history_name}],
+                }
+            },
+            history_url: _columns(
+                accession="0000000001-25-000001",
+                report_date="2025-12-31",
+                accepted_at="2026-02-14T12:00:00.000Z",
+            ),
+        }
+    )
+    records = discover_filings(client, 1, quarters=12, as_of=date(2026, 9, 5))
+    assert [r.accession_number for r in records] == [
+        "0000000001-26-000002",
+        "0000000001-25-000001",
+    ]
+    assert records[1].accepted_at == "2026-02-14T12:00:00.000Z"
+    assert records[1].submission_source_url == history_url
+    assert client.urls == [main_url, history_url]
+
+
+def test_discovery_deduplicates_accessions_deterministically():
+    main_url = "https://data.sec.gov/submissions/CIK0000000001.json"
+    history_name = "CIK0000000001-submissions-001.json"
+    history_url = f"https://data.sec.gov/submissions/{history_name}"
+    duplicate = _columns(
+        accession="0000000001-26-000002",
+        report_date="2026-06-30",
+        accepted_at="2026-08-14T12:00:00.000Z",
+    )
+    client = _DiscoveryClient(
+        {
+            main_url: {
+                "filings": {"recent": duplicate, "files": [{"name": history_name}]}
+            },
+            history_url: duplicate,
+        }
+    )
+    records = discover_filings(client, 1, quarters=12, as_of=date(2026, 9, 5))
+    assert len(records) == 1
+    assert records[0].submission_source_url == main_url
+
+
+def test_latest_n_quarters_uses_as_of_not_latest_stale_record():
+    records = [_record("2022-12-31", "old")]
+    assert latest_n_quarters(records, n=12, as_of=date(2026, 9, 5)) == []

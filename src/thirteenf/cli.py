@@ -25,9 +25,8 @@ from thirteenf.database import (
     upsert_manager,
 )
 from thirteenf.filings import (
+    discover_filings,
     download_filing,
-    parse_submissions,
-    latest_n_quarters,
 )
 from thirteenf.parser import XmlParseError, parse_info_table
 from thirteenf.sec_client import SecClient, SecError
@@ -80,13 +79,11 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         cik = int(m["cik"])
         label = m["label"]
         try:
-            payload = client.fetch_json(client.submissions_url(cik))
+            records = discover_filings(client, cik, quarters=args.quarters)
         except SecError as exc:
             print(f"  [FAIL] {label} submissions: {exc}")
             failures += 1
             continue
-        records = parse_submissions(cik, payload)
-        records = latest_n_quarters(records, n=args.quarters)
         print(f"  [{label}] cik={cik} filings={len(records)}")
         for rec in records:
             try:
