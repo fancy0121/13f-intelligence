@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
+
+from thirteenf.product.evidence import ProductStore
 
 
 def test_latest_period_and_event_counts(store):
@@ -31,8 +34,11 @@ def test_manager_evidence_facts_match_db(store):
     assert ev.manager_id == mid
     # snapshot matches DB
     row = store.conn.execute(
-        "SELECT COUNT(*) FROM holdings h JOIN filings f ON f.filing_id=h.filing_id "
-        "WHERE f.manager_id=? AND f.report_period=? AND f.ingest_status='OK'",
+        """
+        SELECT COUNT(*) FROM effective_positions ep
+        JOIN effective_periods p ON p.effective_period_id=ep.effective_period_id
+        WHERE p.manager_id=? AND p.report_period=? AND p.status='READY'
+        """,
         (mid, ev.latest_report_period or ""),
     ).fetchone()
     assert ev.position_count == row[0]
@@ -45,6 +51,35 @@ def test_manager_evidence_facts_match_db(store):
         ).fetchone()[0]
         total_changes = sum(len(v) for v in ev.latest_changes.values())
         assert total_changes == n
+
+
+def test_manager_snapshot_aggregates_raw_rows_and_amendment_components(store):
+    manager_id = store.conn.execute(
+        "SELECT manager_id FROM managers WHERE name='BERKSHIRE HATHAWAY INC'"
+    ).fetchone()[0]
+    evidence = store.manager_evidence(manager_id)
+    assert evidence is not None
+    assert evidence.position_count == 3
+    googl = next(item for item in evidence.top_holdings if item["cusip"] == "02079K305")
+    assert googl["shares"] == 150
+    assert len({item["cusip"] for item in evidence.top_holdings}) == len(
+        evidence.top_holdings
+    )
+
+
+def test_public_store_does_not_create_sqlite_sidecars(product_bundle, tmp_path):
+    copied = tmp_path / "release.db"
+    shutil.copy2(product_bundle.db, copied)
+    reader = ProductStore(
+        copied,
+        product_bundle.resolution,
+        product_bundle.semantic,
+        product_bundle.managers,
+    )
+    assert reader.latest_period() == "2026-06-30"
+    reader.close()
+    assert not Path(f"{copied}-wal").exists()
+    assert not Path(f"{copied}-shm").exists()
 
 
 def test_security_evidence_facts_match_db(store):
@@ -68,6 +103,21 @@ def test_security_evidence_facts_match_db(store):
     # symmetry: activity_state covers both sides when mixed
     if ev.activity_counts["ADD"] > 0 and ev.activity_counts["REDUCE"] > 0:
         assert ev.activity_state == "MIXED_ACTIVITY"
+
+    current_holders = store.conn.execute(
+        """
+        SELECT COUNT(DISTINCT effective.manager_id)
+        FROM effective_positions position
+        JOIN effective_periods effective
+          ON effective.effective_period_id=position.effective_period_id
+        JOIN securities security ON security.security_id=position.security_id
+        WHERE security.cusip=? AND effective.report_period=?
+          AND effective.status='READY' AND position.put_call=''
+          AND position.shares_type='SH'
+        """,
+        (ev.cusip, period),
+    ).fetchone()[0]
+    assert ev.holder_entity_count == current_holders
 
 
 def test_search_by_ticker_cusip_issuer(store):

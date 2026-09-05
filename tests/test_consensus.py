@@ -155,6 +155,38 @@ def test_consensus_empty_without_approved(tmp_path):
     conn.close()
 
 
+def test_consensus_never_merges_shares_and_principal_amounts(tmp_path):
+    conn, mids, sid = _seed(tmp_path)
+    manager_id = mids["M1"]
+    conn.executemany(
+        """
+        INSERT INTO position_changes(
+            manager_id, security_id, report_period, put_call, shares_type,
+            change_type, shares_prev, shares_now, share_change,
+            share_change_pct, weight_prev, weight_now, weight_change,
+            methodology_version
+        ) VALUES (?, ?, '2026-06-30', '', ?, ?, 100, ?, ?, ?, 0.1, 0.2,
+                  0.1, '0.1.0')
+        """,
+        [
+            (manager_id, sid, "SH", "ADD", 200, 100, 1.0),
+            (manager_id, sid, "PRN", "REDUCE", 50, -50, -0.5),
+        ],
+    )
+    conn.commit()
+    assert compute_consensus(conn, methodology_version="0.1.0") == 2
+    rows = conn.execute(
+        """
+        SELECT shares_type, consensus_score FROM consensus_scores
+        ORDER BY shares_type
+        """
+    ).fetchall()
+    scores = {row[0]: row[1] for row in rows}
+    assert scores["SH"] > 0
+    assert scores["PRN"] < 0
+    conn.close()
+
+
 def test_trend_insufficient_history_when_no_consensus(tmp_path):
     conn, mids, sid = _seed(tmp_path)
     conn.execute("UPDATE managers SET scoring_status='NOT_APPROVED', signal_quality=NULL")

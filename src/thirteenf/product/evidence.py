@@ -120,6 +120,7 @@ class ProductStore:
         resolution_csv: Path | str,
         semantic_csv: Path | str,
         managers_csv: Path | str,
+        methodology_version: str | None = None,
     ) -> None:
         self.conn: sqlite3.Connection = connect_readonly(db_path, immutable=True)
         self._root_dir = Path(db_path).resolve().parents[1]
@@ -128,6 +129,9 @@ class ProductStore:
         self.managers = pd.read_csv(managers_csv, dtype=str).fillna("")
         self._res = self.resolution.set_index("cusip").to_dict("index")
         self._sem = self.semantic.set_index("cusip").to_dict("index")
+        self.methodology_version = self._resolve_methodology_version(
+            methodology_version
+        )
         # manager_id -> validation status (by CIK)
         cik_to_id = {
             str(r[0]): r[1]
@@ -145,9 +149,34 @@ class ProductStore:
     def close(self) -> None:
         self.conn.close()
 
+    def _resolve_methodology_version(self, requested: str | None) -> str:
+        rows = self.conn.execute(
+            """
+            SELECT DISTINCT methodology_version
+            FROM effective_periods WHERE status='READY'
+            ORDER BY methodology_version
+            """
+        ).fetchall()
+        available = [str(row[0]) for row in rows]
+        if requested is not None:
+            if requested not in available:
+                raise RuntimeError(
+                    f"requested methodology version is not READY: {requested}"
+                )
+            return requested
+        if len(available) != 1:
+            raise RuntimeError(
+                "public database must contain exactly one READY methodology version"
+            )
+        return available[0]
+
     def _load_quarters(self) -> list[str]:
         rows = self.conn.execute(
-            "SELECT DISTINCT report_period FROM filings WHERE ingest_status='OK'"
+            """
+            SELECT DISTINCT report_period FROM effective_periods
+            WHERE status='READY' AND methodology_version=?
+            """,
+            (self.methodology_version,),
         ).fetchall()
         return sorted(r[0] for r in rows)
 
@@ -156,18 +185,28 @@ class ProductStore:
     # ------------------------------------------------------------------
     def latest_period(self) -> str | None:
         row = self.conn.execute(
-            "SELECT MAX(report_period) FROM filings WHERE ingest_status='OK'"
+            """
+            SELECT MAX(report_period) FROM effective_periods
+            WHERE status='READY' AND methodology_version=?
+            """,
+            (self.methodology_version,),
         ).fetchone()
         return row[0] if row else None
 
     def latest_filing_info(self) -> dict | None:
         row = self.conn.execute(
             """
-            SELECT accession_number, filing_date, report_period, form_type
-            FROM filings
-            WHERE ingest_status='OK'
-            ORDER BY filing_date DESC, filing_id DESC LIMIT 1
-            """
+            SELECT f.accession_number, f.filing_date, ep.report_period,
+                   f.form_type
+            FROM effective_periods ep
+            JOIN effective_filing_components efc
+              ON efc.effective_period_id=ep.effective_period_id
+            JOIN filings f ON f.filing_id=efc.filing_id
+            WHERE ep.status='READY' AND ep.methodology_version=?
+            ORDER BY ep.report_period DESC, f.filing_date DESC,
+                     f.filing_id DESC LIMIT 1
+            """,
+            (self.methodology_version,),
         ).fetchone()
         if not row:
             return None
@@ -191,22 +230,29 @@ class ProductStore:
     def manager_update_counts(self, period: str) -> tuple[int, int]:
         total = self.conn.execute("SELECT COUNT(*) FROM managers").fetchone()[0]
         updated = self.conn.execute(
-            "SELECT COUNT(DISTINCT manager_id) FROM filings "
-            "WHERE report_period=? AND ingest_status='OK'",
-            (period,),
+            """
+            SELECT COUNT(DISTINCT manager_id) FROM effective_periods
+            WHERE report_period=? AND status='READY'
+              AND methodology_version=?
+            """,
+            (period, self.methodology_version),
         ).fetchone()[0]
         return updated, total
 
     def manager_latest_filing(self, manager_id: int) -> tuple[str | None, str | None, bool]:
         row = self.conn.execute(
             """
-            SELECT report_period, filing_date, MAX(is_amendment)
-            FROM filings
-            WHERE manager_id=? AND ingest_status='OK'
-            GROUP BY report_period
-            ORDER BY report_period DESC LIMIT 1
+            SELECT ep.report_period, MAX(f.filing_date), MAX(f.is_amendment)
+            FROM effective_periods ep
+            JOIN effective_filing_components efc
+              ON efc.effective_period_id=ep.effective_period_id
+            JOIN filings f ON f.filing_id=efc.filing_id
+            WHERE ep.manager_id=? AND ep.status='READY'
+              AND ep.methodology_version=?
+            GROUP BY ep.report_period
+            ORDER BY ep.report_period DESC LIMIT 1
             """,
-            (manager_id,),
+            (manager_id, self.methodology_version),
         ).fetchone()
         if not row:
             return None, None, False
@@ -217,9 +263,12 @@ class ProductStore:
         updated = {
             r[0]
             for r in self.conn.execute(
-                "SELECT DISTINCT manager_id FROM filings "
-                "WHERE report_period=? AND ingest_status='OK'",
-                (period,),
+                """
+                SELECT DISTINCT manager_id FROM effective_periods
+                WHERE report_period=? AND status='READY'
+                  AND methodology_version=?
+                """,
+                (period, self.methodology_version),
             ).fetchall()
         }
         mids = [r[0] for r in self.conn.execute("SELECT manager_id FROM managers").fetchall()]
@@ -255,10 +304,11 @@ class ProductStore:
             """
             SELECT change_type, COUNT(*)
             FROM position_changes
-            WHERE report_period=? AND put_call=''
+            WHERE report_period=? AND put_call='' AND shares_type='SH'
+              AND methodology_version=?
             GROUP BY change_type
             """,
-            (period,),
+            (period, self.methodology_version),
         ).fetchall()
         out = {c: 0 for c in CHANGE_TYPES}
         for ct, n in rows:
@@ -303,23 +353,34 @@ class ProductStore:
         # snapshot
         snap = self.conn.execute(
             """
-            SELECT COUNT(*), SUM(value)
-            FROM holdings h JOIN filings f ON f.filing_id=h.filing_id
-            WHERE f.manager_id=? AND f.report_period=? AND f.ingest_status='OK'
+            SELECT COUNT(*), SUM(position.value)
+            FROM effective_positions position
+            JOIN effective_periods period
+              ON period.effective_period_id=position.effective_period_id
+            WHERE period.manager_id=? AND period.report_period=?
+              AND period.status='READY' AND period.methodology_version=?
             """,
-            (mid, period or ""),
+            (mid, period or "", self.methodology_version),
         ).fetchone()
         pos_count = int(snap[0] or 0)
         total_value = float(snap[1]) if snap[1] is not None else None
         top = self.conn.execute(
             """
-            SELECT h.cusip, h.issuer, h.shares, h.value, h.portfolio_weight,
-                   h.put_call
-            FROM holdings h JOIN filings f ON f.filing_id=h.filing_id
-            WHERE f.manager_id=? AND f.report_period=? AND f.ingest_status='OK'
-            ORDER BY h.value DESC LIMIT 10
+            SELECT security.cusip, security.issuer, position.shares,
+                   position.value, position.portfolio_weight,
+                   position.put_call, position.shares_type
+            FROM effective_positions position
+            JOIN effective_periods period
+              ON period.effective_period_id=position.effective_period_id
+            JOIN securities security
+              ON security.security_id=position.security_id
+            WHERE period.manager_id=? AND period.report_period=?
+              AND period.status='READY' AND period.methodology_version=?
+            ORDER BY position.value DESC, security.cusip,
+                     position.put_call, position.shares_type
+            LIMIT 10
             """,
-            (mid, period or ""),
+            (mid, period or "", self.methodology_version),
         ).fetchall()
         top_holdings = [
             {
@@ -329,6 +390,7 @@ class ProductStore:
                 "value": t[3],
                 "weight": t[4],
                 "put_call": t[5],
+                "shares_type": t[6],
                 "resolution_status": self._res.get(t[0], {}).get("status", "UNKNOWN"),
                 "ticker": self._res.get(t[0], {}).get("symbol", ""),
             }
@@ -343,9 +405,10 @@ class ProductStore:
             FROM position_changes pc
             JOIN securities s ON s.security_id = pc.security_id
             WHERE pc.manager_id=? AND pc.report_period=? AND pc.put_call=''
+              AND pc.shares_type='SH' AND pc.methodology_version=?
             ORDER BY pc.change_type, ABS(COALESCE(pc.share_change_pct,0)) DESC
             """,
-            (mid, period or ""),
+            (mid, period or "", self.methodology_version),
         ).fetchall()
         for r in rows:
             changes[r[1]].append(
@@ -376,9 +439,12 @@ class ProductStore:
             mgr_periods = {
                 r[0]
                 for r in self.conn.execute(
-                    "SELECT DISTINCT report_period FROM filings "
-                    "WHERE manager_id=? AND ingest_status='OK'",
-                    (mid,),
+                    """
+                    SELECT DISTINCT report_period FROM effective_periods
+                    WHERE manager_id=? AND status='READY'
+                      AND methodology_version=?
+                    """,
+                    (mid, self.methodology_version),
                 ).fetchall()
             }
             missing_periods = sum(1 for q in self._quarters if q not in mgr_periods)
@@ -411,9 +477,12 @@ class ProductStore:
         filed = {
             r[0]
             for r in self.conn.execute(
-                "SELECT DISTINCT report_period FROM filings "
-                "WHERE manager_id=? AND ingest_status='OK'",
-                (manager_id,),
+                """
+                SELECT DISTINCT report_period FROM effective_periods
+                WHERE manager_id=? AND status='READY'
+                  AND methodology_version=?
+                """,
+                (manager_id, self.methodology_version),
             ).fetchall()
         }
         qpos = {q: i for i, q in enumerate(self._quarters)}
@@ -421,10 +490,11 @@ class ProductStore:
             """
             SELECT security_id, report_period, change_type
             FROM position_changes
-            WHERE manager_id=? AND put_call=''
+            WHERE manager_id=? AND put_call='' AND shares_type='SH'
+              AND methodology_version=?
             ORDER BY security_id, report_period
             """,
-            (manager_id,),
+            (manager_id, self.methodology_version),
         ).fetchall()
         add_runs = 0
         reduce_runs = 0
@@ -527,10 +597,11 @@ class ProductStore:
             FROM position_changes pc
             JOIN securities s ON s.security_id = pc.security_id
             JOIN managers m ON m.manager_id=pc.manager_id
-            WHERE s.cusip=? AND pc.put_call='' AND pc.report_period=?
+            WHERE s.cusip=? AND pc.put_call='' AND pc.shares_type='SH'
+              AND pc.report_period=? AND pc.methodology_version=?
             ORDER BY m.name
             """,
-            (cusip, latest),
+            (cusip, latest, self.methodology_version),
         ).fetchall()
         holders = [
             {
@@ -548,8 +619,27 @@ class ProductStore:
             }
             for r in rows
         ]
-        holder_entity_count = len({h["manager_id"] for h in holders})
-        independent_count = sum(1 for h in holders if h["independent"])
+        current_holder_ids = {
+            int(row[0])
+            for row in self.conn.execute(
+                """
+                SELECT DISTINCT period.manager_id
+                FROM effective_positions position
+                JOIN effective_periods period
+                  ON period.effective_period_id=position.effective_period_id
+                JOIN securities security
+                  ON security.security_id=position.security_id
+                WHERE security.cusip=? AND period.report_period=?
+                  AND period.status='READY' AND period.methodology_version=?
+                  AND position.put_call='' AND position.shares_type='SH'
+                """,
+                (cusip, latest, self.methodology_version),
+            ).fetchall()
+        }
+        holder_entity_count = len(current_holder_ids)
+        independent_count = sum(
+            1 for manager_id in current_holder_ids if self._is_independent(manager_id)
+        )
         activity = {c: 0 for c in CHANGE_TYPES}
         indep_add = indep_reduce = 0
         indep_new = indep_exit = 0
@@ -570,10 +660,15 @@ class ProductStore:
         if latest:
             row = self.conn.execute(
                 """
-                SELECT MAX(f.filing_date) FROM filings f
-                WHERE f.report_period=? AND f.ingest_status='OK'
+                SELECT MAX(f.filing_date)
+                FROM effective_periods period
+                JOIN effective_filing_components component
+                  ON component.effective_period_id=period.effective_period_id
+                JOIN filings f ON f.filing_id=component.filing_id
+                WHERE period.report_period=? AND period.status='READY'
+                  AND period.methodology_version=?
                 """,
-                (latest,),
+                (latest, self.methodology_version),
             ).fetchone()
             fdate = row[0] if row else None
         # repeated counts across independent managers
@@ -581,23 +676,38 @@ class ProductStore:
         # timeline
         timeline = []
         for period in self._quarters:
-            n = self.conn.execute(
+            activity_row = self.conn.execute(
                 """
-                SELECT COUNT(*),
-                       SUM(CASE WHEN pc.change_type IN ('NEW','ADD') THEN 1 ELSE 0 END),
+                SELECT SUM(CASE WHEN pc.change_type IN ('NEW','ADD') THEN 1 ELSE 0 END),
                        SUM(CASE WHEN pc.change_type IN ('REDUCE','EXIT') THEN 1 ELSE 0 END)
                 FROM position_changes pc
                 JOIN securities s ON s.security_id = pc.security_id
                 WHERE s.cusip=? AND pc.report_period=? AND pc.put_call=''
+                  AND pc.shares_type='SH' AND pc.methodology_version=?
                 """,
-                (cusip, period),
+                (cusip, period, self.methodology_version),
             ).fetchone()
+            holder_count = self.conn.execute(
+                """
+                SELECT COUNT(DISTINCT effective.manager_id)
+                FROM effective_positions position
+                JOIN effective_periods effective
+                  ON effective.effective_period_id=position.effective_period_id
+                JOIN securities security
+                  ON security.security_id=position.security_id
+                WHERE security.cusip=? AND effective.report_period=?
+                  AND effective.status='READY'
+                  AND effective.methodology_version=?
+                  AND position.put_call='' AND position.shares_type='SH'
+                """,
+                (cusip, period, self.methodology_version),
+            ).fetchone()[0]
             timeline.append(
                 {
                     "report_period": period,
-                    "holders": int(n[0]),
-                    "adds": int(n[1] or 0),
-                    "reduces": int(n[2] or 0),
+                    "holders": int(holder_count),
+                    "adds": int(activity_row[0] or 0),
+                    "reduces": int(activity_row[1] or 0),
                 }
             )
         return SecurityEvidence(
@@ -658,13 +768,19 @@ class ProductStore:
             SELECT s.cusip, pc.manager_id, pc.report_period, pc.change_type
             FROM position_changes pc
             JOIN securities s ON s.security_id = pc.security_id
-            WHERE pc.put_call=''
+            WHERE pc.put_call='' AND pc.shares_type='SH'
+              AND pc.methodology_version=?
             ORDER BY s.cusip, pc.manager_id, pc.report_period
-            """
+            """,
+            (self.methodology_version,),
         ).fetchall()
         filed_by_mgr: dict[int, set[str]] = {}
         for r in self.conn.execute(
-            "SELECT DISTINCT manager_id, report_period FROM filings WHERE ingest_status='OK'"
+            """
+            SELECT DISTINCT manager_id, report_period FROM effective_periods
+            WHERE status='READY' AND methodology_version=?
+            """,
+            (self.methodology_version,),
         ).fetchall():
             filed_by_mgr.setdefault(int(r[0]), set()).add(r[1])
         result: dict[str, tuple[int, int]] = {}
@@ -729,18 +845,35 @@ class ProductStore:
             SELECT s.cusip, pc.change_type, pc.manager_id
             FROM position_changes pc
             JOIN securities s ON s.security_id = pc.security_id
-            WHERE pc.report_period=? AND pc.put_call=''
+            WHERE pc.report_period=? AND pc.put_call='' AND pc.shares_type='SH'
+              AND pc.methodology_version=?
             """,
-            (period,),
+            (period, self.methodology_version),
         ).fetchall()
         indep_add: dict[str, int] = {}
         indep_reduce: dict[str, int] = {}
         indep_new: dict[str, int] = {}
         indep_exit: dict[str, int] = {}
         holder_entity: dict[str, set[int]] = {}
+        activity_cusips: set[str] = set()
+        for cusip, manager_id in self.conn.execute(
+            """
+            SELECT security.cusip, effective.manager_id
+            FROM effective_positions position
+            JOIN effective_periods effective
+              ON effective.effective_period_id=position.effective_period_id
+            JOIN securities security
+              ON security.security_id=position.security_id
+            WHERE effective.report_period=? AND effective.status='READY'
+              AND effective.methodology_version=?
+              AND position.put_call='' AND position.shares_type='SH'
+            """,
+            (period, self.methodology_version),
+        ).fetchall():
+            holder_entity.setdefault(cusip, set()).add(int(manager_id))
         for cusip, ct, mgr in rows:
             mgr = int(mgr)
-            holder_entity.setdefault(cusip, set()).add(mgr)
+            activity_cusips.add(cusip)
             if not self._is_independent(mgr):
                 continue
             if ct in ("NEW", "ADD"):
@@ -751,7 +884,7 @@ class ProductStore:
                 indep_new[cusip] = indep_new.get(cusip, 0) + 1
             if ct == "EXIT":
                 indep_exit[cusip] = indep_exit.get(cusip, 0) + 1
-        cusips = set(holder_entity)
+        cusips = set(holder_entity) | activity_cusips
         out = []
         for c in cusips:
             rep_add, rep_reduce = self._security_repeated(c)
@@ -767,7 +900,7 @@ class ProductStore:
                     ).fetchone() else None,
                     "resolution_status": res.get("status", "UNKNOWN"),
                     "economic_type": self._sem.get(c, {}).get("economic_type"),
-                    "holder_entity_count": len(holder_entity[c]),
+                    "holder_entity_count": len(holder_entity.get(c, set())),
                     "independent_add_manager_count": indep_add.get(c, 0),
                     "independent_reduce_manager_count": indep_reduce.get(c, 0),
                     "independent_new_manager_count": indep_new.get(c, 0),

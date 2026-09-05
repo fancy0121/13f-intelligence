@@ -33,8 +33,10 @@ def build_task_universe(
         SELECT s.cusip, pc.change_type, pc.report_period, pc.manager_id
         FROM position_changes pc
         JOIN securities s ON s.security_id = pc.security_id
-        WHERE pc.put_call=''
-        """
+        WHERE pc.put_call='' AND pc.shares_type='SH'
+          AND pc.methodology_version=?
+        """,
+        (store.methodology_version,),
     ).fetchall()
     latest_actions: dict[str, list[tuple[str, int]]] = {}
     total_obs: dict[str, int] = {}
@@ -96,9 +98,12 @@ def build_task_universe(
     latest_mids = {
         r[0]
         for r in store.conn.execute(
-            "SELECT DISTINCT manager_id FROM filings WHERE report_period=? "
-            "AND ingest_status='OK'",
-            (period,),
+            """
+            SELECT DISTINCT manager_id FROM effective_periods
+            WHERE report_period=? AND status='READY'
+              AND methodology_version=?
+            """,
+            (period, store.methodology_version),
         ).fetchall()
     }
     stale_mids = set(store.stale_manager_ids(period))

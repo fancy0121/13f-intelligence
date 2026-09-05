@@ -51,7 +51,10 @@ def compute_consensus(
         """
     ).fetchall()
     if not approved:
-        conn.execute("DELETE FROM consensus_scores")
+        conn.execute(
+            "DELETE FROM consensus_scores WHERE methodology_version=?",
+            (methodology_version,),
+        )
         conn.commit()
         return 0
     weights = {r[0]: float(r[2]) for r in approved}
@@ -62,7 +65,11 @@ def compute_consensus(
                pc.report_period, pc.change_type, pc.share_change_pct,
                pc.weight_prev, pc.weight_now
         FROM position_changes pc
-        """
+        WHERE pc.methodology_version=?
+        ORDER BY pc.security_id, pc.put_call, pc.shares_type,
+                 pc.report_period, pc.manager_id
+        """,
+        (methodology_version,),
     ).fetchall()
 
     groups: dict[tuple[int, str, str, str], list[dict]] = {}
@@ -90,7 +97,10 @@ def compute_consensus(
             }
         )
 
-    conn.execute("DELETE FROM consensus_scores")
+    conn.execute(
+        "DELETE FROM consensus_scores WHERE methodology_version=?",
+        (methodology_version,),
+    )
     inserted = 0
     for (security_id, put_call, shares_type, period), members in groups.items():
         contribs = []

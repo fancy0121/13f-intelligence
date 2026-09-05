@@ -13,6 +13,7 @@ if str(ROOT / "src") not in sys.path:
 if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
+from store import configured_database_path
 from ui import BRAND_HTML, FOOTER_HTML, T, inject_style
 
 st.set_page_config(
@@ -46,7 +47,7 @@ def main() -> None:
         )
     )
 
-    if not (ROOT / "data" / "thirteenf.db").exists():
+    if not configured_database_path().exists():
         st.error(T("数据库不存在。请先运行数据构建后重试。", "Database not found. Please build the data first."))
         st.stop()
 
