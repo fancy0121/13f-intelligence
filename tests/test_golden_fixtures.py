@@ -8,13 +8,14 @@ directly from that SEC original file.
 
 from __future__ import annotations
 
+import hashlib
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from thirteenf.parser import parse_info_table
+from thirteenf.parser import AmendmentType, parse_cover_page, parse_info_table
 
 
 def test_golden_real_sec_filing_parses_exactly():
@@ -49,3 +50,29 @@ def test_golden_fixture_no_put_call_rows():
     rows = parse_info_table(fixture.read_bytes())
     assert all(r.put_call == "" for r in rows)
 
+
+def test_cover_add_new_holdings_real_sec_extract():
+    fixture = ROOT / "tests" / "fixtures" / "sec_add_holdings_primary_doc.xml"
+    cover = parse_cover_page(fixture.read_bytes())
+    assert cover.report_period == "2026-03-31"
+    assert cover.amendment_number == 1
+    assert cover.amendment_type is AmendmentType.ADD_NEW_HOLDINGS
+
+
+def test_cover_restatement_real_sec_extract():
+    fixture = ROOT / "tests" / "fixtures" / "sec_restatement_primary_doc.xml"
+    cover = parse_cover_page(fixture.read_bytes())
+    assert cover.report_period == "2026-03-31"
+    assert cover.amendment_number == 1
+    assert cover.amendment_type is AmendmentType.RESTATEMENT
+
+
+def test_cover_extract_payload_hashes_are_stable():
+    expected = {
+        "sec_add_holdings_primary_doc.xml": "24b0d9ea7240e6627289a7a731536de4da21a98b377b5f8700b69091a2bdd127",
+        "sec_restatement_primary_doc.xml": "58918534d1b22f84d8f97a675b32f56f6bfb1a714c6b760c04354a8262457a98",
+    }
+    for name, checksum in expected.items():
+        content = (ROOT / "tests" / "fixtures" / name).read_bytes()
+        payload = content[content.index(b"<edgarSubmission") :].replace(b"\r\n", b"\n")
+        assert hashlib.sha256(payload).hexdigest() == checksum

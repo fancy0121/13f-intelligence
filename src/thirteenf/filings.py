@@ -16,7 +16,7 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import quote
 
-from thirteenf.raw_store import RawStore
+from thirteenf.raw_store import RawObject, RawStore
 from thirteenf.sec_client import SecClient, SecError, SecResponse
 
 THIRTEEN_F_FORMS = ("13F-HR", "13F-HR/A")
@@ -50,6 +50,8 @@ class RawFiling:
     manifest_path: Path
     checksum: str
     source_url: str
+    primary_path: Path | None = None
+    primary_checksum: str | None = None
 
 
 def parse_submissions(
@@ -233,7 +235,17 @@ def download_filing(
         if cached_body is not None and not INFO_TABLE_RE.search(cached_body):
             cached_body = None
 
-    if not force and cached_body is not None and manifest:
+    components = manifest.get("components") if manifest else None
+    has_primary_component = (
+        isinstance(components, dict)
+        and isinstance(components.get("primary_document"), dict)
+    )
+    if (
+        not force
+        and cached_body is not None
+        and manifest
+        and has_primary_component
+    ):
         source_url = str(
             manifest.get("final_url") or manifest.get("source_url") or ""
         )
@@ -260,8 +272,22 @@ def download_filing(
                     prior_manifest=manifest,
                 )
 
-    response = _fetch_info_table(client, filing)
+    primary_response, response = _fetch_filing_components(client, filing)
     if response is None:
+        primary_component = None
+        if primary_response is not None:
+            primary_component = _persist_component(
+                store,
+                filing,
+                logical_name="primary_document.xml",
+                response=primary_response,
+                body=primary_response.body,
+            )
+        error = "no INFORMATION TABLE XML found in accession"
+        status = "NO_INFO_TABLE"
+        if primary_response is None:
+            error = "primary document could not be retrieved"
+            status = "NO_PRIMARY_DOCUMENT"
         manifest_path = store.write_manifest(
             filing.cik,
             filing.accession_number,
@@ -274,16 +300,27 @@ def download_filing(
                 "accepted_at": filing.accepted_at,
                 "submission_source_url": filing.submission_source_url,
                 "source_url": "",
-                "status": "NO_INFO_TABLE",
-                "error": "no INFORMATION TABLE XML found in accession",
+                "status": status,
+                "error": error,
                 "fetched_at_utc": None,
+                "components": (
+                    {"primary_document": primary_component}
+                    if primary_component is not None
+                    else {}
+                ),
             },
         )
         raise SecError(
-            f"No INFORMATION TABLE for {filing.accession_number}; "
+            f"{error} for {filing.accession_number}; "
             f"manifest={manifest_path}"
         )
-    return _persist_info_table(store, filing, response, response.body)
+    return _persist_info_table(
+        store,
+        filing,
+        response,
+        response.body,
+        primary_response=primary_response,
+    )
 
 
 def _persist_info_table(
@@ -292,6 +329,7 @@ def _persist_info_table(
     response: SecResponse,
     body: bytes,
     prior_manifest: dict | None = None,
+    primary_response: SecResponse | None = None,
 ) -> RawFiling:
     obj = store.put(body)
     legacy_path = store.materialize_legacy(
@@ -299,6 +337,30 @@ def _persist_info_table(
         filing.accession_number,
         "info_table.xml",
         body,
+    )
+    prior_components = (prior_manifest or {}).get("components") or {}
+    components = (
+        dict(prior_components) if isinstance(prior_components, dict) else {}
+    )
+    if primary_response is not None:
+        components["primary_document"] = _persist_component(
+            store,
+            filing,
+            logical_name="primary_document.xml",
+            response=primary_response,
+            body=primary_response.body,
+        )
+    components["information_table"] = _component_payload(
+        obj=obj,
+        logical_path=legacy_path,
+        store=store,
+        response=response,
+        document_name=response.final_url.rsplit("/", 1)[-1].split("?", 1)[0],
+        prior=(
+            prior_components.get("information_table", {})
+            if isinstance(prior_components, dict)
+            else {}
+        ),
     )
     payload = {
         "cik": filing.cik,
@@ -319,38 +381,104 @@ def _persist_info_table(
         "etag": response.etag or (prior_manifest or {}).get("etag"),
         "last_modified": response.last_modified
         or (prior_manifest or {}).get("last_modified"),
+        "components": components,
     }
     manifest_path = store.write_manifest(
         filing.cik, filing.accession_number, payload
     )
+    primary = components.get("primary_document") or {}
+    primary_logical_path = primary.get("logical_path")
     return RawFiling(
         filing=filing,
         raw_path=legacy_path,
         manifest_path=manifest_path,
         checksum=obj.checksum,
         source_url=response.final_url,
+        primary_path=(
+            _safe_stored_path(store, primary_logical_path)
+            if primary_logical_path
+            else None
+        ),
+        primary_checksum=primary.get("checksum"),
     )
 
 
-def _fetch_info_table(
+def _persist_component(
+    store: RawStore,
+    filing: FilingRecord,
+    *,
+    logical_name: str,
+    response: SecResponse,
+    body: bytes,
+) -> dict:
+    obj = store.put(body)
+    logical_path = store.materialize_legacy(
+        filing.cik,
+        filing.accession_number,
+        logical_name,
+        body,
+    )
+    return _component_payload(
+        obj=obj,
+        logical_path=logical_path,
+        store=store,
+        response=response,
+        document_name=filing.primary_document,
+        prior={},
+    )
+
+
+def _component_payload(
+    *,
+    obj: RawObject,
+    logical_path: Path,
+    store: RawStore,
+    response: SecResponse,
+    document_name: str,
+    prior: dict,
+) -> dict:
+    return {
+        "document_name": document_name,
+        "source_url": response.url,
+        "final_url": response.final_url,
+        "checksum": obj.checksum,
+        "object_path": obj.relative_path,
+        "logical_path": logical_path.relative_to(store.root).as_posix(),
+        "byte_size": obj.byte_size,
+        "fetched_at_utc": response.fetched_at_utc,
+        "etag": response.etag or prior.get("etag"),
+        "last_modified": response.last_modified or prior.get("last_modified"),
+    }
+
+
+def _safe_stored_path(store: RawStore, relative_path: str) -> Path:
+    candidate = (store.root / relative_path).resolve()
+    if candidate != store.root and store.root not in candidate.parents:
+        raise RuntimeError(f"raw manifest path escapes root: {relative_path}")
+    return candidate
+
+
+def _fetch_filing_components(
     client: SecClient, filing: FilingRecord
-) -> SecResponse | None:
+) -> tuple[SecResponse | None, SecResponse | None]:
     """Locate and download the INFORMATION TABLE XML for a filing.
 
     Strategy:
       1. Try the primary document (some filers make it the info table).
       2. If it is not an information table, list the accession directory and
          try the largest .xml file (the info table is usually the big one).
-    Returns the SEC response or None when no info table is found.
+    Returns ``(primary document, information table)``. The two values are the
+    same response when the primary document itself is the information table.
     """
     # 1. primary document
     primary_url = client.archive_url(
         filing.cik, filing.accession_number, filing.primary_document
     )
+    primary_response: SecResponse | None = None
     try:
-        resp = client.fetch_bytes(primary_url)
-        if INFO_TABLE_RE.search(resp.body):
-            return resp
+        primary_response = client.fetch_bytes(primary_url)
+        if INFO_TABLE_RE.search(primary_response.body):
+            return primary_response, primary_response
     except SecError:
         pass
 
@@ -360,7 +488,7 @@ def _fetch_info_table(
         index = client.fetch_json(index_url)
         items = index.get("directory", {}).get("item", [])
     except SecError:
-        return None
+        return primary_response, None
 
     xml_items = [
         it for it in items if (it.get("name") or "").lower().endswith(".xml")
@@ -375,10 +503,10 @@ def _fetch_info_table(
         try:
             resp = client.fetch_bytes(url)
             if INFO_TABLE_RE.search(resp.body):
-                return resp
+                return primary_response, resp
         except SecError:
             continue
-    return None
+    return primary_response, None
 
 
 def _sha256(data: bytes) -> str:

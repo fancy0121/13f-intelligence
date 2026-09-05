@@ -16,13 +16,18 @@ from thirteenf.sec_client import SecResponse
 
 INFO_XML_A = b"<informationTable><infoTable><cusip>000000001</cusip></infoTable></informationTable>"
 INFO_XML_B = b"<informationTable><infoTable><cusip>000000002</cusip></infoTable></informationTable>"
+COVER_XML = b"""<edgarSubmission><headerData><submissionType>13F-HR/A</submissionType></headerData>
+<formData><coverPage><reportCalendarOrQuarter>06-30-2026</reportCalendarOrQuarter>
+<isAmendment>true</isAmendment><amendmentNo>1</amendmentNo>
+<amendmentInfo><amendmentType>RESTATEMENT</amendmentType></amendmentInfo>
+</coverPage></formData></edgarSubmission>"""
 
 
-def _record():
+def _record(form_type="13F-HR"):
     return FilingRecord(
         cik=1,
         accession_number="0000000001-26-000001",
-        form_type="13F-HR",
+        form_type=form_type,
         filing_date="2026-08-14",
         report_date="2026-06-30",
         primary_document="primary_doc.xml",
@@ -122,3 +127,29 @@ def test_download_changed_content_preserves_old_object(tmp_path):
     assert changed.raw_path.read_bytes() == INFO_XML_B
     objects = [p for p in (tmp_path / "objects" / "sha256").rglob("*") if p.is_file()]
     assert len(objects) == 2
+
+
+class _SeparateComponentsClient(_DownloadClient):
+    def fetch_json(self, url):
+        return {
+            "directory": {
+                "item": [
+                    {"name": "primary_doc.xml", "size": str(len(COVER_XML))},
+                    {"name": "info_table.xml", "size": str(len(INFO_XML_A))},
+                ]
+            }
+        }
+
+
+def test_download_preserves_primary_cover_and_information_table(tmp_path):
+    client = _SeparateComponentsClient(
+        [(200, COVER_XML, '"cover-v1"'), (200, INFO_XML_A, '"info-v1"')]
+    )
+    raw = download_filing(client, _record("13F-HR/A"), tmp_path)
+    manifest = json.loads(raw.manifest_path.read_text(encoding="utf-8"))
+
+    assert raw.primary_path is not None
+    assert raw.primary_path.read_bytes() == COVER_XML
+    assert raw.raw_path.read_bytes() == INFO_XML_A
+    assert manifest["components"]["primary_document"]["checksum"] != manifest["components"]["information_table"]["checksum"]
+    assert (tmp_path / manifest["components"]["primary_document"]["object_path"]).read_bytes() == COVER_XML
