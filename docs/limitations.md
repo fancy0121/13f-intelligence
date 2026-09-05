@@ -40,3 +40,9 @@ PUT/CALL 只以期权形式披露，其他衍生品（swaps、futures、forwards
 13F 是持仓行为的有限证据，不是完整投资观点。系统只输出
 `EVIDENCE_STRENGTHENS / EVIDENCE_WEAKENS / NO_MEANINGFUL_CHANGE /
 INSUFFICIENT_EVIDENCE`，不产生投资建议。
+
+## 9. 中文显示名不是身份事实
+
+界面中的中文机构名和公司名来自 `config/display_names.csv`，只用于提高可读性。
+SEC 英文法定名、CUSIP 和已验证的 ticker 映射仍是身份依据。词表未收录或未经项目核验时，
+页面显示 `中文名待核验 / Chinese name unverified`，不会临时翻译或猜测。

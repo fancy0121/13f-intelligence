@@ -13,7 +13,7 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T
+from ui import B, T, display_code
 
 
 def run() -> None:
@@ -37,19 +37,26 @@ def run() -> None:
     update = store.update_status()
 
     st.markdown(f"#### {T('数据状态', 'DATA STATUS')}")
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)
     c1.metric(T("最新报告季度", "Latest Quarter"), period)
     c2.metric(T("最新有效 filing 日期", "Latest Filing Date"),
               latest_filing["filing_date"] if latest_filing else "N/A")
+    c3, c4 = st.columns(2)
     c3.metric(T("机构数量", "Managers"), total)
     c4.metric(T("本周期已更新", "Updated"), f"{updated}/{total}")
-    c5, c6, c7, c8 = st.columns(4)
+    c5, c6 = st.columns(2)
     c5.metric(T("陈旧机构", "Stale Managers"), len(stale))
     c6.metric(T("修订 filing", "Amendments"), amended)
-    c7.metric(T("已解析证券覆盖", "Resolved Coverage"),
-              f"{verified}/{sum(res.values())} ({verified/total_res:.1%})")
-    c8.metric(T("本地数据更新", "Local Data Updated"),
-              (update or {}).get("last_update_finished_at", T("从未记录", "never recorded")))
+    c7, c8 = st.columns(2)
+    c7.metric(
+        T("已解析证券覆盖", "Resolved Coverage"),
+        f"{verified/total_res:.1%}",
+        delta=f"{verified}/{sum(res.values())}",
+        delta_color="off",
+    )
+    updated_at = (update or {}).get("last_update_finished_at")
+    updated_date = str(updated_at).split("T", 1)[0] if updated_at else T("从未记录", "never recorded")
+    c8.metric(T("本地数据更新", "Local Data Updated"), updated_date)
     if latest_filing:
         st.caption(
             T(
@@ -65,12 +72,9 @@ def run() -> None:
         upd = update
         flag = T("成功", "OK") if upd.get("success") else T("失败", "FAILED")
         st.caption(
-            T(
-                f"最近一次更新：{flag}（started={upd.get('last_update_started_at')} "
-                f"finished={upd.get('last_update_finished_at')}）；日志：{upd.get('log_path')}",
-                f"Last update: {flag} (started={upd.get('last_update_started_at')} "
-                f"finished={upd.get('last_update_finished_at')}); log: {upd.get('log_path')}",
-            )
+            f"{T('最近一次数据流程', 'Last data run')}: {flag} · "
+            f"{T('完成时间', 'Finished')}: "
+            f"{str(upd.get('last_update_finished_at') or 'N/A').replace('T', ' ', 1)}"
         )
 
     with st.expander(T("关于两个日期的区别（重要）", "Two dates - why it matters")):
@@ -107,7 +111,7 @@ def run() -> None:
     st.markdown(f"#### {T('本周期发生了什么', 'What Changed')}")
     cols = st.columns(5)
     for col, key in zip(cols, ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")):
-        col.metric(key, events[key])
+        col.metric(display_code(key), events[key])
     st.caption(
         B(
             "事件计数 = 全部已跟踪机构在最新报告季度的 position_change 数量（事实计数，不是推荐）",
@@ -130,7 +134,7 @@ def run() -> None:
     else:
         for event_type, severity, cnt in q:
             label = "⚠️" if severity == "WARN" else "❌"
-            st.write(f"{label} {event_type}: {cnt}")
+            st.write(f"{label} {display_code(event_type)}: {cnt}")
     st.write(
         f"- {T('未解析证券', 'Unresolved')}: {res.get('UNRESOLVED', 0)}；"
         f"{T('歧义', 'Ambiguous')}: {res.get('AMBIGUOUS', 0)}；"

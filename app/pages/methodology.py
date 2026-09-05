@@ -9,14 +9,14 @@ DOC = ROOT / "docs" / "product_methodology_and_limitations.md"
 
 
 def _h(zh: str, en: str) -> str:
-    return f"### {zh} <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ {en}</span>"
+    return f"### {zh} / {en}"
 
 
 def run() -> None:
     st.subheader("方法论与限制 / Methodology & Limitations")
     st.markdown(
         """
-        ### 这份看板是什么？ <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ What is this dashboard?</span>
+        ### 这份看板是什么？ / What is this dashboard?
 
         这份看板展示的是 **SEC Form 13F 披露的机构多头持仓事实**。每季度，大型机构要向 SEC 报告
         他们持有哪些美国证券、持有多少股、报告价值多少。看板把这些原始披露整理成：
@@ -30,7 +30,7 @@ def run() -> None:
           *— same direction for ≥2 consecutive quarters*。
         - **组合权重**：该证券占该机构报告总市值的比例 *— share of reported total value*。
 
-        ### 为什么这不是股票推荐？ <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Why is this not a stock pick?</span>
+        ### 为什么这不是股票推荐？ / Why is this not a stock pick?
 
         13F 只看得到 **多头持仓**。它看不到 *13F only shows long holdings. It cannot see*：
 
@@ -44,7 +44,7 @@ def run() -> None:
         「这家公司会涨」的结论。本项目曾做过严格的研究验证：连续 2 或 3 个季度的机构
         行为，没有被证明带来增量经济价值。因此看板只展示证据，不做预测。
 
-        ### 你需要注意的限制 <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Limitations to keep in mind</span>
+        ### 你需要注意的限制 / Limitations to keep in mind
 
         - 数据有延迟（报告季度 ≠ 实时持仓）*data is delayed (report quarter ≠ real-time)*。
         - 未解析的证券身份会明确标出（UNRESOLVED / AMBIGUOUS / CONFLICT），系统不会猜
@@ -56,7 +56,7 @@ def run() -> None:
     )
     st.divider()
     if DOC.exists():
-        st.markdown(f"#### 更详细的说明（面向研究者） <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Detailed notes (for researchers)</span>")
+        st.markdown("#### 更详细的说明（面向研究者） / Detailed notes (for researchers)")
         st.markdown(DOC.read_text(encoding="utf-8"))
     else:
         st.info("方法论文档缺失 / Methodology document missing.")

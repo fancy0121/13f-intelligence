@@ -13,7 +13,7 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T, searchable_select
+from ui import B, T, display_code, display_security_name, searchable_select
 
 
 METRICS = {
@@ -82,19 +82,21 @@ def run() -> None:
     st.dataframe(
         [
             {
-                "Ticker": r["ticker"] or r["cusip"],
-                "CUSIP": r["cusip"],
-                T("发行方", "Issuer"): r["issuer"],
-                T("解析状态", "Resolution"): r["resolution_status"],
-                T("经济类型", "Economic Type"): r["economic_type"],
+                T("股票代码", "Ticker"): r["ticker"] or r["cusip"],
+                T("CUSIP 编号", "CUSIP"): r["cusip"],
+                T("公司名称", "Company Name"): display_security_name(
+                    r["cusip"], r["issuer"]
+                ),
+                T("解析状态", "Resolution"): display_code(r["resolution_status"]),
+                T("经济类型", "Economic Type"): display_code(r["economic_type"]),
                 T("持有机构实体数", "Entities"): r["holder_entity_count"],
-                "独立NEW": r["independent_new_manager_count"],
-                "独立ADD": r["independent_add_manager_count"],
-                "独立REDUCE": r["independent_reduce_manager_count"],
-                "独立EXIT": r["independent_exit_manager_count"],
-                "重复ADD": r["repeated_add_manager_count"],
-                "重复REDUCE": r["repeated_reduce_manager_count"],
-                T("活动状态", "Activity"): r["activity_state"],
+                T("独立新增", "Independent NEW"): r["independent_new_manager_count"],
+                T("独立增持", "Independent ADD"): r["independent_add_manager_count"],
+                T("独立减持", "Independent REDUCE"): r["independent_reduce_manager_count"],
+                T("独立退出", "Independent EXIT"): r["independent_exit_manager_count"],
+                T("重复增持", "Repeated ADD"): r["repeated_add_manager_count"],
+                T("重复减持", "Repeated REDUCE"): r["repeated_reduce_manager_count"],
+                T("活动状态", "Activity"): display_code(r["activity_state"]),
             }
             for r in rows
         ],

@@ -151,6 +151,92 @@ def test_task9_portfolio_page_editor(tmp_path):
     assert any(r["ticker"] == "GOOGL" for r in rows)
 
 
+def test_task9_portfolio_ambiguous_choice_survives_rerun(tmp_path):
+    """Regression: selecting one ALPHABET candidate must not dismiss the flow."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    p = tmp_path / "portfolio.csv"
+    p.write_text("# header\nticker,weight\n", encoding="utf-8")
+    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at.session_state["portfolio_path"] = str(p)
+    at.run()
+
+    at.text_input[0].set_value("ALPHABET")
+    at.text_input[1].set_value("0.05")
+    at.button[0].click()
+    at.run()
+
+    candidate = next(b for b in at.button if "GOOGL" in b.label)
+    candidate.click()
+    at.run()
+
+    add_selected = next(b for b in at.button if b.label.startswith("添加所选"))
+    add_selected.click()
+    at.run()
+
+    assert load_portfolio_rows(p) == [{"ticker": "GOOGL", "weight": "0.05"}]
+
+
+def test_task9_new_unique_search_clears_stale_ambiguous_candidates(tmp_path):
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    p = tmp_path / "portfolio.csv"
+    p.write_text("# header\nticker,weight\n", encoding="utf-8")
+    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at.session_state["portfolio_path"] = str(p)
+    at.run()
+
+    at.text_input[0].set_value("ALPHABET")
+    at.text_input[1].set_value("0.05")
+    at.button[0].click()
+    at.run()
+    assert any("GOOGL" in b.label for b in at.button)
+
+    at.text_input[0].set_value("AAPL")
+    at.text_input[1].set_value("0.10")
+    at.button[0].click()
+    at.run()
+
+    assert load_portfolio_rows(p) == [{"ticker": "AAPL", "weight": "0.10"}]
+    assert not any("GOOGL" in b.label for b in at.button)
+
+
+def test_task9_public_portfolios_are_isolated_by_browser_session(monkeypatch):
+    """A public visitor must never read or overwrite another visitor's holdings."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
+    first = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    first.run()
+    second.run()
+
+    first_path = str(first.session_state["public_portfolio_path"])
+    second_path = str(second.session_state["public_portfolio_path"])
+    assert first_path != second_path
+    assert "config/portfolio.csv" not in first_path.replace("\\", "/")
+    assert "config/portfolio.csv" not in second_path.replace("\\", "/")
+
+
+def test_public_observations_are_isolated_by_browser_session(monkeypatch):
+    """Public research notes must not leak across unauthenticated visitors."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
+    first = AppTest.from_file(str(ROOT / "app" / "pages" / "observation.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "pages" / "observation.py"), default_timeout=30)
+    first.run()
+    second.run()
+
+    assert str(first.session_state["public_observation_dir"]) != str(
+        second.session_state["public_observation_dir"]
+    )
+
+
 # TASK 10: update workflow orchestration path.
 def test_task10_update_script_present_and_references_existing_pipeline():
     script = ROOT / "scripts" / "update_data.py"

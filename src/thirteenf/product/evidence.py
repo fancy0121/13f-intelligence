@@ -472,16 +472,28 @@ class ProductStore:
             return []
         out = []
         seen = set()
+
+        def match(cusip: str, match_type: str, ticker: str) -> dict:
+            security = self.conn.execute(
+                "SELECT issuer, share_class FROM securities WHERE cusip=?", (cusip,)
+            ).fetchone()
+            return {
+                "cusip": cusip,
+                "match_type": match_type,
+                "ticker": ticker,
+                "issuer": security[0] if security else None,
+                "share_class": security[1] if security else None,
+            }
+
         # by verified ticker
         for cusip, r in self._res.items():
             sym = str(r.get("symbol", "")).upper()
             if sym == q and r.get("status") in VERIFIED_RESOLUTION and cusip not in seen:
-                out.append({"cusip": cusip, "match_type": "ticker", "ticker": sym})
+                out.append(match(cusip, "ticker", sym))
                 seen.add(cusip)
         # by CUSIP
         if q in self._res and q not in seen:
-            out.append({"cusip": q, "match_type": "cusip",
-                        "ticker": self._res[q].get("symbol", "")})
+            out.append(match(q, "cusip", self._res[q].get("symbol", "")))
             seen.add(q)
         # by issuer (all matches)
         rows = self.conn.execute(
@@ -492,7 +504,7 @@ class ProductStore:
             if cusip in seen:
                 continue
             if cusip in self._res:
-                out.append({"cusip": cusip, "match_type": "issuer", "ticker": self._res[cusip].get("symbol", "")})
+                out.append(match(cusip, "issuer", self._res[cusip].get("symbol", "")))
                 seen.add(cusip)
         return out
 
@@ -810,6 +822,7 @@ class ProductStore:
                         "weight": weight,
                         "status": "UNRESOLVED" if not matches else "AMBIGUOUS",
                         "cusip": "",
+                        "issuer": None,
                         "holder_entity_count": 0,
                         "independent_add_manager_count": 0,
                         "independent_reduce_manager_count": 0,
@@ -832,6 +845,7 @@ class ProductStore:
                     "weight": weight,
                     "status": "OK",
                     "cusip": ev.cusip,
+                    "issuer": ev.issuer,
                     "holder_entity_count": ev.holder_entity_count,
                     "verified_independent_manager_count": ev.verified_independent_manager_count,
                     "independent_add_manager_count": ev.independent_add_manager_count,

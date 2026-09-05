@@ -6,7 +6,15 @@ labels and widgets for the Streamlit frontend.
 
 from __future__ import annotations
 
+import csv
+from functools import lru_cache
+from pathlib import Path
+
 import streamlit as st
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DISPLAY_NAMES_PATH = ROOT / "config" / "display_names.csv"
 
 
 def T(zh: str, en: str) -> str:
@@ -16,7 +24,138 @@ def T(zh: str, en: str) -> str:
 
 def B(zh: str, en: str) -> str:
     """Bilingual sentence joined with a full stop, for longer captions."""
-    return f"{zh}。{en}."
+    zh_text = zh.rstrip()
+    en_text = en.rstrip()
+    if not zh_text.endswith(("。", "！", "？")):
+        zh_text += "。"
+    if not en_text.endswith((".", "!", "?")):
+        en_text += "."
+    return f"{zh_text}{en_text}"
+
+
+@lru_cache(maxsize=1)
+def _display_names() -> dict[tuple[str, str], dict[str, str]]:
+    """Load presentation-only names; SEC English names remain authoritative."""
+    if not DISPLAY_NAMES_PATH.exists():
+        return {}
+    with DISPLAY_NAMES_PATH.open(encoding="utf-8-sig", newline="") as fh:
+        return {
+            (row["entity_type"].strip(), row["entity_key"].strip().upper()): row
+            for row in csv.DictReader(fh)
+            if row.get("entity_type") and row.get("entity_key")
+        }
+
+
+def display_entity_name(entity_type: str, entity_key: str, english_name: str | None) -> str:
+    """Return an honest bilingual name without altering identity facts."""
+    english = (english_name or "").strip() or T("英文名缺失", "English name missing")
+    row = _display_names().get((entity_type.strip(), entity_key.strip().upper()))
+    chinese = ""
+    if row and row.get("status", "").strip() == "PROJECT_CURATED":
+        chinese = row.get("name_zh", "").strip()
+    return f"{chinese or '中文名待核验'} / {english}"
+
+
+def display_manager_name(english_name: str) -> str:
+    return display_entity_name("manager", english_name, english_name)
+
+
+def display_security_name(cusip: str, english_name: str | None) -> str:
+    return display_entity_name("security", cusip, english_name)
+
+
+def display_name_keys(entity_type: str, query: str) -> list[str]:
+    """Return curated entity keys matching a Chinese display-name query."""
+    needle = (query or "").strip().casefold()
+    if not needle:
+        return []
+    return [
+        row["entity_key"].strip()
+        for (kind, _), row in _display_names().items()
+        if kind == entity_type
+        and row.get("status", "").strip() == "PROJECT_CURATED"
+        and needle in row.get("name_zh", "").casefold()
+    ]
+
+
+def security_search_with_display_names(store, query: str) -> list[dict]:
+    """Search SEC identity fields plus curated Chinese display aliases."""
+    matches = list(store.security_search(query))
+    seen = {m["cusip"] for m in matches}
+    for cusip in display_name_keys("security", query):
+        for match in store.security_search(cusip):
+            if match["cusip"] not in seen:
+                matches.append(match)
+                seen.add(match["cusip"])
+    return matches
+
+
+def security_option_label(match: dict) -> str:
+    ticker = match.get("ticker") or T("代码未解析", "Ticker unresolved")
+    share_class = match.get("share_class") or T("类别未收录", "Class unavailable")
+    return (
+        f"{display_security_name(match['cusip'], match.get('issuer'))} · "
+        f"{ticker} · {match['cusip']} · {share_class}"
+    )
+
+
+_CODE_LABELS = {
+    "NEW": ("新增", "NEW"),
+    "ADD": ("增持", "ADD"),
+    "REDUCE": ("减持", "REDUCE"),
+    "EXIT": ("退出", "EXIT"),
+    "UNCHANGED": ("未变化", "UNCHANGED"),
+    "VERIFIED": ("已验证", "Verified"),
+    "VERIFIED_WITH_SCOPE": ("限定范围已验证", "Verified with scope"),
+    "VERIFIED_EXACT": ("精确验证", "Verified exact"),
+    "VERIFIED_MULTI_SOURCE": ("多来源验证", "Verified by multiple sources"),
+    "VERIFIED_HISTORICAL": ("历史验证", "Historically verified"),
+    "PROVISIONAL": ("暂定", "Provisional"),
+    "UNRESOLVED": ("未解析", "Unresolved"),
+    "AMBIGUOUS": ("有歧义", "Ambiguous"),
+    "CONFLICT": ("有冲突", "Conflict"),
+    "NON_EQUITY_OR_UNSUPPORTED": ("非股权或暂不支持", "Non-equity or unsupported"),
+    "UNKNOWN": ("未知", "Unknown"),
+    "OPERATING_COMMON_EQUITY": ("经营性普通股", "Operating common equity"),
+    "OPERATING_ADR": ("经营性公司存托凭证", "Operating-company ADR"),
+    "OPERATING_OTHER_EQUITY": ("其他经营性股权", "Other operating equity"),
+    "ETF": ("交易所交易基金", "ETF"),
+    "MUTUAL_OR_POOLED_FUND": ("共同或集合基金", "Mutual or pooled fund"),
+    "CLOSED_END_FUND": ("封闭式基金", "Closed-end fund"),
+    "REIT_OR_SPECIAL_EQUITY": ("房地产信托或特殊股权", "REIT or special equity"),
+    "OTHER_13F_SECURITY": ("其他 13F 证券", "Other 13F security"),
+    "PREFERRED_OR_HYBRID": ("优先或混合证券", "Preferred or hybrid security"),
+    "INSUFFICIENT_DATA": ("数据不足", "Insufficient data"),
+    "LOW_BREADTH": ("覆盖面较低", "Low breadth"),
+    "NO_RECENT_CHANGE": ("近期无变化", "No recent change"),
+    "MIXED_ACTIVITY": ("增减并存", "Mixed activity"),
+    "MORE_ADDS_THAN_REDUCTIONS": ("增持多于减持", "More adds than reductions"),
+    "MORE_REDUCTIONS_THAN_ADDS": ("减持多于增持", "More reductions than adds"),
+    "INCOMPLETE_QUARTER": ("季度不完整", "Incomplete quarter"),
+    "STALE_FILING": ("披露陈旧", "Stale filing"),
+    "UNRESOLVED_CUSIP": ("CUSIP 未解析", "Unresolved CUSIP"),
+    "FAILED_INGESTION": ("采集失败", "Failed ingestion"),
+    "MALFORMED_FILING": ("披露文件格式异常", "Malformed filing"),
+    "OK": ("正常", "OK"),
+    "SETUP_REQUIRED": ("需要设置", "Setup required"),
+    "NONE": ("无风险", "None"),
+    "LOW": ("低风险", "Low"),
+    "MODERATE": ("中等风险", "Moderate"),
+    "HIGH": ("高风险", "High"),
+    "PENDING": ("待完成", "Pending"),
+}
+
+
+def display_code(code: str | None, *, include_raw: bool = True) -> str:
+    """Translate a governed code; optionally retain its raw value for audit views."""
+    raw = (code or "UNKNOWN").strip().upper()
+    label = _CODE_LABELS.get(raw)
+    if label is None:
+        return f"{T('未翻译状态', 'Untranslated status')} [{raw}]"
+    zh, en = label
+    if en == raw or not include_raw:
+        return T(zh, en)
+    return f"{T(zh, en)} [{raw}]"
 
 
 BRAND_HTML = """
@@ -33,7 +172,9 @@ FOOTER_HTML = """
   <b>13F Institutional Evidence System · v0.5.1</b> ｜
   Source: SEC EDGAR original 13F disclosures · 数据来源：SEC EDGAR 原始 13F 披露<br/>
   Evidence only, no investment advice. Report quarter ≠ real-time holdings
-  (up to 45-day disclosure lag). 仅展示证据，不含投资建议；报告季度 ≠ 实时持仓（最长 45 天披露延迟）。
+  (up to 45-day disclosure lag). 仅展示证据，不含投资建议；报告季度 ≠ 实时持仓（最长 45 天披露延迟）。<br/>
+  中文名称仅用于界面阅读，SEC 英文法定名与 CUSIP 仍是身份依据；未核验中文名会明确标记。
+  Chinese names are display aids only; SEC legal names and CUSIPs remain authoritative.
 </div>
 """
 
@@ -140,11 +281,23 @@ def searchable_select(
     if sel_key not in st.session_state:
         st.session_state[sel_key] = None
 
+    def commit_unique_match() -> None:
+        typed = str(st.session_state.get(f"{key}_q", "")).strip().casefold()
+        if not typed:
+            return
+        exact = [o for o in options if o.casefold() == typed]
+        filtered_options = [o for o in options if typed in o.casefold()]
+        if len(exact) == 1:
+            st.session_state[sel_key] = exact[0]
+        elif len(filtered_options) == 1:
+            st.session_state[sel_key] = filtered_options[0]
+
     query = st.text_input(
         label,
         key=f"{key}_q",
         placeholder=T("输入关键字筛选…", "Type to filter…"),
         help=help_text,
+        on_change=commit_unique_match,
     ).strip().lower()
 
     filtered = [o for o in options if query in o.lower()] if query else list(options)
