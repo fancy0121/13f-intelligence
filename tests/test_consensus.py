@@ -98,6 +98,7 @@ def _filing(conn, mid, period, accession, rows):
         raw_path="/raw",
         fetched_at_utc=None,
         ingest_status="OK",
+        accepted_at="2026-08-14T10:00:00Z",
     )
     replace_holdings(
         conn,
