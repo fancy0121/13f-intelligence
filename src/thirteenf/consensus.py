@@ -39,7 +39,7 @@ def compute_consensus(
     change_scale_divisor: float = 0.5,
     significance_mode: str = "min_prev_now",
 ) -> int:
-    """Compute weighted consensus per (security, put_call, report_period).
+    """Compute consensus per (security, put_call, shares_type, report_period).
 
     Only APPROVED managers are considered. Returns row count inserted.
     """
@@ -58,19 +58,28 @@ def compute_consensus(
 
     changes = conn.execute(
         """
-        SELECT pc.manager_id, pc.security_id, pc.put_call, pc.report_period,
-               pc.change_type, pc.share_change_pct,
+        SELECT pc.manager_id, pc.security_id, pc.put_call, pc.shares_type,
+               pc.report_period, pc.change_type, pc.share_change_pct,
                pc.weight_prev, pc.weight_now
         FROM position_changes pc
         """
     ).fetchall()
 
-    # group by (security_id, put_call, report_period)
-    groups: dict[tuple[int, str, str], list[dict]] = {}
-    for manager_id, security_id, put_call, period, ctype, pct, wp, wn in changes:
+    groups: dict[tuple[int, str, str, str], list[dict]] = {}
+    for (
+        manager_id,
+        security_id,
+        put_call,
+        shares_type,
+        period,
+        ctype,
+        pct,
+        wp,
+        wn,
+    ) in changes:
         if manager_id not in weights:
             continue
-        key = (security_id, put_call or "", period)
+        key = (security_id, put_call or "", shares_type, period)
         groups.setdefault(key, []).append(
             {
                 "manager_id": manager_id,
@@ -83,7 +92,7 @@ def compute_consensus(
 
     conn.execute("DELETE FROM consensus_scores")
     inserted = 0
-    for (security_id, put_call, period), members in groups.items():
+    for (security_id, put_call, shares_type, period), members in groups.items():
         contribs = []
         denom = 0.0
         numerator = 0.0
@@ -125,15 +134,16 @@ def compute_consensus(
         conn.execute(
             """
             INSERT INTO consensus_scores(
-                security_id, report_period, put_call, manager_count,
+                security_id, report_period, put_call, shares_type, manager_count,
                 high_quality_manager_count, independent_strategy_count,
                 raw_contributions, consensus_score, methodology_version
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 security_id,
                 period,
                 put_call,
+                shares_type,
                 len(contribs),
                 len(contribs),
                 len(strategy_types),

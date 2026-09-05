@@ -34,24 +34,27 @@ def compute_trends(
     """
     rows = conn.execute(
         """
-        SELECT security_id, put_call, report_period, consensus_score
+        SELECT security_id, put_call, shares_type, report_period,
+               consensus_score
         FROM consensus_scores
         WHERE methodology_version = ?
-        ORDER BY security_id, put_call, report_period
+        ORDER BY security_id, put_call, shares_type, report_period
         """,
         (methodology_version,),
     ).fetchall()
 
-    series: dict[tuple[int, str], list[tuple[str, float]]] = {}
-    for security_id, put_call, period, score in rows:
-        series.setdefault((security_id, put_call or ""), []).append((period, score))
+    series: dict[tuple[int, str, str], list[tuple[str, float]]] = {}
+    for security_id, put_call, shares_type, period, score in rows:
+        series.setdefault(
+            (security_id, put_call or "", shares_type), []
+        ).append((period, score))
 
     conn.execute(
         "DELETE FROM trends WHERE methodology_version = ?",
         (methodology_version,),
     )
     inserted = 0
-    for (security_id, put_call), points in series.items():
+    for (security_id, put_call, shares_type), points in series.items():
         points.sort(key=lambda x: x[0])
         scores = [p[1] for p in points]
         for horizon in windows:
@@ -72,14 +75,15 @@ def compute_trends(
             conn.execute(
                 """
                 INSERT INTO trends(
-                    security_id, report_period, put_call, horizon, trend_label,
-                    trend_score, methodology_version
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    security_id, report_period, put_call, shares_type, horizon,
+                    trend_label, trend_score, methodology_version
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     security_id,
                     points[-1][0],
                     put_call,
+                    shares_type,
                     f"{horizon}Q",
                     label,
                     trend_score,
@@ -89,4 +93,3 @@ def compute_trends(
             inserted += 1
     conn.commit()
     return inserted
-

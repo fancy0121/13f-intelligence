@@ -22,12 +22,17 @@ from thirteenf.trends import compute_trends
 
 
 class _Row:
-    def __init__(self, ordinal, cusip, issuer, shares, value, put_call=""):
+    def __init__(
+        self, ordinal, cusip, issuer, shares, value, put_call="", shares_type="SH"
+    ):
         self.row_ordinal = ordinal
         self.cusip = cusip
         self.name_of_issuer = issuer
         self.title_of_class = "COM"
         self.put_call = put_call
+        self.ssh_prnamt_type = shares_type
+        self.investment_discretion = "SOLE"
+        self.other_manager = ""
         self.shares = shares
         self.value = value
 
@@ -160,4 +165,3 @@ def test_trend_insufficient_history_when_no_consensus(tmp_path):
     n = compute_trends(conn, methodology_version="0.1.0")
     assert n == 0
     conn.close()
-

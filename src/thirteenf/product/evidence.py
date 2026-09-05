@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from thirteenf.database import connect
+from thirteenf.database import connect_readonly
 
 
 VERIFIED_RESOLUTION = frozenset(
@@ -121,7 +121,7 @@ class ProductStore:
         semantic_csv: Path | str,
         managers_csv: Path | str,
     ) -> None:
-        self.conn: sqlite3.Connection = connect(db_path)
+        self.conn: sqlite3.Connection = connect_readonly(db_path, immutable=True)
         self._root_dir = Path(db_path).resolve().parents[1]
         self.resolution = pd.read_csv(resolution_csv, dtype=str).fillna("")
         self.semantic = pd.read_csv(semantic_csv, dtype=str).fillna("")

@@ -1,6 +1,6 @@
 """Objective position-change engine (deterministic, no LLM).
 
-Computes per (manager, security, put_call, report_period):
+Computes per (manager, security, put_call, shares_type, report_period):
   - portfolio weight (value / filing total value)
   - NEW / ADD / REDUCE / EXIT / UNCHANGED
   - shares_prev / shares_now / share_change / share_change_pct
@@ -64,22 +64,28 @@ def effective_filings(conn: sqlite3.Connection) -> list[tuple[int, str, int]]:
 
 def _holding_map(
     conn: sqlite3.Connection, filing_id: int
-) -> dict[tuple[int, str], dict]:
+) -> dict[tuple[int, str, str], dict]:
     rows = conn.execute(
         """
-        SELECT s.security_id, h.put_call, h.shares, h.portfolio_weight, h.value
+        SELECT s.security_id, h.put_call, h.ssh_prnamt_type,
+               h.shares, h.portfolio_weight, h.value
         FROM holdings h
         JOIN securities s ON s.cusip = h.cusip
         WHERE h.filing_id = ?
         """,
         (filing_id,),
     ).fetchall()
-    out: dict[tuple[int, str], dict] = {}
-    for security_id, put_call, shares, weight, value in rows:
-        key = (security_id, put_call or "")
+    out: dict[tuple[int, str, str], dict] = {}
+    for security_id, put_call, shares_type, shares, weight, value in rows:
+        if shares_type not in {"SH", "PRN"}:
+            raise ValueError(
+                f"filing {filing_id} has missing or invalid shares type"
+            )
+        key = (security_id, put_call or "", shares_type)
         out[key] = {
             "security_id": security_id,
             "put_call": put_call or "",
+            "shares_type": shares_type,
             "shares": shares,
             "weight": weight,
             "value": value,
@@ -115,7 +121,7 @@ def compute_position_changes(
     inserted = 0
     for manager_id, period_filings in by_manager.items():
         period_filings.sort(key=lambda x: x[0])
-        prev: dict[tuple[int, str], dict] | None = None
+        prev: dict[tuple[int, str, str], dict] | None = None
         prev_period: str | None = None
         for report_period, filing_id in period_filings:
             now = _holding_map(conn, filing_id)
@@ -127,6 +133,7 @@ def compute_position_changes(
                         manager_id=manager_id,
                         security_id=rec["security_id"],
                         put_call=rec["put_call"],
+                        shares_type=rec["shares_type"],
                         report_period=report_period,
                         change_type="NEW",
                         shares_prev=None,
@@ -167,6 +174,7 @@ def compute_position_changes(
                         manager_id=manager_id,
                         security_id=key[0],
                         put_call=key[1],
+                        shares_type=key[2],
                         report_period=report_period,
                         change_type=change_type,
                         shares_prev=shares_prev,
@@ -188,15 +196,17 @@ def _insert_change(conn, **kwargs) -> int:
     conn.execute(
         """
         INSERT INTO position_changes(
-            manager_id, security_id, put_call, report_period, change_type,
+            manager_id, security_id, put_call, shares_type, report_period,
+            change_type,
             shares_prev, shares_now, share_change, share_change_pct,
             weight_prev, weight_now, weight_change, methodology_version
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             kwargs["manager_id"],
             kwargs["security_id"],
             kwargs["put_call"],
+            kwargs["shares_type"],
             kwargs["report_period"],
             kwargs["change_type"],
             kwargs["shares_prev"],

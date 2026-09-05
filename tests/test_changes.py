@@ -50,12 +50,17 @@ def _seed(tmp_path):
 
 
 class _Row:
-    def __init__(self, ordinal, cusip, issuer, shares, value, put_call=""):
+    def __init__(
+        self, ordinal, cusip, issuer, shares, value, put_call="", shares_type="SH"
+    ):
         self.row_ordinal = ordinal
         self.cusip = cusip
         self.name_of_issuer = issuer
         self.title_of_class = "COM"
         self.put_call = put_call
+        self.ssh_prnamt_type = shares_type
+        self.investment_discretion = "SOLE"
+        self.other_manager = ""
         self.shares = shares
         self.value = value
 
@@ -208,4 +213,3 @@ def test_amendment_supersedes_original(tmp_path):
     assert len(chosen) == 1
     assert chosen[0][2] == fid_a  # amendment chosen
     conn.close()
-
