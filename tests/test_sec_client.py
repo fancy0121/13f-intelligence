@@ -17,6 +17,34 @@ from thirteenf.cli import build_parser
 from thirteenf.sec_client import SecClient, SecError
 
 
+@pytest.mark.parametrize("url", ["https://attacker.test/data", "http://www.sec.gov/data",
+                                 "https://www.sec.gov:8501/data", "https://user@www.sec.gov/data"])
+def test_redirect_rejected_before_following_request(url):
+    handler = sec_client_module._SecRedirectHandler()
+    request = sec_client_module.urllib.request.Request("https://www.sec.gov/data")
+    with pytest.raises(SecError, match="unapproved SEC host"):
+        handler.redirect_request(request, None, 302, "redirect", {}, url)
+
+
+def test_sec_redirect_handler_is_installed(monkeypatch):
+    seen = []
+    class Opener:
+        def open(self, request, timeout):
+            return "response"
+    def build(*handlers):
+        seen.extend(handlers)
+        return Opener()
+    monkeypatch.setattr(sec_client_module.urllib.request, "build_opener", build)
+    assert sec_client_module.open_sec_url(object(), timeout=1) == "response"
+    assert isinstance(seen[0], sec_client_module._SecRedirectHandler)
+
+
+@pytest.mark.parametrize("value", ["-1", "NaN", "inf", "garbage"])
+def test_malformed_retry_after_uses_finite_nonnegative_backoff(value):
+    delay = SecClient._backoff(0, value)
+    assert math.isfinite(delay) and 1 <= delay <= 1.5
+
+
 class _FakeResponse:
     def __init__(
         self,
@@ -65,7 +93,7 @@ def _install_opener(monkeypatch, responses):
                 )
             return _FakeResponse(status, body)
 
-    monkeypatch.setattr("urllib.request.urlopen", _Opener().open)
+    monkeypatch.setattr("thirteenf.sec_client.open_sec_url", _Opener().open)
     return calls
 
 
@@ -124,6 +152,13 @@ def test_release_user_agent_accepts_named_contact():
     assert sec_client_module.validate_release_user_agent(value) == value
 
 
+def test_placeholder_is_blocked_before_any_network_even_outside_release(monkeypatch):
+    calls = _install_opener(monkeypatch, [(200, b'{}')])
+    with pytest.raises(SecError, match="contact"):
+        SecClient(user_agent="contact@example.com").fetch_json("https://www.sec.gov/x.json")
+    assert calls["n"] == 0
+
+
 @pytest.mark.parametrize("rate", [0, -1, 10.1, math.inf, math.nan])
 def test_rate_limit_rps_must_be_finite_and_bounded(rate):
     with pytest.raises(ValueError, match="rate_limit_rps"):
@@ -138,7 +173,7 @@ def test_rate_limit_reads_environment_when_argument_absent(monkeypatch):
 
 def test_redirect_outside_sec_is_rejected(monkeypatch):
     monkeypatch.setattr(
-        "urllib.request.urlopen",
+        "thirteenf.sec_client.open_sec_url",
         lambda req, timeout=None: _FakeResponse(
             200,
             b"data",
@@ -157,7 +192,7 @@ def test_unapproved_requested_host_is_rejected_before_network(monkeypatch):
         called["value"] = True
         return _FakeResponse(200, b"data")
 
-    monkeypatch.setattr("urllib.request.urlopen", opener)
+    monkeypatch.setattr("thirteenf.sec_client.open_sec_url", opener)
     client = SecClient(user_agent="test@acme.test", rate_limit_rps=10)
     with pytest.raises(SecError, match="unapproved SEC host"):
         client.fetch_bytes("https://attacker.invalid/file.xml")
@@ -199,7 +234,7 @@ def test_response_metadata_and_conditional_headers(monkeypatch):
             final_url="https://www.sec.gov/final.xml",
         )
 
-    monkeypatch.setattr("urllib.request.urlopen", opener)
+    monkeypatch.setattr("thirteenf.sec_client.open_sec_url", opener)
     client = SecClient(user_agent="test@acme.test", rate_limit_rps=10)
     response = client.fetch_bytes(
         "https://www.sec.gov/file.xml",
@@ -226,7 +261,7 @@ def test_not_modified_returns_metadata_response(monkeypatch):
             None,
         )
 
-    monkeypatch.setattr("urllib.request.urlopen", opener)
+    monkeypatch.setattr("thirteenf.sec_client.open_sec_url", opener)
     client = SecClient(user_agent="test@acme.test", rate_limit_rps=10)
     response = client.fetch_bytes("https://www.sec.gov/file.xml", etag='"same"')
     assert response.status == 304

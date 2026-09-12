@@ -21,10 +21,12 @@ from thirteenf.database import (
 )
 from thirteenf.effective import (
     AmendmentPendingError,
+    EffectiveDataError,
     FilingVersion,
     load_effective_positions,
     rebuild_effective_positions,
     select_effective_components,
+    reported_value_usd,
 )
 from thirteenf.parser import AmendmentType
 
@@ -90,6 +92,63 @@ def test_addition_supplements_current_base():
     assert selection.base_filing_id == 1
     assert selection.supplement_filing_ids == (2,)
     assert len(selection.state_hash) == 64
+
+
+@pytest.mark.parametrize("amendment_type", [AmendmentType.ADD_NEW_HOLDINGS, AmendmentType.RESTATEMENT])
+def test_mixed_dollar_units_are_normalized_before_amendment_aggregation(tmp_path, amendment_type):
+    conn, manager_id = _database(tmp_path)
+    sid_a, sid_b = _security(conn, "AAAA11111"), _security(conn, "BBBB22222")
+    base = _filing(conn, manager_id, accession="OLD-BASE", accepted_at="2022-11-14T10:00:00Z",
+                   rows=[_Row(1, "AAAA11111", 10, 1)])
+    _filing(conn, manager_id, accession="NEW-SUPPLEMENT", accepted_at="2023-01-03T10:00:00Z",
+            rows=[_Row(1, "BBBB22222", 20, 1000)], is_amendment=True,
+            amendment_number=1, amendment_type=amendment_type,
+            amendment_status="PARSED")
+    # Same historical reporting period; unit depends on filing date, NOT quarter.
+    conn.execute("UPDATE filings SET report_period='2022-09-30'")
+    conn.execute("UPDATE holdings SET report_period='2022-09-30'")
+    rebuild_effective_positions(conn, "0.1.0")
+    positions = load_effective_positions(conn, manager_id, "2022-09-30", "0.1.0")
+    assert positions[(sid_b, "", "SH")].value == 1000
+    if amendment_type is AmendmentType.ADD_NEW_HOLDINGS:
+        assert positions[(sid_a, "", "SH")].value == 1000
+        assert positions[(sid_a, "", "SH")].portfolio_weight == 0.5
+    else:
+        assert (sid_a, "", "SH") not in positions
+        assert positions[(sid_b, "", "SH")].portfolio_weight == 1.0
+    assert conn.execute("SELECT value FROM holdings WHERE filing_id=?", (base,)).fetchone()[0] == 1
+    conn.close()
+
+
+def test_unknown_value_unit_date_fails_closed(tmp_path):
+    conn, manager_id = _database(tmp_path)
+    _security(conn, "AAAA11111")
+    _filing(conn, manager_id, accession="BASE", accepted_at="2026-05-01T10:00:00Z", rows=[_Row(1, "AAAA11111", 1, 1)])
+    conn.execute("UPDATE filings SET filing_date='UNKNOWN'")
+    with pytest.raises(EffectiveDataError, match="value unit"):
+        rebuild_effective_positions(conn, "0.1.0")
+    conn.close()
+
+
+@pytest.mark.parametrize("filing_date,expected", [("2023-01-02", 1000), ("2023-01-03", 1)])
+def test_value_unit_boundary(filing_date, expected):
+    assert reported_value_usd(1, filing_date) == expected
+
+
+@pytest.mark.parametrize("level", ["row", "position", "period"])
+def test_usd_overflow_fails_before_promotion(tmp_path, level):
+    conn, mid = _database(tmp_path)
+    _security(conn, "AAAA11111")
+    _security(conn, "BBBB22222")
+    amount = 2**63 - 1 if level == "row" else 2**62
+    rows = [_Row(1, "AAAA11111", 1, amount)]
+    if level != "row":
+        rows.append(_Row(2, "AAAA11111" if level == "position" else "BBBB22222", 1, amount))
+    _filing(conn, mid, accession="OVERFLOW", accepted_at="2022-11-14T10:00:00Z" if level == "row" else "2026-05-01T10:00:00Z", rows=rows)
+    with pytest.raises(EffectiveDataError, match="overflows"):
+        rebuild_effective_positions(conn, "0.1.0")
+    assert conn.execute("SELECT COUNT(*) FROM effective_positions").fetchone()[0] == 0
+    conn.close()
 
 
 def test_selection_hash_does_not_depend_on_database_surrogate_ids():
@@ -263,8 +322,8 @@ def test_rebuild_aggregates_economic_keys_and_preserves_provenance(tmp_path):
         (sid_a,),
     ).fetchone()[0]
     assert json.loads(stored) == [
-        {"filing_id": base_id, "row_ordinal": 1},
-        {"filing_id": base_id, "row_ordinal": 2},
+        {"filing_id": base_id, "row_ordinal": 1, "filing_date": "2026-05-01", "value_basis": "USD_SEC_FILING_DATE_2023_01_03_V1"},
+        {"filing_id": base_id, "row_ordinal": 2, "filing_date": "2026-05-01", "value_basis": "USD_SEC_FILING_DATE_2023_01_03_V1"},
     ]
     conn.close()
 

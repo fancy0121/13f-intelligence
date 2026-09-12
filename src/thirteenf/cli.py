@@ -73,18 +73,26 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     )
     managers = load_verified_managers(managers_path)
     print(f"verified_managers={len(managers)}")
+    if not managers:
+        print("ingestion blocked: no eligible managers")
+        print("raw_files=0 failures=1")
+        return 1
     total_files = 0
     failures = 0
     for m in managers:
         cik = int(m["cik"])
         label = m["label"]
         try:
-            records = discover_filings(client, cik, quarters=args.quarters)
+            records = discover_filings(client, cik, quarters=args.quarters, raw_root=raw_root)
         except SecError as exc:
             print(f"  [FAIL] {label} submissions: {exc}")
             failures += 1
             continue
         print(f"  [{label}] cik={cik} filings={len(records)}")
+        if not records:
+            print(f"  [FAIL] {label}: no filings in requested window")
+            failures += 1
+            continue
         for rec in records:
             try:
                 raw = download_filing(client, rec, raw_root, force=args.force)
@@ -107,11 +115,13 @@ def cmd_normalize(args: argparse.Namespace) -> int:
         mappings_path=Path(args.mappings),
         scoring_path=Path(args.scoring),
         methodology_version=args.methodology,
+        quarantine_policy_path=args.quarantine_policy,
     )
     print(
         f"processed={summary.processed} failed={summary.failed} "
         f"pending_amendments={summary.pending_amendments} "
-        f"skipped={summary.skipped} promoted={int(summary.promoted)}"
+        f"skipped={summary.skipped} promoted={int(summary.promoted)} "
+        f"quarantined_source_filings={summary.quarantined}"
     )
     for error in summary.errors:
         print(f"  [FAIL] {error}")
@@ -218,7 +228,8 @@ def build_parser() -> argparse.ArgumentParser:
     normalize.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
     normalize.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     normalize.add_argument("--scoring", default=str(ROOT / "config" / "manager_scoring.yaml"))
-    normalize.add_argument("--methodology", default="0.1.0")
+    normalize.add_argument("--methodology", default="0.1.1")
+    normalize.add_argument("--quarantine-policy", default=None)
     normalize.add_argument("--clean", action="store_true")
     normalize.set_defaults(func=cmd_normalize)
 
@@ -230,7 +241,8 @@ def build_parser() -> argparse.ArgumentParser:
     rebuild.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
     rebuild.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     rebuild.add_argument("--scoring", default=str(ROOT / "config" / "manager_scoring.yaml"))
-    rebuild.add_argument("--methodology", default="0.1.0")
+    rebuild.add_argument("--methodology", default="0.1.1")
+    rebuild.add_argument("--quarantine-policy", default=None)
     rebuild.set_defaults(clean=True)
     rebuild.set_defaults(func=cmd_normalize)
 
@@ -238,7 +250,7 @@ def build_parser() -> argparse.ArgumentParser:
         "analyze", help="Compute weights, position changes, and quality checks"
     )
     analyze.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
-    analyze.add_argument("--methodology", default="0.1.0")
+    analyze.add_argument("--methodology", default="0.1.1")
     analyze.add_argument("--change-scale-divisor", default="0.5")
     analyze.add_argument("--significance-mode", default="min_prev_now")
     analyze.add_argument("--stable-abs-threshold", default="0.1")
@@ -249,7 +261,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     score.add_argument("--db-path", default=str(ROOT / "data" / "thirteenf.db"))
     score.add_argument("--scoring", default=str(ROOT / "config" / "manager_scoring.yaml"))
-    score.add_argument("--methodology", default="0.1.0")
+    score.add_argument("--methodology", default="0.1.1")
     score.set_defaults(func=cmd_score)
 
     portfolio = sub.add_parser(

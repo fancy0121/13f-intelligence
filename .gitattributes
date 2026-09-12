@@ -1,0 +1,2 @@
+# Preserve byte-bound policy; recognize its existing CRLF endings.
+config/source_quarantine.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

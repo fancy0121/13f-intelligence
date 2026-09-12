@@ -211,11 +211,12 @@ def cross_check(
     )
     results: list[HoldingEvidence] = []
     for h in holdings:
-        row = conn.execute(
+        matches = conn.execute(
             "SELECT security_id FROM securities WHERE ticker=? AND "
-            "mapping_status != 'UNRESOLVED' LIMIT 1",
+            "mapping_status = 'VERIFIED'",
             (h.ticker,),
-        ).fetchone()
+        ).fetchall()
+        row = matches[0] if len(matches) == 1 else None
         if row is None:
             results.append(
                 HoldingEvidence(

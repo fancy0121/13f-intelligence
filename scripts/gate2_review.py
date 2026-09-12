@@ -56,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
         default=str(ROOT / "reports" / "validation" / "current"),
     )
     parser.add_argument("--methodology-version", default="0.1.0")
+    parser.add_argument("--quarantine-policy")
     parser.add_argument("--min-transitions", type=int, default=30)
     parser.add_argument("--min-managers", type=int, default=5)
     parser.add_argument("--emit-manual-packet")
@@ -66,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
         raw_root=Path(args.raw_root),
         db_path=Path(args.db),
         methodology_version=args.methodology_version,
+        quarantine_policy_path=args.quarantine_policy,
     )
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -107,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
             "manager_ids": list(result.manager_ids),
             "period_pairs": [list(pair) for pair in result.period_pairs],
             "mismatches": list(result.mismatches),
+            "quarantine": result.quarantine,
             "manual_errors": list(manual_errors),
             "manual_packet": args.emit_manual_packet,
         }

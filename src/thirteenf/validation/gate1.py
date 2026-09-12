@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from thirteenf.database import connect_readonly
 from thirteenf.validation.gate_context import (
@@ -13,6 +13,7 @@ from thirteenf.validation.gate_context import (
     component_bytes,
 )
 from thirteenf.validation.reference_xml import ReferenceXmlError, reference_rows
+from thirteenf.validation.quarantine import audit_quarantine
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,7 @@ class Gate1Result:
     manager_ids: tuple[int, ...]
     mismatches: tuple[dict, ...]
     sampled_filings: tuple[dict, ...]
+    quarantine: dict = field(default_factory=dict)
 
 
 def run_gate1(
@@ -32,12 +34,16 @@ def run_gate1(
     rows_per_filing: int = 10,
 ) -> Gate1Result:
     """Check exactly managers x quarters x rows against raw SEC XML."""
-
+    if managers < 5 or quarters < 3 or rows_per_filing < 10:
+        raise ValueError('Gate 1 requires at least 5 managers x 3 quarters x 10 rows')
     conn = connect_readonly(bundle.db_path, immutable=True)
     conn.row_factory = sqlite3.Row
     mismatches: list[dict] = []
     samples: list[dict] = []
     checked = 0
+    quarantine = audit_quarantine(bundle)
+    if quarantine["status"] != "PASS":
+        mismatches.append({"kind": "source_quarantine", "detail": quarantine["errors"]})
     try:
         raw_fingerprint = build_gate_context(bundle).raw_fingerprint
         selected = _select_filings(
@@ -162,6 +168,7 @@ def run_gate1(
             manager_ids=selected_managers,
             mismatches=tuple(mismatches),
             sampled_filings=tuple(samples),
+            quarantine=quarantine,
         )
     finally:
         conn.close()

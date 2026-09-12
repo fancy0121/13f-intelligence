@@ -9,6 +9,55 @@ from thirteenf.validation.gate2 import run_gate2
 from thirteenf.validation.gate_context import GateBundle
 
 
+def test_gate2_detects_missing_effective_period(sample_bundle, tmp_path):
+    copied = tmp_path / "dropped-period.db"
+    shutil.copy2(sample_bundle.db_path, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("DELETE FROM effective_periods WHERE effective_period_id=(SELECT MAX(effective_period_id) FROM effective_periods)")
+    conn.commit()
+    conn.close()
+    result = run_gate2(GateBundle(sample_bundle.raw_root, copied, "0.1.0"))
+    assert any(item["kind"] == "period_inventory" for item in result.mismatches)
+
+
+def test_gate2_detects_changed_acceptance_timestamp(sample_bundle, tmp_path):
+    copied = tmp_path / "changed-time.db"
+    shutil.copy2(sample_bundle.db_path, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("UPDATE filings SET accepted_at='2026-08-14T10:00:01Z' WHERE filing_id=(SELECT MAX(filing_id) FROM filings)")
+    conn.commit()
+    conn.close()
+    result = run_gate2(GateBundle(sample_bundle.raw_root, copied, "0.1.0"))
+    assert any(item.get("field") == "accepted_at" for item in result.mismatches)
+
+
+def test_gate2_checks_filing_date_used_for_value_units(sample_bundle, tmp_path):
+    copied = tmp_path / "changed-date.db"
+    shutil.copy2(sample_bundle.db_path, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("UPDATE filings SET filing_date='2022-11-14' WHERE filing_id=(SELECT MIN(filing_id) FROM filings)")
+    conn.commit()
+    conn.close()
+    result = run_gate2(GateBundle(sample_bundle.raw_root, copied, "0.1.0"))
+    assert not result.passed
+    assert any(item.get("field") == "filing_date" for item in result.mismatches)
+
+
+def test_gate2_does_not_reuse_production_unit_conversion(sample_bundle, tmp_path, monkeypatch):
+    import thirteenf.effective as effective
+    copied = tmp_path / "bad-conversion.db"
+    shutil.copy2(sample_bundle.db_path, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("PRAGMA foreign_keys=ON")
+    monkeypatch.setattr(effective, "reported_value_usd", lambda value, filing_date: value * 2)
+    effective.rebuild_effective_positions(conn, "0.1.0")
+    conn.commit()
+    conn.close()
+    result = run_gate2(GateBundle(sample_bundle.raw_root, copied, "0.1.0"))
+    assert not result.passed
+    assert any(item.get("field") == "value" for item in result.mismatches)
+
+
 def test_gate2_replays_amendments_aggregates_and_checks_transitions(sample_bundle):
     before = hashlib.sha256(sample_bundle.db_path.read_bytes()).hexdigest()
     result = run_gate2(sample_bundle, min_transitions=30, min_managers=5)

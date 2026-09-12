@@ -6,6 +6,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -220,3 +222,103 @@ def test_amendments_link_to_immediate_predecessor(tmp_path):
     assert rows[1][2] == rows[0][0]
     assert rows[2][2] == rows[1][0]
     conn.close()
+
+
+def _quarantine_case(tmp_path):
+    """Synthetic control-total contradiction; never a real SEC fixture."""
+    raw = tmp_path / "raw"
+    accession = "0000000001-26-000001"
+    _manifest(raw)
+    store = RawStore(raw)
+    path = raw / "manifests" / "0000000001" / "000000000126000001.json"
+    manifest = json.loads(path.read_text())
+    cover = store.put(_cover().replace(
+        b"</formData>",
+        b"<summaryPage><tableEntryTotal>1</tableEntryTotal>"
+        b"<tableValueTotal>999</tableValueTotal></summaryPage></formData>",
+    ))
+    manifest["components"]["primary_document"].update(
+        checksum=cover.checksum, object_path=cover.relative_path,
+    )
+    store.write_manifest(1, accession, manifest)
+    entry = dict(cik=1, accession=accession, report_period="2026-06-30",
+                 cover_sha256=cover.checksum, info_sha256=manifest["checksum"],
+                 cover_entry_total=1, info_row_count=1,
+                 cover_value_total_raw_units=999, info_value_sum_raw_units=1000)
+    policy = tmp_path / "quarantine.json"
+    policy.write_text(json.dumps(dict(
+        policy_id="test-approved-quarantine", methodology_version="0.1.1",
+        action="QUARANTINE_MANAGER_PERIOD", entries=[entry],
+    )))
+    return raw, policy
+
+
+def _with_quarantine(tmp_path, raw, policy, version="0.1.1"):
+    managers, mappings, scoring = _configs(tmp_path)
+    scoring.write_text(f'methodology_version: "{version}"\ntiers: {{}}\nmanagers: {{}}\n')
+    return normalize_raw_tree(raw, tmp_path / "candidate.db", managers_path=managers,
+                              mappings_path=mappings, scoring_path=scoring,
+                              methodology_version=version, quarantine_policy_path=policy)
+
+
+def test_approved_quarantine_preserves_raw_and_excludes_whole_period(tmp_path):
+    from thirteenf.changes import compute_portfolio_weights, compute_position_changes
+    raw, policy = _quarantine_case(tmp_path)
+    _manifest(raw, accession="0000000001-26-000002",
+              accepted_at="2026-08-15T10:00:00Z", amendment_type="RESTATEMENT",
+              amendment_number=1)
+    result = _with_quarantine(tmp_path, raw, policy)
+    assert result.promoted, result.errors
+    assert result.quarantined == 1
+    conn = sqlite3.connect(tmp_path / "candidate.db")
+    assert conn.execute("SELECT ingest_status FROM filings").fetchall() == [("QUARANTINED",)] * 2
+    assert conn.execute("SELECT shares,value,portfolio_weight FROM holdings").fetchall() == [(100, 1000, None)] * 2
+    assert conn.execute("SELECT status,total_value FROM effective_periods").fetchall() == [("INCOMPLETE", None)]
+    assert conn.execute("SELECT COUNT(*) FROM quality_events WHERE event_type='SOURCE_QUARANTINED'").fetchone()[0] == 1
+    # Neither recomputation nor a different methodology may resurrect a quarantined period.
+    compute_portfolio_weights(conn)
+    compute_position_changes(conn, "future-test-version")
+    for table in ("effective_positions", "effective_filing_components", "position_changes", "consensus_scores"):
+        assert conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM holdings WHERE portfolio_weight IS NOT NULL").fetchone()[0] == 0
+    conn.close()
+
+
+@pytest.mark.parametrize("field,value", [
+    ("cover_sha256", "0" * 64), ("info_sha256", "0" * 64),
+    ("report_period", "2026-03-31"), ("info_row_count", 2),
+    ("cik", 2), ("accession", "0000000001-26-999999"),
+])
+def test_quarantine_is_exact_not_a_numeric_tolerance(tmp_path, field, value):
+    raw, policy = _quarantine_case(tmp_path)
+    data = json.loads(policy.read_text())
+    data["entries"][0][field] = value
+    policy.write_text(json.dumps(data))
+    result = _with_quarantine(tmp_path, raw, policy)
+    assert not result.promoted
+    assert result.failed
+    assert not (tmp_path / "candidate.db").exists()
+
+
+def test_quarantine_wrong_methodology_fails_closed(tmp_path):
+    raw, policy = _quarantine_case(tmp_path)
+    result = _with_quarantine(tmp_path, raw, policy, "0.1.0")
+    assert not result.promoted
+    assert result.failed
+
+
+def test_quarantine_not_implicit_for_known_source(tmp_path):
+    raw, _ = _quarantine_case(tmp_path)
+    result = _normalize(tmp_path, raw, tmp_path / "strict.db")
+    assert result.failed == 1
+    assert not result.promoted
+
+
+def test_quarantine_cannot_hide_missing_approved_source(tmp_path):
+    raw, policy = _quarantine_case(tmp_path)
+    data = json.loads(policy.read_text())
+    data["entries"].append({**data["entries"][0], "accession": "0000000001-26-000099"})
+    policy.write_text(json.dumps(data))
+    result = _with_quarantine(tmp_path, raw, policy)
+    assert not result.promoted
+    assert any("approved quarantine source missing" in error for error in result.errors)

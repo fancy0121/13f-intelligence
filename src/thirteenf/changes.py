@@ -29,24 +29,26 @@ def compute_portfolio_weights(conn: sqlite3.Connection) -> int:
     Only filings with ingest_status='OK' and at least one holding are used.
     Returns number of holdings updated.
     """
-    cur = conn.execute(
+    # Materialize filing totals once. A correlated aggregate here otherwise
+    # scans all holdings again per row on SQLite (quadratic on real 13F data).
+    totals = conn.execute(
         """
-        UPDATE holdings
-        SET portfolio_weight = (
-            SELECT value * 1.0 / total.value_total
-            FROM (
-                SELECT filing_id, SUM(value) AS value_total
-                FROM holdings
-                WHERE value IS NOT NULL
-                GROUP BY filing_id
-            ) AS total
-            WHERE total.filing_id = holdings.filing_id
-        )
-        WHERE holdings.value IS NOT NULL
+        SELECT SUM(h.value), h.filing_id
+        FROM holdings h JOIN filings f ON f.filing_id=h.filing_id
+        WHERE f.ingest_status='OK' AND h.value IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM filings q WHERE q.manager_id=f.manager_id
+                          AND q.report_period=f.report_period AND q.ingest_status='QUARANTINED')
+        GROUP BY h.filing_id
         """
+    ).fetchall()
+    conn.execute("UPDATE holdings SET portfolio_weight=NULL")
+    cur = conn.executemany(
+        "UPDATE holdings SET portfolio_weight=value * 1.0 / ? "
+        "WHERE filing_id=? AND value IS NOT NULL", totals,
     )
     conn.commit()
     return cur.rowcount
+
 
 
 def effective_filings(
@@ -141,29 +143,9 @@ def compute_position_changes(
                 }
                 for key, position in positions.items()
             }
-            if not seen_period:
-                # First period: everything is NEW, prev values are None.
-                for key in sorted(now):
-                    rec = now[key]
-                    inserted += _insert_change(
-                        conn,
-                        manager_id=manager_id,
-                        security_id=rec["security_id"],
-                        put_call=rec["put_call"],
-                        shares_type=rec["shares_type"],
-                        report_period=report_period,
-                        change_type="NEW",
-                        shares_prev=None,
-                        shares_now=rec["shares"],
-                        share_change=None,
-                        share_change_pct=None,
-                        weight_prev=None,
-                        weight_now=rec["weight"],
-                        weight_change=None,
-                        methodology_version=methodology_version,
-                    )
-            elif (
-                comparison_blocked
+            if (
+                not seen_period
+                or comparison_blocked
                 or prev is None
                 or prev_period is None
                 or not _is_next_quarter(prev_period, report_period)

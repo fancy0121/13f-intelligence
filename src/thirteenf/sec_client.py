@@ -58,6 +58,17 @@ def validate_release_user_agent(value: str) -> str:
     return normalized
 
 
+class _SecRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        # Check BEFORE urllib sends the next request (including contact headers).
+        SecClient._validate_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def open_sec_url(request, *, timeout):
+    return urllib.request.build_opener(_SecRedirectHandler()).open(request, timeout=timeout)
+
+
 class SecClient:
     def __init__(
         self,
@@ -105,8 +116,14 @@ class SecClient:
 
     @staticmethod
     def _validate_url(url: str) -> None:
-        parsed = urllib.parse.urlsplit(url)
-        if parsed.scheme != "https" or parsed.hostname not in SEC_ALLOWED_HOSTS:
+        try:
+            parsed = urllib.parse.urlsplit(url)
+            allowed = (parsed.scheme == "https" and parsed.hostname in SEC_ALLOWED_HOSTS
+                       and parsed.port in (None, 443) and parsed.username is None
+                       and parsed.password is None)
+        except ValueError:
+            allowed = False
+        if not allowed:
             raise SecError(f"unapproved SEC host for {url}")
 
     def _read_limited(self, response) -> bytes:
@@ -147,6 +164,10 @@ class SecClient:
         last_modified: str | None = None,
     ) -> SecResponse:
         self._validate_url(url)
+        try:
+            validate_release_user_agent(self.user_agent)
+        except ValueError as exc:
+            raise SecError(str(exc)) from exc
         retries = self.max_retries if retries is None else retries
         attempt = 0
         while True:
@@ -158,7 +179,7 @@ class SecClient:
                 headers["If-Modified-Since"] = last_modified
             req = urllib.request.Request(url, headers=headers)
             try:
-                with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                with open_sec_url(req, timeout=self.timeout) as resp:
                     status = resp.status
                     final_url = resp.geturl()
                     self._validate_url(final_url)
@@ -208,7 +229,9 @@ class SecClient:
     def _backoff(attempt: int, retry_after: str | None = None) -> float:
         if retry_after:
             try:
-                return min(float(retry_after), 60.0)
+                delay = float(retry_after)
+                if math.isfinite(delay) and delay >= 0:
+                    return min(delay, 60.0)
             except ValueError:
                 pass
         base = 2.0 ** attempt

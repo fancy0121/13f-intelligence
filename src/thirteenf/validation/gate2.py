@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 
 from thirteenf.database import connect_readonly
@@ -21,6 +21,7 @@ from thirteenf.validation.reference_xml import (
     reference_cover,
     reference_rows,
 )
+from thirteenf.validation.quarantine import audit_quarantine
 
 
 _CHANGE_TYPES = ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")
@@ -35,6 +36,7 @@ class Gate2Result:
     period_pairs: tuple[tuple[str, str], ...]
     mismatches: tuple[dict, ...]
     review_rows: tuple[dict, ...]
+    quarantine: dict = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -54,10 +56,17 @@ def run_gate2(
     effective_version: str = "v3",
 ) -> Gate2Result:
     """Independently replay raw filings and compare derived database state."""
-
+    if min_transitions < 30 or min_managers < 5:
+        raise ValueError('Gate 2 requires at least 30 transitions across 5 managers')
     conn = connect_readonly(bundle.db_path, immutable=True)
     conn.row_factory = sqlite3.Row
     mismatches: list[dict] = []
+    quarantine = audit_quarantine(bundle)
+    allowed_exclusions = set()
+    if quarantine["status"] == "PASS":
+        allowed_exclusions = {tuple(p) for p in quarantine["manager_periods"]}
+    else:
+        mismatches.append({"kind": "source_quarantine", "detail": quarantine["errors"]})
     try:
         periods = conn.execute(
             """
@@ -70,6 +79,17 @@ def run_gate2(
             """,
             (bundle.methodology_version,),
         ).fetchall()
+        expected_periods = set(conn.execute(
+            "SELECT DISTINCT manager_id, report_period FROM filings WHERE ingest_status IN ('OK','QUARANTINED')"
+        ).fetchall())
+        expected_periods = {tuple(row) for row in expected_periods}
+        actual_periods = {(p["manager_id"], p["report_period"]) for p in periods}
+        if expected_periods != actual_periods:
+            mismatches.append({
+                "kind": "period_inventory",
+                "missing": sorted(expected_periods - actual_periods),
+                "unexpected": sorted(actual_periods - expected_periods),
+            })
         if not periods:
             mismatches.append(
                 {"kind": "coverage", "detail": "no effective periods found"}
@@ -77,6 +97,9 @@ def run_gate2(
 
         period_records: list[tuple[sqlite3.Row, _PeriodState | None]] = []
         for period in periods:
+            if (period["manager_id"], period["report_period"]) in allowed_exclusions:
+                period_records.append((period, None))
+                continue
             if period["status"] != "READY":
                 mismatches.append(
                     {
@@ -143,6 +166,7 @@ def run_gate2(
             period_pairs=period_pairs,
             mismatches=tuple(mismatches),
             review_rows=tuple(selected),
+            quarantine=quarantine,
         )
     finally:
         conn.close()
@@ -158,7 +182,7 @@ def _replay_period(
         """
         SELECT filing_id, accession_number, form_type, is_amendment,
                accepted_at, amendment_number, amendment_type,
-               amendment_status
+               amendment_status, filing_date
         FROM filings
         WHERE manager_id=? AND report_period=? AND ingest_status='OK'
         ORDER BY COALESCE(accepted_at, ''), accession_number
@@ -173,6 +197,7 @@ def _replay_period(
             "accession_number": filing["accession_number"],
         }
         try:
+            manifest = manifest_for(bundle, int(period["cik"]), filing["accession_number"])
             cover = reference_cover(
                 component_bytes(
                     bundle,
@@ -187,6 +212,8 @@ def _replay_period(
             )
             continue
         comparisons = (
+            ("accepted_at", manifest.get("accepted_at"), filing["accepted_at"]),
+            ("filing_date", manifest.get("filing_date"), filing["filing_date"]),
             ("report_period", cover.report_period, period["report_period"]),
             ("form_type", cover.submission_type, filing["form_type"]),
             ("is_amendment", int(cover.is_amendment), int(filing["is_amendment"])),
@@ -356,7 +383,14 @@ def _replay_period(
                     "information_table",
                 )
             )
-        except (OSError, RuntimeError, ReferenceXmlError) as exc:
+            # Independent unit interpretation uses the RAW manifest date, not
+            # production aggregation helpers or the DB's derived values.
+            date_text = manifest.get("filing_date")
+            submitted = date.fromisoformat(date_text)
+            if submitted.isoformat() != date_text:
+                raise ReferenceXmlError("invalid filing date for value units")
+            value_multiplier = 1000 if submitted < date(2023, 1, 3) else 1
+        except (OSError, RuntimeError, ValueError, TypeError) as exc:
             mismatches.append(
                 {
                     "kind": "raw_document",
@@ -374,13 +408,15 @@ def _replay_period(
                 {"shares": 0, "value": 0, "provenance": []},
             )
             record["shares"] += row.shares
-            record["value"] += row.value
+            record["value"] += row.value * value_multiplier
             record["provenance"].append(
                 {
                     "filing_id": int(filing["filing_id"]),
                     "accession_number": filing["accession_number"],
                     "object_path": object_path,
                     "row_ordinal": row.row_ordinal,
+                    "filing_date": date_text,
+                    "value_basis": "USD_SEC_FILING_DATE_2023_01_03_V1",
                 }
             )
     positions: dict[tuple[int, str, str], dict] = {}
@@ -475,6 +511,8 @@ def _compare_positions(
             {
                 "filing_id": item["filing_id"],
                 "row_ordinal": item["row_ordinal"],
+                "filing_date": item["filing_date"],
+                "value_basis": item["value_basis"],
             }
             for item in raw["provenance"]
         ]
@@ -517,17 +555,7 @@ def _expected_changes(period_records):
                 seen_period = True
                 previous = None
                 continue
-            if not seen_period:
-                for key in sorted(state.positions):
-                    change = _change_record(
-                        state,
-                        key,
-                        None,
-                        state.positions[key],
-                        previous_period=None,
-                    )
-                    expected[change["key"]] = change
-            elif previous is not None and _is_next_quarter(
+            if seen_period and previous is not None and _is_next_quarter(
                 previous.report_period, report_period
             ):
                 pair_set.add((previous.report_period, report_period))

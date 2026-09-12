@@ -37,7 +37,8 @@ def verify_manual_baseline(
     expected_transition_ids: set[str] | None = None,
 ) -> ManualBaselineResult:
     """Validate a completed human review packet without inferring approval."""
-
+    if min_transitions < 30 or min_managers < 5:
+        raise ValueError('Manual Gate 2 requires at least 30 transitions across 5 managers')
     source = Path(path)
     errors: list[str] = []
     if not source.is_file():

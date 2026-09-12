@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import pytest
 import sys
 from pathlib import Path
 
@@ -197,4 +198,36 @@ def test_trend_insufficient_history_when_no_consensus(tmp_path):
     compute_consensus(conn, methodology_version="0.1.0")
     n = compute_trends(conn, methodology_version="0.1.0")
     assert n == 0
+    conn.close()
+
+
+def test_removed_manager_approval_is_revoked(tmp_path):
+    conn, mids, _ = _seed(tmp_path)
+    for period, amount in (("2026-03-31", 100), ("2026-06-30", 200)):
+        _filing(conn, mids["M1"], period, period, [_Row(1, "AAAA11111", "AAA Inc", amount, amount * 10)])
+    compute_position_changes(conn, "0.1.0")
+    assert compute_consensus(conn, methodology_version="0.1.0") > 0
+    assert compute_trends(conn, methodology_version="0.1.0") > 0
+    scoring = _scoring(tmp_path)
+    scoring.write_text('methodology_version: "0.1.0"\nmanagers: {}\n', encoding="utf-8")
+    result = apply_scoring(conn, scoring, methodology_version="0.1.0")
+    assert result == {"approved": 0, "not_approved": 3}
+    assert conn.execute("SELECT COUNT(*) FROM managers WHERE scoring_status='APPROVED'").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM consensus_scores").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM trends").fetchone()[0] == 0
+    conn.close()
+
+
+def test_scoring_version_mismatch_leaves_approvals_unchanged(tmp_path):
+    conn, _, _ = _seed(tmp_path)
+    with pytest.raises(ValueError, match="version"):
+        apply_scoring(conn, _scoring(tmp_path), methodology_version="different")
+    assert conn.execute("SELECT COUNT(*) FROM managers WHERE scoring_status='APPROVED'").fetchone()[0] == 3
+    conn.close()
+
+
+def test_consensus_rejects_cross_version_scoring(tmp_path):
+    conn, _, _ = _seed(tmp_path)
+    with pytest.raises(ValueError, match="version"):
+        compute_consensus(conn, methodology_version="different")
     conn.close()

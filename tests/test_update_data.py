@@ -130,3 +130,28 @@ def test_normalize_only_forwards_raw_root_and_database(
     normalize_args = calls[0][1]
     assert normalize_args[normalize_args.index("--raw-root") + 1] == str(raw_root)
     assert normalize_args[normalize_args.index("--db-path") + 1] == str(update_data.DB)
+
+
+def test_successful_ingestion_does_not_mean_release_approved(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    monkeypatch.setattr(update_data, '_run', lambda step, args: (
+        0, 'raw_files=1 failures=0' if step == 'ingest' else
+        'processed=1 failed=0 pending_amendments=0 promoted=1'))
+    assert update_data.main(['--release-mode']) == 0
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding='utf-8'))
+    assert status['releaseable'] is False
+    assert status['validation_status'] == 'NOT_VALIDATED'
+
+
+def test_explicit_quarantine_policy_is_forwarded_not_a_release_approval(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+    def fake_run(step, args):
+        calls.append(args)
+        return 0, "processed=343 failed=0 pending_amendments=0 promoted=1 quarantined_source_filings=16"
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--normalize-only", "--quarantine-policy", "approved.json"]) == 0
+    assert calls[0][-2:] == ["--quarantine-policy", "approved.json"]
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding="utf-8"))
+    assert status["quarantined_source_filings"] == 16
+    assert status["releaseable"] is False

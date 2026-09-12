@@ -5,6 +5,7 @@ from __future__ import annotations
 import sqlite3
 import csv
 import json
+import calendar
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -27,6 +28,11 @@ def _direction(ct: str) -> int:
     if ct in ("REDUCE", "EXIT"):
         return -1
     return 0
+
+
+def _comparison_missing(current_holder_ids: set[int], change_manager_ids: set[int]) -> bool:
+    """A current holder without a change row has no comparable prior period."""
+    return bool(current_holder_ids - change_manager_ids)
 
 
 def _days_since(d: str) -> int | None:
@@ -153,7 +159,7 @@ class ProductStore:
         rows = self.conn.execute(
             """
             SELECT DISTINCT methodology_version
-            FROM effective_periods WHERE status='READY'
+            FROM effective_periods
             ORDER BY methodology_version
             """
         ).fetchall()
@@ -161,12 +167,12 @@ class ProductStore:
         if requested is not None:
             if requested not in available:
                 raise RuntimeError(
-                    f"requested methodology version is not READY: {requested}"
+                    f"requested methodology version is absent: {requested}"
                 )
             return requested
         if len(available) != 1:
             raise RuntimeError(
-                "public database must contain exactly one READY methodology version"
+                "public database must contain exactly one methodology version"
             )
         return available[0]
 
@@ -174,20 +180,30 @@ class ProductStore:
         rows = self.conn.execute(
             """
             SELECT DISTINCT report_period FROM effective_periods
-            WHERE status='READY' AND methodology_version=?
+            WHERE methodology_version=?
             """,
             (self.methodology_version,),
         ).fetchall()
-        return sorted(r[0] for r in rows)
+        if not rows:
+            return []
+        def index(value):
+            d = date.fromisoformat(value)
+            return d.year * 4 + (d.month - 1) // 3
+        # Calendar quarters, not a compressed sequence of available filings.
+        first, last = min(index(r[0]) for r in rows), max(index(r[0]) for r in rows)
+        return [date(n // 4, (n % 4 + 1) * 3,
+                     calendar.monthrange(n // 4, (n % 4 + 1) * 3)[1]).isoformat()
+                for n in range(first, last + 1)]
 
     # ------------------------------------------------------------------
     # Managers / overview
     # ------------------------------------------------------------------
     def latest_period(self) -> str | None:
+        """Latest observed quarter, including blocked data; never silently backfill."""
         row = self.conn.execute(
             """
             SELECT MAX(report_period) FROM effective_periods
-            WHERE status='READY' AND methodology_version=?
+            WHERE methodology_version=?
             """,
             (self.methodology_version,),
         ).fetchone()
@@ -244,10 +260,8 @@ class ProductStore:
             """
             SELECT ep.report_period, MAX(f.filing_date), MAX(f.is_amendment)
             FROM effective_periods ep
-            JOIN effective_filing_components efc
-              ON efc.effective_period_id=ep.effective_period_id
-            JOIN filings f ON f.filing_id=efc.filing_id
-            WHERE ep.manager_id=? AND ep.status='READY'
+            JOIN filings f ON f.manager_id=ep.manager_id AND f.report_period=ep.report_period
+            WHERE ep.manager_id=?
               AND ep.methodology_version=?
             GROUP BY ep.report_period
             ORDER BY ep.report_period DESC LIMIT 1
@@ -257,6 +271,20 @@ class ProductStore:
         if not row:
             return None, None, False
         return row[0], row[1], bool(row[2])
+
+    def quarantined_periods(self, manager_id: int | None = None) -> list[dict]:
+        query = """SELECT f.manager_id, m.name, f.report_period,
+                   GROUP_CONCAT(f.accession_number), COUNT(*)
+                   FROM filings f JOIN managers m ON m.manager_id=f.manager_id
+                   WHERE f.ingest_status='QUARANTINED'"""
+        params = ()
+        if manager_id is not None:
+            query += " AND f.manager_id=?"
+            params = (manager_id,)
+        query += " GROUP BY f.manager_id, m.name, f.report_period ORDER BY f.report_period DESC, m.name"
+        return [dict(manager_id=r[0], manager=r[1], report_period=r[2], accessions=r[3],
+                     filing_count=r[4], status="SOURCE_QUARANTINED")
+                for r in self.conn.execute(query, params)]
 
     def stale_manager_ids(self, period: str) -> list[int]:
         """Managers without a filing for the latest period (or very old)."""
@@ -330,6 +358,7 @@ class ProductStore:
         ]
 
     def _is_independent(self, manager_id: int) -> bool:
+        # Legacy internal name: this is filer-identity validation, not strategy independence.
         return self._mgr_status.get(int(manager_id)) in ("VERIFIED", "VERIFIED_WITH_SCOPE")
 
     # ------------------------------------------------------------------
@@ -343,6 +372,13 @@ class ProductStore:
         if not row:
             return None
         period, fdate, amended = self.manager_latest_filing(mid)
+        state = self.conn.execute(
+            "SELECT status FROM effective_periods WHERE manager_id=? AND report_period=? "
+            "AND methodology_version=?", (mid, period, self.methodology_version),
+        ).fetchone()
+        quarantined = self.quarantined_periods(mid)
+        source_status = ("SOURCE_QUARANTINED" if any(q["report_period"] == period for q in quarantined)
+                         else state[0] if state else "INSUFFICIENT_DATA")
         stale = False
         latest = self.latest_period()
         if latest and (period is None or period != latest):
@@ -464,6 +500,8 @@ class ProductStore:
             latest_changes=changes,
             repeated=repeated,
             quality={
+                "source_status": source_status,
+                "quarantined_periods": quarantined,
                 "unresolved_or_conflict_top10": unresolved,
                 "missing_periods": missing_periods,
                 "amended": amended,
@@ -654,12 +692,21 @@ class ProductStore:
                     indep_new += 1
                 if h["change_type"] == "EXIT":
                     indep_exit += 1
-        activity_state = self._activity_state(holders, indep_add, indep_reduce)
+        comparison_missing = _comparison_missing(
+            current_holder_ids, {int(h["manager_id"]) for h in holders}
+        )
+        activity_state = (
+            "INSUFFICIENT_COMPARISON"
+            if comparison_missing
+            else self._activity_state(holders, indep_add, indep_reduce)
+        )
         # filing freshness (max filing date across holders for latest period)
         fdate = None
-        if latest:
+        relevant_manager_ids = sorted(current_holder_ids | {int(h["manager_id"]) for h in holders})
+        if latest and relevant_manager_ids:
+            placeholders = ",".join("?" for _ in relevant_manager_ids)
             row = self.conn.execute(
-                """
+                f"""
                 SELECT MAX(f.filing_date)
                 FROM effective_periods period
                 JOIN effective_filing_components component
@@ -667,8 +714,9 @@ class ProductStore:
                 JOIN filings f ON f.filing_id=component.filing_id
                 WHERE period.report_period=? AND period.status='READY'
                   AND period.methodology_version=?
+                  AND period.manager_id IN ({placeholders})
                 """,
-                (latest, self.methodology_version),
+                (latest, self.methodology_version, *relevant_manager_ids),
             ).fetchone()
             fdate = row[0] if row else None
         # repeated counts across independent managers
@@ -687,9 +735,11 @@ class ProductStore:
                 """,
                 (cusip, period, self.methodology_version),
             ).fetchone()
-            holder_count = self.conn.execute(
+            holder_ids = {
+                int(row[0])
+                for row in self.conn.execute(
                 """
-                SELECT COUNT(DISTINCT effective.manager_id)
+                SELECT DISTINCT effective.manager_id
                 FROM effective_positions position
                 JOIN effective_periods effective
                   ON effective.effective_period_id=position.effective_period_id
@@ -701,13 +751,29 @@ class ProductStore:
                   AND position.put_call='' AND position.shares_type='SH'
                 """,
                 (cusip, period, self.methodology_version),
-            ).fetchone()[0]
+                ).fetchall()
+            }
+            change_manager_ids = {
+                int(row[0])
+                for row in self.conn.execute(
+                    """
+                    SELECT DISTINCT pc.manager_id
+                    FROM position_changes pc
+                    JOIN securities s ON s.security_id = pc.security_id
+                    WHERE s.cusip=? AND pc.report_period=? AND pc.put_call=''
+                      AND pc.shares_type='SH' AND pc.methodology_version=?
+                    """,
+                    (cusip, period, self.methodology_version),
+                ).fetchall()
+            }
+            no_comparison = _comparison_missing(holder_ids, change_manager_ids)
+            available, _ = self.manager_update_counts(period)
             timeline.append(
                 {
                     "report_period": period,
-                    "holders": int(holder_count),
-                    "adds": int(activity_row[0] or 0),
-                    "reduces": int(activity_row[1] or 0),
+                    "holders": len(holder_ids) if available else None,
+                    "adds": None if no_comparison or not available else int(activity_row[0] or 0),
+                    "reduces": None if no_comparison or not available else int(activity_row[1] or 0),
                 }
             )
         return SecurityEvidence(
@@ -854,6 +920,7 @@ class ProductStore:
         indep_reduce: dict[str, int] = {}
         indep_new: dict[str, int] = {}
         indep_exit: dict[str, int] = {}
+        change_manager_ids: dict[str, set[int]] = {}
         holder_entity: dict[str, set[int]] = {}
         activity_cusips: set[str] = set()
         for cusip, manager_id in self.conn.execute(
@@ -874,6 +941,7 @@ class ProductStore:
         for cusip, ct, mgr in rows:
             mgr = int(mgr)
             activity_cusips.add(cusip)
+            change_manager_ids.setdefault(cusip, set()).add(mgr)
             if not self._is_independent(mgr):
                 continue
             if ct in ("NEW", "ADD"):
@@ -908,7 +976,11 @@ class ProductStore:
                     "repeated_add_manager_count": rep_add,
                     "repeated_reduce_manager_count": rep_reduce,
                     "activity_state": (
-                        "MORE_ADDS_THAN_REDUCTIONS" if indep_add.get(c, 0) > indep_reduce.get(c, 0)
+                        "INSUFFICIENT_COMPARISON"
+                        if _comparison_missing(
+                            holder_entity.get(c, set()), change_manager_ids.get(c, set())
+                        )
+                        else "MORE_ADDS_THAN_REDUCTIONS" if indep_add.get(c, 0) > indep_reduce.get(c, 0)
                         else "MORE_REDUCTIONS_THAN_ADDS" if indep_reduce.get(c, 0) > indep_add.get(c, 0)
                         else "MIXED_ACTIVITY" if (indep_add.get(c, 0) or indep_reduce.get(c, 0))
                         else "NO_RECENT_CHANGE"
@@ -931,16 +1003,12 @@ class ProductStore:
     # ------------------------------------------------------------------
     # My Portfolio (Scenario C)
     # ------------------------------------------------------------------
-    def portfolio_evidence(self, portfolio_path: Path | str) -> list[dict] | str:
-        p = Path(portfolio_path)
-        if not p.exists():
-            return "SETUP_REQUIRED"
-        rows = []
-        with open(p, encoding="utf-8-sig", newline="") as fh:
-            import csv
-
-            for r in csv.DictReader(line for line in fh if not line.lstrip().startswith("#")):
-                rows.append((str(r.get("ticker", "")).strip().upper(), r.get("weight", "").strip()))
+    def portfolio_evidence(self, portfolio_path: Path | str | None = None, *, rows: list[dict] | None = None) -> list[dict] | str:
+        if rows is None:
+            if portfolio_path is None or not Path(portfolio_path).exists():
+                return "SETUP_REQUIRED"
+            rows = load_portfolio_rows(portfolio_path)
+        rows = [(str(r.get("ticker", "")).strip().upper(), str(r.get("weight", "")).strip()) for r in rows]
         if not rows:
             return "SETUP_REQUIRED"
         out = []

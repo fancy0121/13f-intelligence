@@ -153,3 +153,96 @@ def test_download_preserves_primary_cover_and_information_table(tmp_path):
     assert raw.raw_path.read_bytes() == INFO_XML_A
     assert manifest["components"]["primary_document"]["checksum"] != manifest["components"]["information_table"]["checksum"]
     assert (tmp_path / manifest["components"]["primary_document"]["object_path"]).read_bytes() == COVER_XML
+
+
+def test_cached_information_table_does_not_hide_changed_cover(tmp_path):
+    record = _record('13F-HR/A')
+    first = _SeparateComponentsClient([(200, COVER_XML, '"c1"'), (200, INFO_XML_A, '"i1"')])
+    original = download_filing(first, record, tmp_path)
+    changed_cover = COVER_XML.replace(b'RESTATEMENT', b'NEW HOLDINGS')
+    class Revalidator(_SeparateComponentsClient):
+        def fetch_bytes(self, url, **headers):
+            self.calls.append((url, headers))
+            body = changed_cover if url.endswith('primary_doc.xml') else b''
+            return SecResponse(url, url, 200 if body else 304, body,
+                               '2026-09-07T00:00:00Z', '"c2"' if body else '"i1"')
+    client = Revalidator([])
+    refreshed = download_filing(client, record, tmp_path)
+    assert refreshed.primary_checksum != original.primary_checksum
+    assert refreshed.primary_path.read_bytes() == changed_cover
+    assert len(client.calls) == 2
+
+
+def test_missing_cover_cannot_be_successful_information_table_download(tmp_path):
+    from thirteenf.sec_client import SecError
+
+    class MissingCover(_SeparateComponentsClient):
+        def fetch_bytes(self, url, **headers):
+            if url.endswith('primary_doc.xml'):
+                raise SecError('HTTP 403 for primary document')
+            return super().fetch_bytes(url, **headers)
+
+    client = MissingCover([(200, INFO_XML_A, '"i1"')])
+    with pytest.raises(SecError, match='primary document'):
+        download_filing(client, _record(), tmp_path)
+    manifest = RawStore(tmp_path).load_manifest(1, _record().accession_number)
+    assert manifest['status'] == 'NO_PRIMARY_DOCUMENT'
+
+
+@pytest.mark.parametrize('prefix', ['xslForm13F_X01/', 'xslForm13F_X02/'])
+def test_primary_download_uses_raw_xml_not_sec_html_display(tmp_path, prefix):
+    from dataclasses import replace
+
+    record = replace(_record(), primary_document=prefix + 'primary_doc.xml')
+    client = _SeparateComponentsClient([(200, COVER_XML, '"c1"'), (200, INFO_XML_A, '"i1"')])
+    raw = download_filing(client, record, tmp_path)
+    assert client.calls[0][0].endswith('/000000000126000001/primary_doc.xml')
+    assert raw.primary_path.read_bytes() == COVER_XML
+
+
+def test_cached_html_display_url_is_refetched_as_raw_xml(tmp_path):
+    from dataclasses import replace
+
+    record = replace(_record(), primary_document='xslForm13F_X02/primary_doc.xml')
+    client = _SeparateComponentsClient([(200, COVER_XML, '"c1"'), (200, INFO_XML_A, '"i1"')])
+    download_filing(client, record, tmp_path)
+    store = RawStore(tmp_path)
+    manifest = store.load_manifest(1, record.accession_number)
+    primary = manifest['components']['primary_document']
+    old_url = client.archive_url(1, record.accession_number, record.primary_document)
+    primary['source_url'] = primary['final_url'] = old_url
+    store.write_manifest(1, record.accession_number, manifest)
+    fresh = _SeparateComponentsClient([(200, COVER_XML, '"c2"'), (200, INFO_XML_A, '"i1"')])
+    raw = download_filing(fresh, record, tmp_path)
+    assert fresh.calls[0][0].endswith('/000000000126000001/primary_doc.xml')
+    updated = json.loads(raw.manifest_path.read_text(encoding='utf-8'))
+    assert '/xslForm13F_' not in updated['components']['primary_document']['source_url']
+
+
+def test_directory_missing_attachment_uses_filename_from_full_sec_submission(tmp_path):
+    submission = (b'<SEC-DOCUMENT>\n<DOCUMENT>\n<TYPE>INFORMATION TABLE\n'
+                  b'<SEQUENCE>2\n<FILENAME>XML_Infotable.xml\n<TEXT>\n<XML>\n'
+                  + INFO_XML_A + b'\n</XML>\n</TEXT>\n</DOCUMENT>\n</SEC-DOCUMENT>')
+    class MissingIndex(_DownloadClient):
+        def fetch_json(self, url):
+            return {'directory': {'item': [{'name': 'primary_doc.xml', 'size': '100'}]}}
+    client = MissingIndex([(200, COVER_XML, '"c1"'), (200, submission, '"s1"'),
+                           (200, INFO_XML_A, '"i1"')])
+    raw = download_filing(client, _record(), tmp_path)
+    assert client.calls[-1][0].endswith('/XML_Infotable.xml')
+    manifest = json.loads(raw.manifest_path.read_text())
+    locator = manifest['components']['complete_submission']
+    assert RawStore(tmp_path).read_object(locator['object_path'], locator['checksum']) == submission
+
+
+@pytest.mark.parametrize('name', ['../outside.xml', 'https://evil.example/x.xml', 'nested/table.xml'])
+def test_full_submission_attachment_name_cannot_escape_accession(tmp_path, name):
+    from thirteenf.sec_client import SecError
+    submission = f'<DOCUMENT>\n<TYPE>INFORMATION TABLE\n<FILENAME>{name}\n<TEXT>xml</TEXT>\n</DOCUMENT>'.encode()
+    class MissingIndex(_DownloadClient):
+        def fetch_json(self, url):
+            return {'directory': {'item': []}}
+    client = MissingIndex([(200, COVER_XML, '"c1"'), (200, submission, '"s1"')])
+    with pytest.raises(SecError):
+        download_filing(client, _record(), tmp_path)
+    assert len(client.calls) == 2

@@ -11,6 +11,7 @@ config/manager_scoring.yaml, which is versioned, documented and reviewable.
 from __future__ import annotations
 
 import sqlite3
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -52,7 +53,29 @@ def apply_scoring(
     This function NEVER invents scores; it only reflects the governance file.
     """
     scoring = load_scoring(scoring_path)
+    if scoring.get("methodology_version") != methodology_version:
+        raise ValueError("scoring methodology version mismatch")
     managers = scoring.get("managers") or {}
+    if not isinstance(managers, dict):
+        raise ValueError("managers must be a mapping")
+    for label, config in managers.items():
+        config = config or {}
+        tier = config.get("tier")
+        if tier and tier not in TIERS:
+            raise ValueError(f"unknown score tier for {label}: {tier}")
+        if tier:
+            if tier != "NON_SIGNAL" and tier not in (scoring.get("tiers") or {}):
+                raise ValueError(f"missing tier weight: {tier}")
+            weight = tier_weight(tier, scoring)
+            if not math.isfinite(weight) or not 0 <= weight <= 1:
+                raise ValueError(f"invalid tier weight: {tier}")
+            if tier == "NON_SIGNAL" and weight != 0:
+                raise ValueError("NON_SIGNAL weight must be zero")
+    # The file is the complete approval set: omitted managers lose approval.
+    conn.execute(
+        "UPDATE managers SET signal_quality=NULL, scoring_status='NOT_APPROVED', "
+        "methodology_version=?", (methodology_version,),
+    )
 
     approved = 0
     not_approved = 0
@@ -88,8 +111,14 @@ def apply_scoring(
             (strategy_type, weight, methodology_version, label),
         )
         approved += 1
+    # These are rebuildable derived tables. A prior approved result must not
+    # survive a change/revocation of the shared manager governance state.
+    # Immutable release snapshots remain the historical record.
+    conn.execute("DELETE FROM consensus_scores")
+    conn.execute("DELETE FROM trends")
     conn.commit()
-    return {"approved": approved, "not_approved": not_approved}
+    counts = manager_counts(conn)
+    return {"approved": counts.get("APPROVED", 0), "not_approved": counts.get("NOT_APPROVED", 0)}
 
 
 def approved_managers(conn: sqlite3.Connection) -> list[tuple[int, str, float]]:

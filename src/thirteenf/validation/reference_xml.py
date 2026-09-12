@@ -26,6 +26,8 @@ class ReferenceHolding:
     shares: int
     put_call: str
     shares_type: str
+    investment_discretion: str = ""
+    other_manager: str = ""
 
 
 @dataclass(frozen=True)
@@ -39,9 +41,16 @@ class ReferenceCover:
 
 def reference_rows(xml_bytes: bytes) -> tuple[ReferenceHolding, ...]:
     root = _root(xml_bytes)
+    if _local(root.tag) != 'informationTable':
+        raise ReferenceXmlError('expected INFORMATION TABLE root')
     nodes = [node for node in root.iter() if _local(node.tag) == "infoTable"]
+    if not nodes:
+        raise ReferenceXmlError('empty INFORMATION TABLE requires manual review')
     rows = []
     for ordinal, node in enumerate(nodes, start=1):
+        for field in ('nameOfIssuer', 'titleOfClass', 'cusip'):
+            if not _text(node, field):
+                raise ReferenceXmlError(f'row {ordinal}: missing {field}')
         put_call = _text(node, "putCall").upper()
         shares_type = _text(node, "sshPrnamtType").upper()
         if put_call not in {"", "CALL", "PUT"}:
@@ -58,6 +67,8 @@ def reference_rows(xml_bytes: bytes) -> tuple[ReferenceHolding, ...]:
                 shares=_number(_text(node, "sshPrnamt"), ordinal, "shares"),
                 put_call=put_call,
                 shares_type=shares_type,
+                investment_discretion=_text(node, "investmentDiscretion"),
+                other_manager=_text(node, "otherManager"),
             )
         )
     return tuple(rows)
@@ -71,6 +82,11 @@ def reference_cover(xml_bytes: bytes) -> ReferenceCover:
     report_raw = _text(root, "reportCalendarOrQuarter")
     report_period = _date(report_raw)
     amended_raw = _text(root, "isAmendment").lower()
+    flags = [node for node in root.iter() if _local(node.tag) == "isAmendment"]
+    if len(flags) == 0 and submission_type == "13F-HR":
+        amended_raw = "false"  # Optional in the SEC COVER_PAGE schema.
+    if len(flags) > 1:
+        raise ReferenceXmlError("duplicate isAmendment")
     if amended_raw not in {"true", "false"}:
         raise ReferenceXmlError("missing or invalid isAmendment")
     is_amendment = amended_raw == "true"
@@ -106,7 +122,7 @@ def reference_cover(xml_bytes: bytes) -> ReferenceCover:
 
 
 def _root(xml_bytes: bytes):
-    if _UNSAFE.search(xml_bytes):
+    if _UNSAFE.search(xml_bytes.replace(b'\x00', b'')):
         raise ReferenceXmlError("DTD and entity declarations are forbidden")
     try:
         return ET.fromstring(xml_bytes)
@@ -128,7 +144,10 @@ def _text(node, name: str) -> str:
 def _number(value: str, ordinal: int, field: str) -> int:
     if not _INTEGER.fullmatch(value):
         raise ReferenceXmlError(f"row {ordinal}: invalid {field} {value!r}")
-    return int(value)
+    result = int(value)
+    if result > 2**63 - 1:
+        raise ReferenceXmlError(f'row {ordinal}: overflow in {field}')
+    return result
 
 
 def _date(value: str) -> str:

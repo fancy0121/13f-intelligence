@@ -66,6 +66,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--rate-limit-rps", type=float)
     parser.add_argument("--raw-root", default=str(RAW_ROOT))
     parser.add_argument("--db", default=None)
+    parser.add_argument("--quarantine-policy", default=None,
+                        help="Explicit approved source exclusion policy; never a release approval")
     return parser
 
 
@@ -102,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
     warnings: list[str] = []
     raw_files = None
     processed = None
+    quarantined = None
 
     if not normalize_only:
         ingest_args = [
@@ -142,7 +145,10 @@ def main(argv: list[str] | None = None) -> int:
             "--scoring",
             str(ROOT / "config" / "manager_scoring.yaml"),
         ]
+        if args.quarantine_policy:
+            normalize_args.extend(["--quarantine-policy", args.quarantine_policy])
         code, output = _run("normalize", normalize_args)
+        quarantined = _parse_int(output, "quarantined_source_filings")
         processed = _parse_int(output, "processed")
         failed = _parse_int(output, "failed")
         pending = _parse_int(output, "pending_amendments")
@@ -161,17 +167,20 @@ def main(argv: list[str] | None = None) -> int:
 
     filings_count, holdings_count = _database_counts(db_path)
     success = not errors
-    releaseable = bool(success and args.release_mode)
-    if success and not args.release_mode:
-        warnings.append("NOT_RELEASEABLE: run did not use --release-mode")
+    # Network policy selection is not Gate 1/2 or publication approval.
+    releaseable = False
+    if success:
+        warnings.append('NOT_VALIDATED: independent release gates still required')
     status = {
         "last_update_started_at": started,
         "last_update_finished_at": datetime.now(timezone.utc).isoformat(),
         "source": "normalize_only" if normalize_only else "full",
         "success": success,
         "releaseable": releaseable,
+        "validation_status": "NOT_VALIDATED",
         "raw_files": raw_files,
         "filings_processed": processed if processed is not None else filings_count,
+        "quarantined_source_filings": quarantined,
         "holdings_processed": holdings_count,
         "errors": errors,
         "warnings": warnings,

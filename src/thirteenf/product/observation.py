@@ -72,44 +72,92 @@ def _flag(v) -> int:
 class ObservationStore:
     """Append-only local episode logger (JSONL) + product error log."""
 
-    def __init__(self, storage_dir: Path | str) -> None:
-        self.dir = Path(storage_dir)
-        self.dir.mkdir(parents=True, exist_ok=True)
-        self.episodes_path = self.dir / "episodes.jsonl"
-        self.errors_path = self.dir / "product_errors.jsonl"
+    def __init__(self, storage_dir: Path | str | None) -> None:
+        self.dir = Path(storage_dir) if storage_dir is not None else None
+        if self.dir is not None:
+            self.dir.mkdir(parents=True, exist_ok=True)
+        self.episodes_path = self.dir / "episodes.jsonl" if self.dir else None
+        self.errors_path = self.dir / "product_errors.jsonl" if self.dir else None
+        self._memory_events: list[dict] = []
+        self._memory_errors: list[dict] = []
 
     # ------------------------------------------------------------------
-    def _read(self, path: Path) -> list[dict]:
+    def _read(self, path: Path | None, memory: list[dict]) -> list[dict]:
+        if path is None:
+            return [dict(record) for record in memory]
         if not path.exists():
             return []
         out = []
         with open(path, encoding="utf-8") as fh:
-            for line in fh:
+            for line_number, line in enumerate(fh, start=1):
                 line = line.strip()
                 if not line:
                     continue
                 try:
-                    out.append(json.loads(line))
-                except ValueError:
-                    continue
+                    record = json.loads(line)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"malformed JSONL in {path} at line {line_number}"
+                    ) from exc
+                if not isinstance(record, dict):
+                    raise ValueError(
+                        f"malformed JSONL in {path} at line {line_number}: object required"
+                    )
+                out.append(record)
         return out
 
-    def _append(self, path: Path, record: dict) -> None:
+    def _append(self, path: Path | None, memory: list[dict], record: dict) -> None:
+        if path is None:
+            memory.append(dict(record))
+            return
         with open(path, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     def episodes(self) -> list[dict]:
-        return self._read(self.episodes_path)
+        """Merge immutable start records and appended completion snapshots."""
+        episodes: dict[str, dict] = {}
+        order: list[str] = []
+        for record in self._read(self.episodes_path, self._memory_events):
+            event_type = record.get("event_type")
+            if event_type is None:
+                # v0.5 legacy start record: retain support without rewriting it.
+                episode = record
+            elif event_type == "FINISH":
+                episode = record.get("episode_snapshot")
+                if not isinstance(episode, dict):
+                    raise ValueError("malformed FINISH event: episode_snapshot required")
+                if record.get("episode_id") != episode.get("episode_id"):
+                    raise ValueError("malformed FINISH event: episode_id mismatch")
+            else:
+                raise ValueError(f"unknown episode event_type: {event_type}")
+            episode_id = str(episode.get("episode_id") or "")
+            if not episode_id:
+                raise ValueError("malformed episode record: episode_id required")
+            if event_type == "FINISH" and episode_id not in episodes:
+                raise ValueError(f"malformed FINISH event: unknown episode_id {episode_id}")
+            if event_type is None and episode_id in episodes:
+                raise ValueError(f"duplicate legacy episode_id: {episode_id}")
+            if event_type == "FINISH" and episodes[episode_id].get("episode_validity") != "PENDING":
+                raise ValueError(f"duplicate FINISH event: {episode_id}")
+            if episode_id not in episodes:
+                order.append(episode_id)
+            episodes[episode_id] = dict(episode)
+        return [episodes[episode_id] for episode_id in order]
 
     def errors(self) -> list[dict]:
-        return self._read(self.errors_path)
+        return self._read(self.errors_path, self._memory_errors)
 
     # ------------------------------------------------------------------
     def start_episode(self, pre: dict) -> dict:
         """Create an episode with pre-use state. Must run before exposure."""
+        requested_id = str(pre.get("episode_id") or "")
+        if requested_id and any(
+            episode["episode_id"] == requested_id for episode in self.episodes()
+        ):
+            raise ValueError(f"duplicate episode_id: {requested_id}")
         now = _now()
         episode = {
-            "episode_id": pre.get("episode_id") or str(uuid.uuid4()),
+            "episode_id": requested_id or str(uuid.uuid4()),
             "episode_cluster_id": (pre.get("episode_cluster_id")
                                    or pre.get("target_id")
                                    or pre.get("episode_id") or ""),
@@ -140,7 +188,7 @@ class ObservationStore:
                 "misuse_risk", "misuse_type", "post_use_next_step",
                 "estimated_manual_effort_bucket", "product_design_issue",
             ) else 0)
-        self._append(self.episodes_path, episode)
+        self._append(self.episodes_path, self._memory_events, episode)
         return episode
 
     def finish_episode(self, episode_id: str, post: dict) -> dict | None:
@@ -153,6 +201,8 @@ class ObservationStore:
                 break
         if target is None:
             return None
+        if target.get("episode_validity") != "PENDING":
+            raise ValueError(f"episode is already finished: {episode_id}")
 
         # Pre-use captured?
         if not target.get("research_question") or not target.get("created_at"):
@@ -180,9 +230,16 @@ class ObservationStore:
                 target[f] = post[f]
         target["updated_at"] = _now()
 
-        # Rewrite the file without the finished record's old line (append-only
-        # spirit: original line stays in history; current state updated).
-        self._rewrite(episodes)
+        self._append(
+            self.episodes_path,
+            self._memory_events,
+            {
+                "event_type": "FINISH",
+                "episode_id": target["episode_id"],
+                "completed_at": _now(),
+                "episode_snapshot": target,
+            },
+        )
         return target
 
     def _is_duplicate(self, target: dict, episodes: list[dict]) -> bool:
@@ -196,11 +253,6 @@ class ObservationStore:
             if e.get("episode_cluster_id") == cluster and e.get("episode_validity") == "VALID":
                 return True
         return False
-
-    def _rewrite(self, episodes: list[dict]) -> None:
-        with open(self.episodes_path, "w", encoding="utf-8") as fh:
-            for e in episodes:
-                fh.write(json.dumps(e, ensure_ascii=False) + "\n")
 
     def valid_episodes(self) -> list[dict]:
         return [e for e in self.episodes() if e.get("episode_validity") == "VALID"]
@@ -324,6 +376,7 @@ class ObservationStore:
     def log_product_error(self, rec: dict) -> None:
         self._append(
             self.errors_path,
+            self._memory_errors,
             {
                 "error_id": rec.get("error_id") or str(uuid.uuid4()),
                 "episode_id": rec.get("episode_id", ""),

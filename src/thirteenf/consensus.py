@@ -43,6 +43,17 @@ def compute_consensus(
 
     Only APPROVED managers are considered. Returns row count inserted.
     """
+    if not math.isfinite(change_scale_divisor) or change_scale_divisor <= 0:
+        raise ValueError("change_scale_divisor must be finite and positive")
+    if significance_mode not in {"min_prev_now", "now"}:
+        raise ValueError("unknown significance_mode")
+    mismatched = conn.execute(
+        "SELECT COUNT(*) FROM managers WHERE scoring_status='APPROVED' "
+        "AND (methodology_version IS NULL OR methodology_version != ?)",
+        (methodology_version,),
+    ).fetchone()[0]
+    if mismatched:
+        raise ValueError("approved manager scoring version mismatch")
     approved = conn.execute(
         """
         SELECT manager_id, name, signal_quality

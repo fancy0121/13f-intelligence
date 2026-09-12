@@ -24,6 +24,26 @@ from thirteenf.effective import rebuild_effective_positions
 from thirteenf.parser import AmendmentType
 
 
+def test_weights_do_not_rescan_whole_table_for_every_holding(tmp_path):
+    conn, mid, _, _ = _seed(tmp_path)
+    _filing(conn, mid, "2026-06-30", "perf-test",
+            [_Row(i, "AAAA11111", "AAA Inc", 1, 10) for i in range(1, 1001)])
+    # Deterministic VM budget rather than a hardware-dependent timing assertion.
+    ticks = 0
+    def budget():
+        nonlocal ticks
+        ticks += 1
+        return ticks > 200
+    conn.set_progress_handler(budget, 1000)
+    try:
+        assert compute_portfolio_weights(conn) == 1000
+        conn.set_progress_handler(None, 0)
+        assert conn.execute("SELECT DISTINCT portfolio_weight FROM holdings").fetchall() == [(0.001,)]
+    finally:
+        conn.set_progress_handler(None, 0)
+        conn.close()
+
+
 def _seed(tmp_path):
     conn = connect(tmp_path / "test.db")
     init_db(conn)
@@ -125,7 +145,14 @@ def test_portfolio_weight_and_changes(tmp_path):
     assert abs(q1_a - 1.0) < 1e-9
 
     n = compute_position_changes(conn, "0.1.0")
-    assert n == 3  # Q1: A NEW; Q2: A REDUCE, B NEW
+    assert n == 2  # Q1 has no baseline; Q2: A REDUCE, B NEW.
+    assert conn.execute(
+        "SELECT COUNT(*) FROM position_changes WHERE report_period='2026-03-31'"
+    ).fetchone()[0] == 0
+    assert conn.execute(
+        "SELECT COUNT(*) FROM quality_events WHERE "
+        "event_type='MISSING_HISTORICAL_COMPARISON' AND report_period='2026-03-31'"
+    ).fetchone()[0] == 1
     row_a = conn.execute(
         """
         SELECT change_type, shares_prev, shares_now, share_change,

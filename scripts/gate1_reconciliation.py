@@ -25,6 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         default=str(ROOT / "reports" / "validation" / "current"),
     )
     parser.add_argument("--methodology-version", default="0.1.0")
+    parser.add_argument("--quarantine-policy")
     parser.add_argument("--managers", type=int, default=5)
     parser.add_argument("--quarters", type=int, default=3)
     parser.add_argument("--rows-per-filing", type=int, default=10)
@@ -34,6 +35,7 @@ def main(argv: list[str] | None = None) -> int:
         raw_root=Path(args.raw_root),
         db_path=Path(args.db),
         methodology_version=args.methodology_version,
+        quarantine_policy_path=args.quarantine_policy,
     )
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -53,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
             "manager_ids": list(result.manager_ids),
             "sampled_filings": list(result.sampled_filings),
             "mismatches": list(result.mismatches),
+            "quarantine": result.quarantine,
         }
     except Exception as exc:  # fail closed at the CLI boundary
         payload = {

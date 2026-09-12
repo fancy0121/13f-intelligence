@@ -65,3 +65,25 @@ def test_trend_reversal_is_rule_based(tmp_path):
     compute_trends(conn, methodology_version="0.1.0", windows=(4,))
     assert conn.execute("SELECT trend_label FROM trends").fetchone()[0] == "REVERSAL"
     conn.close()
+
+
+def test_four_observations_with_a_gap_are_not_four_consecutive_quarters(tmp_path):
+    conn = connect(tmp_path / "gap.db")
+    init_db(conn)
+    for period in ("2025-06-30", "2025-12-31", "2026-03-31", "2026-06-30"):
+        _consensus(conn, 1, period, 0.5)
+    conn.commit()
+    compute_trends(conn, methodology_version="0.1.0", windows=(4,))
+    assert tuple(conn.execute("SELECT trend_label, trend_score FROM trends").fetchone()) == ("INSUFFICIENT_HISTORY", None)
+    conn.close()
+
+
+def test_old_security_score_does_not_become_current_trend(tmp_path):
+    conn = connect(tmp_path / "stale-trend.db")
+    init_db(conn)
+    _consensus(conn, 1, "2026-03-31", 0.5)
+    _consensus(conn, 2, "2026-06-30", 0.5)
+    conn.commit()
+    compute_trends(conn, methodology_version="0.1.0", windows=(1,))
+    assert tuple(conn.execute("SELECT report_period, trend_label, trend_score FROM trends WHERE security_id=1").fetchone()) == ("2026-06-30", "INSUFFICIENT_HISTORY", None)
+    conn.close()

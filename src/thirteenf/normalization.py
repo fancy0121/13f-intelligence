@@ -33,6 +33,7 @@ from thirteenf.parser import (
     parse_info_table,
 )
 from thirteenf.quality import run_all as run_quality_checks
+from thirteenf.quarantine import check_source, load_policy
 from thirteenf.raw_store import RawStore
 from thirteenf.security_master import load_mappings, resolve
 from thirteenf.trends import compute_trends
@@ -52,6 +53,7 @@ class NormalizationSummary:
     skipped: int
     promoted: bool
     errors: tuple[str, ...] = ()
+    quarantined: int = 0
 
 
 @dataclass(frozen=True)
@@ -65,6 +67,7 @@ class _NormalizedFiling:
     cover_path: str
     fetched_at_utc: str
     source_url: str
+    quarantine: dict | None = None
 
 
 def normalize_raw_tree(
@@ -74,7 +77,8 @@ def normalize_raw_tree(
     managers_path: Path | str = ROOT / "config" / "managers.csv",
     mappings_path: Path | str = ROOT / "config" / "ticker_mappings.csv",
     scoring_path: Path | str = ROOT / "config" / "manager_scoring.yaml",
-    methodology_version: str = "0.1.0",
+    methodology_version: str = "0.1.1",
+    quarantine_policy_path: Path | str | None = None,
 ) -> NormalizationSummary:
     """Validate all raw evidence, build a staging DB, then atomically promote."""
 
@@ -83,6 +87,10 @@ def normalize_raw_tree(
     managers_path = Path(managers_path)
     mappings_path = Path(mappings_path)
     scoring_path = Path(scoring_path)
+    try:
+        policy = load_policy(quarantine_policy_path, methodology_version)
+    except (OSError, ValueError) as exc:
+        return NormalizationSummary(0, 1, 0, 0, False, (f"quarantine policy: {exc}",))
     verified = _load_verified_managers(managers_path)
     if not verified:
         return NormalizationSummary(
@@ -229,7 +237,14 @@ def normalize_raw_tree(
             continue
         try:
             rows = tuple(parse_info_table(info_bytes))
-        except XmlParseError as exc:
+            quarantine = check_source(policy, dict(
+                cik=cik, accession=accession, report_period=cover.report_period,
+                cover_sha256=str(primary["checksum"]), info_sha256=str(information_table["checksum"]),
+                cover_entry_total=cover.table_entry_total, info_row_count=len(rows),
+                cover_value_total_raw_units=cover.table_value_total,
+                info_value_sum_raw_units=sum(row.value for row in rows),
+            ))
+        except (XmlParseError, ValueError) as exc:
             failed += 1
             errors.append(f"{accession}: invalid information table: {exc}")
             continue
@@ -238,6 +253,7 @@ def normalize_raw_tree(
             _NormalizedFiling(
                 manifest=manifest,
                 cover=cover,
+                quarantine=quarantine,
                 rows=rows,
                 info_checksum=str(information_table["checksum"]),
                 info_path=info_path,
@@ -252,6 +268,12 @@ def normalize_raw_tree(
                 ),
             )
         )
+
+    matched_exceptions = {(int(item.manifest["cik"]), item.manifest["accession"])
+                          for item in normalized if item.quarantine is not None}
+    for cik, accession in sorted(set(policy.get("entries", {})) - matched_exceptions):
+        failed += 1
+        errors.append(f"{cik}/{accession}: approved quarantine source missing or changed")
 
     missing_ciks = sorted(set(verified) - seen_verified_ciks)
     if missing_ciks:
@@ -302,6 +324,7 @@ def normalize_raw_tree(
         skipped=skipped,
         promoted=True,
         errors=(),
+        quarantined=sum(item.quarantine is not None for item in normalized),
     )
 
 
@@ -378,6 +401,10 @@ def _build_database(
         mappings = load_mappings(mappings_path)
         mapping_dates = [item.verified_at for item in mappings.values() if item.verified_at]
         mapping_date = max(mapping_dates, default="UNKNOWN")
+        quarantined_periods = {
+            (int(item.manifest["cik"]), item.cover.report_period)
+            for item in normalized if item.quarantine is not None
+        }
 
         for item in sorted(
             normalized,
@@ -404,7 +431,8 @@ def _build_database(
                 raw_checksum=item.info_checksum,
                 raw_path=item.info_path,
                 fetched_at_utc=item.fetched_at_utc,
-                ingest_status="OK",
+                ingest_status=("QUARANTINED" if (cik, item.cover.report_period)
+                               in quarantined_periods else "OK"),
                 accepted_at=str(manifest["accepted_at"]),
                 amendment_number=item.cover.amendment_number,
                 amendment_type=item.cover.amendment_type,
@@ -443,6 +471,13 @@ def _build_database(
                 commit=False,
             )
             backfill_holding_tickers(conn, filing_id=filing_id, commit=False)
+            if item.quarantine is not None:
+                add_quality_event(
+                    conn, event_type="SOURCE_QUARANTINED", severity="ERROR",
+                    message=json.dumps(item.quarantine, sort_keys=True, separators=(",", ":")),
+                    manager_id=manager_id, report_period=item.cover.report_period,
+                    filing_id=filing_id, commit=False,
+                )
             if unresolved:
                 add_quality_event(
                     conn,
@@ -474,8 +509,11 @@ def _build_database(
 
         blocked = conn.execute(
             """
-            SELECT COUNT(*) FROM effective_periods
+            SELECT COUNT(*) FROM effective_periods ep
             WHERE methodology_version=? AND status!='READY'
+              AND NOT (status='INCOMPLETE' AND EXISTS (
+                SELECT 1 FROM filings f WHERE f.manager_id=ep.manager_id
+                AND f.report_period=ep.report_period AND f.ingest_status='QUARANTINED'))
             """,
             (methodology_version,),
         ).fetchone()[0]

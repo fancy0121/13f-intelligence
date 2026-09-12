@@ -50,6 +50,8 @@ class CoverMetadata:
     amendment_number: int | None
     amendment_type: AmendmentType | None
     submission_type: str
+    table_entry_total: int | None = None
+    table_value_total: int | None = None
 
 
 @dataclass(frozen=True)
@@ -77,7 +79,7 @@ def _safe_parser() -> etree.XMLParser:
 
 
 def _parse_xml(xml_bytes: bytes):
-    if _UNSAFE_XML_DECLARATION.search(xml_bytes):
+    if _UNSAFE_XML_DECLARATION.search(xml_bytes.replace(b'\x00', b'')):
         raise XmlParseError("DTD and entity declarations are not allowed")
     try:
         return etree.fromstring(xml_bytes, parser=_safe_parser())
@@ -90,12 +92,26 @@ def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
 
     root = _parse_xml(xml_bytes)
     submission_type = _first_text(root, "submissionType").upper()
+    if submission_type not in {'13F-HR', '13F-HR/A'}:
+        raise XmlParseError('unsupported submissionType')
+    totals = []
+    for field in ('tableEntryTotal', 'tableValueTotal'):
+        value = _first_text(root, field)
+        totals.append(_required_nonnegative_int(value, 0, field) if value else None)
     report_text = _first_text(root, "reportCalendarOrQuarter")
     if not report_text:
         raise XmlParseError("cover page is missing reportCalendarOrQuarter")
     report_period = _normalize_report_period(report_text)
 
     is_amendment_text = _first_text(root, "isAmendment").lower()
+    flag_nodes = root.xpath("//*[local-name()='isAmendment']")
+    if not flag_nodes and submission_type == "13F-HR":
+        # SEC v1.9 COVER_PAGE declares this element optional (minOccurs=0).
+        # The explicit HR form establishes the base filing; amendment metadata
+        # below must still be absent. Empty/invalid present flags are not defaults.
+        is_amendment_text = "false"
+    if len(flag_nodes) > 1:
+        raise XmlParseError("duplicate isAmendment")
     if is_amendment_text not in {"true", "false"}:
         raise XmlParseError("cover page has invalid or missing isAmendment")
     is_amendment = is_amendment_text == "true"
@@ -110,7 +126,7 @@ def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
     if not is_amendment:
         if amendment_number_text or amendment_type_nodes:
             raise XmlParseError("non-amendment cover contains amendment metadata")
-        return CoverMetadata(report_period, None, None, submission_type)
+        return CoverMetadata(report_period, None, None, submission_type, *totals)
 
     if len(amendment_type_nodes) != 1:
         raise XmlParseError("amendment must contain exactly one amendment type")
@@ -132,6 +148,7 @@ def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
         amendment_number,
         amendment_type,
         submission_type,
+        *totals,
     )
 
 
@@ -139,16 +156,21 @@ def parse_info_table(xml_bytes: bytes) -> list[HoldingRow]:
     """Parse and validate an INFORMATION TABLE into lossless row identities."""
 
     root = _parse_xml(xml_bytes)
+    if etree.QName(root).localname != 'informationTable':
+        raise XmlParseError('expected an INFORMATION TABLE document')
     rows: list[HoldingRow] = []
     info_tables = root.xpath(
         "//*[local-name()='infoTable' and "
         "ancestor::*[local-name()='informationTable']]"
     )
     if not info_tables:
-        info_tables = root.xpath("//*[local-name()='infoTable']")
+        raise XmlParseError('empty INFORMATION TABLE requires manual review')
 
     for ordinal, node in enumerate(info_tables, start=1):
         text = lambda name: _child_text(node, name)  # noqa: E731
+        for field in ('nameOfIssuer', 'titleOfClass', 'cusip'):
+            if not text(field):
+                raise HoldingValidationError(ordinal, field, '')
         put_call = text("putCall").upper()
         if put_call not in {"", "PUT", "CALL"}:
             raise HoldingValidationError(ordinal, "putCall", put_call)
@@ -192,7 +214,10 @@ def _required_nonnegative_int(text: str, row_ordinal: int, field: str) -> int:
     normalized = text.strip()
     if not _NONNEGATIVE_INTEGER.fullmatch(normalized):
         raise HoldingValidationError(row_ordinal, field, text)
-    return int(normalized)
+    result = int(normalized)
+    if result > 2**63 - 1:
+        raise HoldingValidationError(row_ordinal, field, text)
+    return result
 
 
 def _normalize_report_period(value: str) -> str:

@@ -88,6 +88,28 @@ class RawStore:
             )
         return content
 
+    def write_discovery_manifest(self, cik: int, payload: dict) -> Path:
+        """Keep each submissions fetch identity without overwriting its history."""
+        if int(cik) <= 0:
+            raise ValueError("invalid discovery CIK")
+        content = self._canonical_json(payload)
+        checksum = hashlib.sha256(content).hexdigest()
+        path = self._path(Path("discovery") / f"{int(cik):010d}" / f"{checksum}.json")
+        if not path.exists():
+            self._write_atomic(path, content)
+        return path
+
+    def write_discovery_inventory(self, cik: int, payload: dict) -> Path:
+        """Preserve the completed or failed discovery attempt and its scope."""
+        if int(cik) <= 0:
+            raise ValueError("invalid discovery CIK")
+        content = self._canonical_json(payload)
+        checksum = hashlib.sha256(content).hexdigest()
+        path = self._path(Path("discovery_runs") / f"{int(cik):010d}" / f"{checksum}.json")
+        if not path.exists():
+            self._write_atomic(path, content)
+        return path
+
     @staticmethod
     def _identity(cik: int, accession: str) -> tuple[str, str]:
         if int(cik) <= 0 or not ACCESSION_RE.fullmatch(accession):

@@ -9,6 +9,8 @@ empty (no APPROVED managers), trends are reported as INSUFFICIENT_HISTORY.
 from __future__ import annotations
 
 import sqlite3
+import math
+from datetime import date
 
 
 def _label(score: float, stable_abs: float) -> str:
@@ -32,6 +34,10 @@ def compute_trends(
     Governed Interpretation Layer and honestly returns INSUFFICIENT_HISTORY
     when no governed data exists.
     """
+    if not windows or any(type(w) is not int or w < 1 for w in windows) or len(set(windows)) != len(windows):
+        raise ValueError("trend windows must be distinct positive integers")
+    if not math.isfinite(stable_abs_threshold) or not 0 <= stable_abs_threshold <= 1:
+        raise ValueError("invalid stable threshold")
     rows = conn.execute(
         """
         SELECT security_id, put_call, shares_type, report_period,
@@ -42,9 +48,16 @@ def compute_trends(
         """,
         (methodology_version,),
     ).fetchall()
+    effective_latest = conn.execute(
+        "SELECT MAX(report_period) FROM effective_periods WHERE methodology_version=?",
+        (methodology_version,),
+    ).fetchone()[0]
+    latest = max([r[3] for r in rows] + ([effective_latest] if effective_latest else []), default=None)
 
     series: dict[tuple[int, str, str], list[tuple[str, float]]] = {}
     for security_id, put_call, shares_type, period, score in rows:
+        if not math.isfinite(score) or not -1 <= score <= 1:
+            raise ValueError("invalid consensus score")
         series.setdefault(
             (security_id, put_call or "", shares_type), []
         ).append((period, score))
@@ -58,7 +71,10 @@ def compute_trends(
         points.sort(key=lambda x: x[0])
         scores = [p[1] for p in points]
         for horizon in windows:
-            if len(scores) < horizon:
+            dates = [date.fromisoformat(p[0]) for p in points[-horizon:]]
+            indexes = [d.year * 4 + (d.month - 1) // 3 for d in dates]
+            consecutive = all(b == a + 1 for a, b in zip(indexes, indexes[1:]))
+            if len(scores) < horizon or not consecutive or points[-1][0] != latest:
                 label = "INSUFFICIENT_HISTORY"
                 trend_score = None
             else:
@@ -81,7 +97,7 @@ def compute_trends(
                 """,
                 (
                     security_id,
-                    points[-1][0],
+                    latest,
                     put_call,
                     shares_type,
                     f"{horizon}Q",

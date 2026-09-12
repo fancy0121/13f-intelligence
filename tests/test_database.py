@@ -197,6 +197,8 @@ def test_security_and_quality_event(tmp_path):
         mapping_date="2026-08-24",
     )
     assert sid == sid2
+    revoked = conn.execute("SELECT ticker, mapping_status FROM securities WHERE security_id=?", (sid,)).fetchone()
+    assert tuple(revoked) == (None, "UNRESOLVED")
     add_quality_event(
         conn,
         event_type="UNRESOLVED_CUSIP",

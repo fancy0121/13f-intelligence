@@ -575,20 +575,15 @@ def ensure_security(
             mapping_date
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(cusip) DO UPDATE SET
-            ticker=COALESCE(excluded.ticker, securities.ticker),
+            ticker=excluded.ticker,
             issuer=COALESCE(excluded.issuer, securities.issuer),
             share_class=COALESCE(excluded.share_class, securities.share_class),
-            mapping_status=CASE
-                WHEN securities.mapping_status='UNRESOLVED'
-                THEN excluded.mapping_status
-                ELSE securities.mapping_status END,
-            mapping_source=CASE
-                WHEN securities.mapping_status='UNRESOLVED'
-                THEN excluded.mapping_source
-                ELSE securities.mapping_source END,
+            mapping_status=excluded.mapping_status,
+            mapping_source=excluded.mapping_source,
             mapping_date=excluded.mapping_date
         """,
-        (cusip, ticker, issuer, share_class, mapping_status, mapping_source, mapping_date),
+        (cusip, ticker if mapping_status == "VERIFIED" else None, issuer,
+         share_class, mapping_status, mapping_source, mapping_date),
     )
     if commit:
         conn.commit()
@@ -607,7 +602,7 @@ def bulk_ensure_securities(
 
     rows: list of (cusip, ticker, issuer, share_class, mapping_status,
     mapping_source). Uses INSERT ... ON CONFLICT DO UPDATE with the same
-    COALESCE/CASE semantics as ensure_security.
+    authoritative mapping replacement semantics as ensure_security.
     """
     if not rows:
         return
@@ -618,21 +613,15 @@ def bulk_ensure_securities(
             mapping_date
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(cusip) DO UPDATE SET
-            ticker=COALESCE(excluded.ticker, securities.ticker),
+            ticker=excluded.ticker,
             issuer=COALESCE(excluded.issuer, securities.issuer),
             share_class=COALESCE(excluded.share_class, securities.share_class),
-            mapping_status=CASE
-                WHEN securities.mapping_status='UNRESOLVED'
-                THEN excluded.mapping_status
-                ELSE securities.mapping_status END,
-            mapping_source=CASE
-                WHEN securities.mapping_status='UNRESOLVED'
-                THEN excluded.mapping_source
-                ELSE securities.mapping_source END,
+            mapping_status=excluded.mapping_status,
+            mapping_source=excluded.mapping_source,
             mapping_date=excluded.mapping_date
         """,
         [
-            (c, t, i, s, st, src, mapping_date)
+            (c, t if st == "VERIFIED" else None, i, s, st, src, mapping_date)
             for (c, t, i, s, st, src) in rows
         ],
     )

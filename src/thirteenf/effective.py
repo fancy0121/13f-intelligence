@@ -6,8 +6,29 @@ import hashlib
 import json
 import sqlite3
 from dataclasses import dataclass
+from datetime import date
 
 from thirteenf.parser import AmendmentType
+
+VALUE_BASIS = "USD_SEC_FILING_DATE_2023_01_03_V1"
+
+
+def reported_value_usd(value: int, filing_date: str) -> int:
+    """SEC 13F FAQ: filings from Jan 3 2023 use dollars, older filings thousands.
+
+    The filing date governs even for amendments of earlier reporting periods.
+    This converts declared units; it never repairs a filer's reported number.
+    """
+    try:
+        submitted = date.fromisoformat(filing_date)
+        if submitted.isoformat() != filing_date:
+            raise ValueError("noncanonical filing date")
+    except (TypeError, ValueError) as exc:
+        raise EffectiveDataError("value unit cannot be determined from filing_date") from exc
+    result = int(value) * (1000 if submitted < date(2023, 1, 3) else 1)
+    if not 0 <= result <= 2**63 - 1:
+        raise EffectiveDataError("USD value overflows SQLite integer")
+    return result
 
 
 class AmendmentPendingError(ValueError):
@@ -132,7 +153,7 @@ def rebuild_effective_positions(
             """
             SELECT manager_id, report_period
             FROM filings
-            WHERE ingest_status='OK'
+            WHERE ingest_status IN ('OK', 'QUARANTINED')
             GROUP BY manager_id, report_period
             ORDER BY manager_id, report_period
             """
@@ -142,9 +163,9 @@ def rebuild_effective_positions(
                 """
                 SELECT filing_id, accession_number, accepted_at,
                        amendment_number, amendment_type, is_amendment,
-                       amendment_status, raw_checksum
+                       amendment_status, raw_checksum, filing_date
                 FROM filings
-                WHERE manager_id=? AND report_period=? AND ingest_status='OK'
+                WHERE manager_id=? AND report_period=? AND ingest_status IN ('OK', 'QUARANTINED')
                 ORDER BY COALESCE(accepted_at, ''), filing_date,
                          accession_number
                 """,
@@ -154,6 +175,17 @@ def rebuild_effective_positions(
             all_state_hash = _period_state_hash(
                 methodology_version, filing_rows
             )
+            if conn.execute(
+                "SELECT 1 FROM filings WHERE manager_id=? AND report_period=? "
+                "AND ingest_status='QUARANTINED' LIMIT 1", (manager_id, report_period),
+            ).fetchone():
+                _insert_effective_period(
+                    conn, manager_id=manager_id, report_period=report_period,
+                    methodology_version=methodology_version,
+                    state_hash=hashlib.sha256((all_state_hash + ":SOURCE_QUARANTINED").encode()).hexdigest(),
+                    status="INCOMPLETE", total_value=None,
+                )
+                continue
             if metadata_pending:
                 _insert_effective_period(
                     conn,
@@ -208,6 +240,8 @@ def rebuild_effective_positions(
                 continue
             aggregates = _aggregate_rows(raw_rows)
             total_value = sum(record["value"] for record in aggregates.values())
+            if total_value > 2**63 - 1:
+                raise EffectiveDataError("USD period total overflows SQLite integer")
             if aggregates and total_value <= 0:
                 _insert_effective_period(
                     conn,
@@ -256,10 +290,7 @@ def rebuild_effective_positions(
             for key in sorted(aggregates):
                 record = aggregates[key]
                 provenance_json = json.dumps(
-                    [
-                        {"filing_id": filing_id, "row_ordinal": row_ordinal}
-                        for filing_id, row_ordinal in record["provenance"]
-                    ],
+                    record["provenance"],
                     sort_keys=True,
                     separators=(",", ":"),
                 )
@@ -372,6 +403,7 @@ def _filing_versions(rows) -> tuple[list[FilingVersion], bool]:
             is_amendment,
             amendment_status,
             _raw_checksum,
+            _filing_date,
         ) = row
         normalized_type = None
         if amendment_type:
@@ -403,8 +435,9 @@ def _load_component_rows(conn, filing_ids: tuple[int, ...]):
     rows = conn.execute(
         f"""
         SELECT h.filing_id, h.row_ordinal, s.security_id, h.put_call,
-               h.ssh_prnamt_type, h.shares, h.value
+               h.ssh_prnamt_type, h.shares, h.value, f.filing_date
         FROM holdings h
+        JOIN filings f ON f.filing_id=h.filing_id
         LEFT JOIN securities s ON s.cusip=h.cusip
         WHERE h.filing_id IN ({placeholders})
         ORDER BY h.filing_id, h.row_ordinal
@@ -412,7 +445,7 @@ def _load_component_rows(conn, filing_ids: tuple[int, ...]):
         filing_ids,
     ).fetchall()
     for row in rows:
-        _, _, security_id, put_call, shares_type, shares, value = row
+        _, _, security_id, put_call, shares_type, shares, value, _filing_date = row
         if (
             security_id is None
             or put_call not in {"", "CALL", "PUT"}
@@ -434,6 +467,7 @@ def _aggregate_rows(rows) -> dict[tuple[int, str, str], dict]:
         shares_type,
         shares,
         value,
+        filing_date,
     ) in rows:
         key = (security_id, put_call, shares_type)
         record = aggregates.setdefault(
@@ -441,8 +475,13 @@ def _aggregate_rows(rows) -> dict[tuple[int, str, str], dict]:
             {"shares": 0, "value": 0, "provenance": []},
         )
         record["shares"] += int(shares)
-        record["value"] += int(value)
-        record["provenance"].append((filing_id, row_ordinal))
+        record["value"] += reported_value_usd(value, filing_date)
+        if record["value"] > 2**63 - 1 or record["shares"] > 2**63 - 1:
+            raise EffectiveDataError("effective position overflows SQLite integer")
+        record["provenance"].append({
+            "filing_id": filing_id, "row_ordinal": row_ordinal,
+            "filing_date": filing_date, "value_basis": VALUE_BASIS,
+        })
     return aggregates
 
 
@@ -504,6 +543,7 @@ def _period_state_hash(methodology_version: str, filing_rows) -> str:
     return _hash_payload(
         {
             "methodology_version": methodology_version,
+            "value_basis": VALUE_BASIS,
             "filings": [tuple(row)[1:] for row in filing_rows],
         }
     )
@@ -514,16 +554,18 @@ def _selected_state_hash(
     selection: EffectiveSelection,
     filing_rows,
 ) -> str:
-    identities = {row[0]: (row[1], row[7]) for row in filing_rows}
+    identities = {row[0]: (row[1], row[7], row[8]) for row in filing_rows}
     ids = (selection.base_filing_id, *selection.supplement_filing_ids)
     return _hash_payload(
         {
             "methodology_version": methodology_version,
             "selection_hash": selection.state_hash,
+            "value_basis": VALUE_BASIS,
             "components": [
                 {
                     "accession_number": identities[filing_id][0],
                     "raw_checksum": identities[filing_id][1],
+                    "filing_date": identities[filing_id][2],
                 }
                 for filing_id in ids
             ],

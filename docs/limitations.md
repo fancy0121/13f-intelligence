@@ -4,13 +4,14 @@
 
 ## 1. 45 天披露延迟
 
-13F 在季度结束后最多 45 天才提交；系统数据天然滞后，最新季度可能不完整。
+13F 通常要求在季度结束后 45 天内提交（具体到期日还受非工作日顺延规则影响）；
+这不是信息延迟的绝对上限，保密处理、迟报及后续修订可能使披露更晚。系统数据天然滞后，最新季度可能不完整。
 `Data Quality Status` 会显示 stale / incomplete quarter。
 
 ## 2. Short positions 不披露
 
 13F 只披露多头。`reported long exposure increased` 不能解释为
-`manager is bullish`——空头、对冲与衍生品不可见。
+`manager is bullish`——空头不可见，对冲与衍生品敞口不完整。
 
 ## 3. Derivatives incomplete
 

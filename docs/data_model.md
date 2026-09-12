@@ -37,6 +37,21 @@ SQLite（`data/thirteenf.db`，gitignored，可从 `data/raw` 重建）。
 - migration 不猜 amendment 类型；旧库中的 amendment 默认进入 `AMENDMENT_PENDING`。
 - v2 → v3 会保留 managers、filings、holdings 和 security master；旧版派生分析表会清空并从原始证据重算，因为旧键缺少 `shares_type` 且旧 amendment 选择规则不可靠。
 
+## 金额单位（2026-09-07 正确性修复）
+
+- `holdings.value` 保留 SEC 原始填报整数，不把原始值改写成美元。
+- `effective_positions.value` 与 `effective_periods.total_value` 统一为 USD。
+- 金额口径身份为 `USD_SEC_FILING_DATE_2023_01_03_V1`，作为有效状态的版本身份组成部分；
+  不改变机构评分档位。每个来源的 `filing_date`、口径身份写入 provenance，原始 checksum 与日期写入状态 hash。
+- 依据每份 filing 实际提交日，而非报告季度：2023-01-03 之前的原始千美元数乘 1000，
+  当日及以后的美元数乘 1；历史季度的晚到修订也按其提交日单独处理。
+- 日期缺失/无效、原始 manifest 与 DB 日期冲突、乘法/汇总整数溢出均不允许形成可发布数据。
+- 独立 Gate 2 从原始 manifest 日期重新换算，不调用生产换算函数；Gate 1 仍对账原始值。
+- 旧派生表不能直接复用。须从来源重新生成有效状态并重跑真实 Gate；旧验收不适用于这个新口径身份。
+- 这只是 SEC 格式单位转换，不根据数量/价格猜测或“纠正”申报人的填报错误。
+
+依据：[SEC Form 13F FAQ，Question 36 与 62](https://www.sec.gov/rules-regulations/staff-guidance/division-investment-management-frequently-asked-questions/frequently-asked-questions-about-form-13f)。
+
 ## 关键索引
 
 - filings(manager_id, report_period)
@@ -57,3 +72,11 @@ python -m thirteenf rebuild
 ```
 
 同样的 raw 数据 + 同样的 methodology_version ⇒ 相同分析结果（确定性复现）。
+# Source quarantine / 源异常隔离（0.1.1）
+
+复用 schema v3，不迁移或覆盖旧数据库：filings 的 ingest_status 新增可读状态
+`QUARANTINED`；同 manager_id / report_period 全部申报同步隔离。
+holdings 保留原始行及 provenance，portfolio_weight 为 NULL；effective_periods 为
+`INCOMPLETE`、total_value 为 NULL，无 effective_positions 或 components。
+quality_events 的 `SOURCE_QUARANTINED` / ERROR 记录精确策略 ID、策略 SHA-256、方法版本、
+源文双 SHA-256 与原始控制数。隔离是持久化状态，重新分析或改方法学版本不会自动恢复。
