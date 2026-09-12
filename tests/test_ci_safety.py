@@ -40,6 +40,8 @@ def test_ci_is_readonly_and_cannot_publish_before_real_gates():
     assert "pull_request" in workflow["on"]
     steps = [step for job in workflow["jobs"].values() for step in job["steps"]]
     assert any("pytest" in step.get("run", "") for step in steps)
+    test_step = next(step["run"] for step in steps if "pytest" in step.get("run", ""))
+    assert test_step.index("mkdir -p .pytest_tmp") < test_step.index("python -m pytest")
     assert not any("build-push-action" in step.get("uses", "") for step in steps)
     assert not any("secrets." in str(step) for step in steps)
 
