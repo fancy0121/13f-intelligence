@@ -4,13 +4,14 @@
 
 ## 1. 45 天披露延迟
 
-13F 在季度结束后最多 45 天才提交；系统数据天然滞后，最新季度可能不完整。
+13F 通常要求在季度结束后 45 天内提交（具体到期日还受非工作日顺延规则影响）；
+这不是信息延迟的绝对上限，保密处理、迟报及后续修订可能使披露更晚。系统数据天然滞后，最新季度可能不完整。
 `Data Quality Status` 会显示 stale / incomplete quarter。
 
 ## 2. Short positions 不披露
 
 13F 只披露多头。`reported long exposure increased` 不能解释为
-`manager is bullish`——空头、对冲与衍生品不可见。
+`manager is bullish`——空头不可见，对冲与衍生品敞口不完整。
 
 ## 3. Derivatives incomplete
 
@@ -40,3 +41,9 @@ PUT/CALL 只以期权形式披露，其他衍生品（swaps、futures、forwards
 13F 是持仓行为的有限证据，不是完整投资观点。系统只输出
 `EVIDENCE_STRENGTHENS / EVIDENCE_WEAKENS / NO_MEANINGFUL_CHANGE /
 INSUFFICIENT_EVIDENCE`，不产生投资建议。
+
+## 9. 中文显示名不是身份事实
+
+界面中的中文机构名和公司名来自 `config/display_names.csv`，只用于提高可读性。
+SEC 英文法定名、CUSIP 和已验证的 ticker 映射仍是身份依据。词表未收录或未经项目核验时，
+页面显示 `中文名待核验 / Chinese name unverified`，不会临时翻译或猜测。

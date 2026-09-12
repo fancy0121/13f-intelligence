@@ -13,7 +13,7 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T
+from ui import B, T, display_code, display_manager_name
 
 
 def run() -> None:
@@ -30,26 +30,33 @@ def run() -> None:
     res = store.resolution_summary()
     verified = sum(v for k, v in res.items() if k in (
         "VERIFIED_EXACT", "VERIFIED_MULTI_SOURCE", "VERIFIED_HISTORICAL"))
-    total_res = sum(res.values()) or 1
+    total_res = sum(res.values())
     q = store.quality_events()
     events = store.event_counts(period)
     latest_filing = store.latest_filing_info()
     update = store.update_status()
 
     st.markdown(f"#### {T('数据状态', 'DATA STATUS')}")
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)
     c1.metric(T("最新报告季度", "Latest Quarter"), period)
     c2.metric(T("最新有效 filing 日期", "Latest Filing Date"),
               latest_filing["filing_date"] if latest_filing else "N/A")
+    c3, c4 = st.columns(2)
     c3.metric(T("机构数量", "Managers"), total)
     c4.metric(T("本周期已更新", "Updated"), f"{updated}/{total}")
-    c5, c6, c7, c8 = st.columns(4)
+    c5, c6 = st.columns(2)
     c5.metric(T("陈旧机构", "Stale Managers"), len(stale))
     c6.metric(T("修订 filing", "Amendments"), amended)
-    c7.metric(T("已解析证券覆盖", "Resolved Coverage"),
-              f"{verified}/{sum(res.values())} ({verified/total_res:.1%})")
-    c8.metric(T("本地数据更新", "Local Data Updated"),
-              (update or {}).get("last_update_finished_at", T("从未记录", "never recorded")))
+    c7, c8 = st.columns(2)
+    c7.metric(
+        T("映射表已解析比例", "Mapping-table Resolution"),
+        f"{verified/total_res:.1%}" if total_res else "INSUFFICIENT_DATA",
+        delta=f"{verified}/{sum(res.values())}",
+        delta_color="off",
+    )
+    updated_at = (update or {}).get("last_update_finished_at")
+    updated_date = str(updated_at).split("T", 1)[0] if updated_at else T("从未记录", "never recorded")
+    c8.metric(T("本地数据更新", "Local Data Updated"), updated_date)
     if latest_filing:
         st.caption(
             T(
@@ -65,12 +72,9 @@ def run() -> None:
         upd = update
         flag = T("成功", "OK") if upd.get("success") else T("失败", "FAILED")
         st.caption(
-            T(
-                f"最近一次更新：{flag}（started={upd.get('last_update_started_at')} "
-                f"finished={upd.get('last_update_finished_at')}）；日志：{upd.get('log_path')}",
-                f"Last update: {flag} (started={upd.get('last_update_started_at')} "
-                f"finished={upd.get('last_update_finished_at')}); log: {upd.get('log_path')}",
-            )
+            f"{T('最近一次数据流程', 'Last data run')}: {flag} · "
+            f"{T('完成时间', 'Finished')}: "
+            f"{str(upd.get('last_update_finished_at') or 'N/A').replace('T', ' ', 1)}"
         )
 
     with st.expander(T("关于两个日期的区别（重要）", "Two dates - why it matters")):
@@ -81,10 +85,10 @@ def run() -> None:
             "**" + T("filing 日期", "FILING DATE") + "**：" +
             T("这份报告实际公开的日期，例如 2026-08-14。",
               "The date the report was actually made public, e.g. 2026-08-14.") + "\n\n"
-            "- " + T("也就是说，2026-06-30 不等于「机构在 2026-06-30 当天知道这些持仓」。",
-                     "So 2026-06-30 does not mean the manager knew these holdings on that day.") + "\n"
-            "- " + T("13F 允许最长 45 天延迟，所以看板上的信息总是有延迟的，不是实时仓位。",
-                     "13F allows up to 45 days of lag; the dashboard is always delayed, never real-time.")
+            "- " + T("也就是说，公众不能在 2026-06-30 当天据此得知这些持仓；应以 filing 实际公开时间为准。",
+                     "So the public could not know these holdings on 2026-06-30; use the filing's actual public date.") + "\n"
+            "- " + T("13F 通常在季末后 45 天内提交；修订与保密处理可能更晚，绝非实时仓位。",
+                     "13F is normally filed within 45 days after quarter-end; amendments and confidential treatment may delay it further. Never real-time.")
         )
 
     with st.expander(T("如何使用本看板（快速开始）", "How to use this dashboard")):
@@ -107,7 +111,7 @@ def run() -> None:
     st.markdown(f"#### {T('本周期发生了什么', 'What Changed')}")
     cols = st.columns(5)
     for col, key in zip(cols, ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")):
-        col.metric(key, events[key])
+        col.metric(display_code(key), events[key])
     st.caption(
         B(
             "事件计数 = 全部已跟踪机构在最新报告季度的 position_change 数量（事实计数，不是推荐）",
@@ -116,8 +120,8 @@ def run() -> None:
         )
     )
     chart_data = pd.DataFrame(
-        {"count": [events[k] for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")]},
-        index=["NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED"],
+        {T("事件数", "Event count"): [events[k] for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")]},
+        index=[display_code(k) for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")],
     )
     st.bar_chart(chart_data)
     st.markdown(T("按证券维度查看：请前往「活动探索」页（仅描述性排序）。",
@@ -125,12 +129,21 @@ def run() -> None:
 
     st.divider()
     st.markdown(f"#### {T('数据质量状态', 'Data Quality Status')}")
+    quarantined = store.quarantined_periods()
+    if quarantined:
+        st.dataframe([
+            {T("机构", "Manager"): display_manager_name(row["manager"]),
+             T("报告季度", "Quarter"): row["report_period"],
+             T("隔离申报", "Quarantined accessions"): row["accessions"],
+             T("状态", "Status"): T("源数据已隔离", "SOURCE_QUARANTINED")}
+            for row in quarantined
+        ], hide_index=True, width="stretch")
     if not q:
         st.success(T("未发现数据质量事件。", "No data quality events found."))
     else:
         for event_type, severity, cnt in q:
             label = "⚠️" if severity == "WARN" else "❌"
-            st.write(f"{label} {event_type}: {cnt}")
+            st.write(f"{label} {display_code(event_type)}: {cnt}")
     st.write(
         f"- {T('未解析证券', 'Unresolved')}: {res.get('UNRESOLVED', 0)}；"
         f"{T('歧义', 'Ambiguous')}: {res.get('AMBIGUOUS', 0)}；"

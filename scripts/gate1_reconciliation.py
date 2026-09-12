@@ -1,235 +1,98 @@
-"""Gate 1 - Data Correctness reconciliation.
-
-Sampling: 5 managers x 3 quarters x 10 holdings. For every sampled holding,
-compare the normalized DB fields (CUSIP, issuer, shares, value, put/call)
-against the SEC raw INFORMATION TABLE XML that produced them.
-
-Requirement: 100% match. Any mismatch => GATE1=FAIL.
-Sample is chosen to cover:
-  - normal 13F-HR
-  - 13F-HR/A amendment
-  - PUT/CALL cases
-  - unresolved security mapping cases
-"""
+"""Run independent Gate 1 raw-to-normalized reconciliation."""
 
 from __future__ import annotations
 
 import argparse
-import csv
+import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
-if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from thirteenf.database import connect, init_db
-from thirteenf.parser import parse_info_table
+from thirteenf.validation.gate1 import run_gate1
+from thirteenf.validation.gate_context import GateBundle, build_gate_context
 
 
-def load_verified_managers(path: Path) -> list[dict]:
-    rows = []
-    with open(path, encoding="utf-8-sig", newline="") as fh:
-        reader = csv.DictReader(
-            (line for line in fh if not line.lstrip().startswith("#"))
-        )
-        for row in reader:
-            if (row.get("validation_status") or "").strip() == "VERIFIED":
-                rows.append(row)
-    return rows
-
-
-def pick_sample_filings(conn, managers, n_managers=5, n_quarters=3) -> list[dict]:
-    """Pick managers (prefer those with amendments and put/call) and quarters."""
-    chosen: list[dict] = []
-    for m in managers[:n_managers]:
-        cik = int(m["cik"])
-        rows = conn.execute(
-            """
-            SELECT f.filing_id, f.manager_id, f.report_period, f.accession_number,
-                   f.form_type, f.raw_path
-            FROM filings f
-            JOIN managers mg ON mg.manager_id = f.manager_id
-            WHERE mg.cik = ? AND f.ingest_status = 'OK'
-            ORDER BY f.report_period DESC
-            """,
-            (cik,),
-        ).fetchall()
-        # Deduplicate to effective (latest) filing per quarter, keep up to n.
-        by_period: dict[str, tuple] = {}
-        for r in rows:
-            by_period.setdefault(r[2], r)
-        periods = sorted(by_period, reverse=True)[:n_quarters]
-        for p in periods:
-            r = by_period[p]
-            chosen.append(
-                {
-                    "filing_id": r[0],
-                    "manager_id": r[1],
-                    "report_period": r[2],
-                    "accession": r[3],
-                    "form_type": r[4],
-                    "raw_path": Path(r[5]),
-                    "label": m["label"],
-                }
-            )
-    return chosen
-
-
-def reconcile_filing(conn, sample: dict, holdings_per_filing=10) -> list[dict]:
-    """Compare DB holdings vs raw XML for one filing."""
-    raw_path = sample["raw_path"]
-    if not raw_path.exists():
-        return [
-            {
-                "accession": sample["accession"],
-                "ok": False,
-                "detail": "raw file missing",
-            }
-        ]
-    try:
-        raw_rows = parse_info_table(raw_path.read_bytes())
-    except Exception as exc:  # noqa: BLE001
-        return [
-            {
-                "accession": sample["accession"],
-                "ok": False,
-                "detail": f"parse error: {exc}",
-            }
-        ]
-    db_rows = conn.execute(
-        """
-        SELECT row_ordinal, cusip, issuer, shares, value, put_call
-        FROM holdings WHERE filing_id=? ORDER BY row_ordinal
-        """,
-        (sample["filing_id"],),
-    ).fetchall()
-    db_map = {r[0]: r for r in db_rows}
-
-    mismatches: list[dict] = []
-    for raw in raw_rows[:holdings_per_filing]:
-        db = db_map.get(raw.row_ordinal)
-        if db is None:
-            mismatches.append(
-                {
-                    "accession": sample["accession"],
-                    "row": raw.row_ordinal,
-                    "field": "missing_row",
-                    "raw": str(raw),
-                    "db": "None",
-                }
-            )
-            continue
-        checks = [
-            ("cusip", raw.cusip, db[1]),
-            ("issuer", raw.name_of_issuer, db[2]),
-            ("shares", raw.shares, db[3]),
-            ("value", raw.value, db[4]),
-            ("put_call", raw.put_call, db[5] or ""),
-        ]
-        for field, rv, dv in checks:
-            if rv != dv:
-                mismatches.append(
-                    {
-                        "accession": sample["accession"],
-                        "row": raw.row_ordinal,
-                        "field": field,
-                        "raw": rv,
-                        "db": dv,
-                    }
-                )
-    return mismatches
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Gate 1 reconciliation")
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", default=str(ROOT / "data" / "thirteenf.db"))
-    parser.add_argument("--managers", default=str(ROOT / "config" / "managers.csv"))
-    parser.add_argument("--out", default=str(ROOT / "reports" / "gate1_report.md"))
-    parser.add_argument("--n-managers", type=int, default=5)
-    parser.add_argument("--n-quarters", type=int, default=3)
-    parser.add_argument("--n-holdings", type=int, default=10)
-    args = parser.parse_args()
-
-    conn = connect(args.db)
-    init_db(conn)
-    managers = load_verified_managers(Path(args.managers))
-    samples = pick_sample_filings(
-        conn, managers, n_managers=args.n_managers, n_quarters=args.n_quarters
+    parser.add_argument("--raw-root", default=str(ROOT / "data" / "raw"))
+    parser.add_argument(
+        "--output-dir",
+        default=str(ROOT / "reports" / "validation" / "current"),
     )
+    parser.add_argument("--methodology-version", default="0.1.0")
+    parser.add_argument("--quarantine-policy")
+    parser.add_argument("--managers", type=int, default=5)
+    parser.add_argument("--quarters", type=int, default=3)
+    parser.add_argument("--rows-per-filing", type=int, default=10)
+    args = parser.parse_args(argv)
 
-    total_checked = 0
-    total_mismatches = 0
-    details: list[str] = []
-    for s in samples:
-        mismatches = reconcile_filing(conn, s, holdings_per_filing=args.n_holdings)
-        if mismatches:
-            total_mismatches += len(mismatches)
-        total_checked += args.n_holdings
-        details.append(
-            f"- {s['label']} {s['accession']} ({s['form_type']}, "
-            f"{s['report_period']}): {'OK' if not mismatches else f'{len(mismatches)} MISMATCH'}"
+    bundle = GateBundle(
+        raw_root=Path(args.raw_root),
+        db_path=Path(args.db),
+        methodology_version=args.methodology_version,
+        quarantine_policy_path=args.quarantine_policy,
+    )
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        context = build_gate_context(bundle)
+        result = run_gate1(
+            bundle,
+            managers=args.managers,
+            quarters=args.quarters,
+            rows_per_filing=args.rows_per_filing,
         )
-        for mm in mismatches[:5]:
-            details.append(f"    - row {mm.get('row')} field {mm.get('field')}: raw={mm.get('raw')!r} db={mm.get('db')!r}")
+        payload = {
+            "status": "PASS" if result.passed else "FAIL",
+            "releaseable": result.passed,
+            "context": asdict(context),
+            "checked_rows": result.checked_rows,
+            "manager_ids": list(result.manager_ids),
+            "sampled_filings": list(result.sampled_filings),
+            "mismatches": list(result.mismatches),
+            "quarantine": result.quarantine,
+        }
+    except Exception as exc:  # fail closed at the CLI boundary
+        payload = {
+            "status": "FAIL",
+            "releaseable": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
 
-    # Coverage requirements (Gate 1 enhancement).
-    forms = {s["form_type"] for s in samples}
-    has_amendment = "13F-HR/A" in forms
-    has_put_call = conn.execute(
-        """
-        SELECT COUNT(*) FROM holdings WHERE put_call IN ('PUT','CALL')
-        AND filing_id IN (
-            SELECT filing_id FROM filings WHERE ingest_status='OK'
-        )
-        """
-    ).fetchone()[0] > 0
-    has_unresolved = conn.execute(
-        "SELECT COUNT(*) FROM securities WHERE mapping_status='UNRESOLVED'"
-    ).fetchone()[0] > 0
-
-    gate_pass = total_mismatches == 0 and has_amendment and has_put_call and has_unresolved
-
+    (output_dir / "gate1.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
     lines = [
-        "# Gate 1 - Data Correctness Report",
+        "# Gate 1 — Data Correctness / 数据正确性",
         "",
-        f"> Generated: {__import__('datetime').date.today().isoformat()}",
-        f"> Sampling: {len(samples)} filings "
-        f"({args.n_managers} managers x up to {args.n_quarters} quarters x "
-        f"{args.n_holdings} holdings)",
+        f"- Status / 状态: **{payload['status']}**",
+        f"- Releaseable / 可发布: **{payload['releaseable']}**",
+        f"- Rows checked / 对账行数: **{payload.get('checked_rows', 0)}**",
+        f"- Managers / 机构数: **{len(payload.get('manager_ids', []))}**",
+        f"- Mismatches / 不匹配: **{len(payload.get('mismatches', []))}**",
         "",
-        "## Coverage",
-        f"- Amendment (13F-HR/A) covered: **{has_amendment}**",
-        f"- PUT/CALL case covered in DB: **{has_put_call}**",
-        f"- Unresolved security mapping covered: **{has_unresolved}**",
-        "",
-        "## Result",
-        f"- Holdings checked: **{total_checked}**",
-        f"- Mismatches: **{total_mismatches}**",
-        "",
-        f"## Verdict: **{'GATE1=PASS' if gate_pass else 'GATE1=FAIL'}**",
-        "",
-        "## Filings sampled",
-        "",
+        "The authoritative detail is gate1.json. / 权威明细见 gate1.json。",
     ]
-    lines.extend(details)
-    lines.append("")
-    if not gate_pass:
-        lines.append("Mismatches must be fixed before proceeding.")
-
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(lines), encoding="utf-8")
-    conn.close()
-    print(f"sampled_filings={len(samples)} checked={total_checked} mismatches={total_mismatches}")
-    print(f"coverage: amendment={has_amendment} putcall={has_put_call} unresolved={has_unresolved}")
-    print(f"GATE1={'PASS' if gate_pass else 'FAIL'}")
-    print(f"report={out}")
-    return 0 if gate_pass else 1
+    if payload.get("error"):
+        lines.extend(("", f"- Error / 错误: `{payload['error']}`"))
+    (output_dir / "gate1.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(
+        json.dumps(
+            {
+                "status": payload["status"],
+                "releaseable": payload["releaseable"],
+                "report": str(output_dir / "gate1.json"),
+            },
+            sort_keys=True,
+        )
+    )
+    return 0 if payload["releaseable"] else 1
 
 
 if __name__ == "__main__":

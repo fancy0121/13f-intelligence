@@ -9,14 +9,14 @@ DOC = ROOT / "docs" / "product_methodology_and_limitations.md"
 
 
 def _h(zh: str, en: str) -> str:
-    return f"### {zh} <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ {en}</span>"
+    return f"### {zh} / {en}"
 
 
 def run() -> None:
     st.subheader("方法论与限制 / Methodology & Limitations")
     st.markdown(
         """
-        ### 这份看板是什么？ <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ What is this dashboard?</span>
+        ### 这份看板是什么？ / What is this dashboard?
 
         这份看板展示的是 **SEC Form 13F 披露的机构多头持仓事实**。每季度，大型机构要向 SEC 报告
         他们持有哪些美国证券、持有多少股、报告价值多少。看板把这些原始披露整理成：
@@ -30,21 +30,24 @@ def run() -> None:
           *— same direction for ≥2 consecutive quarters*。
         - **组合权重**：该证券占该机构报告总市值的比例 *— share of reported total value*。
 
-        ### 为什么这不是股票推荐？ <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Why is this not a stock pick?</span>
+        ### 为什么这不是股票推荐？ / Why is this not a stock pick?
 
         13F 只看得到 **多头持仓**。它看不到 *13F only shows long holdings. It cannot see*：
 
         - 空头仓位 *short positions*
-        - 衍生品、期权、期货、对冲 *derivatives, options, futures, hedges*
+        - 完整衍生品和对冲敞口（部分 PUT/CALL 会披露，但不能据此还原完整组合）
+          *complete derivatives and hedging exposure (some PUT/CALL positions are disclosed, not a complete portfolio)*
         - 确切的买入/卖出时间 *exact purchase/sale timing*
         - 买入成本 *cost basis*
         - 机构是否因为保密申请而未披露某些持仓 *confidential-treatment omissions*
 
-        而且 13F 允许最长 45 天延迟。所以「机构增持」只是一个**已披露事实**，不是
+        13F 通常在季末后 45 天内提交，修订与保密处理可能更晚。
+        *Normally filed within 45 days after quarter-end; amendments and confidential treatment may delay disclosure further.*
+        所以「机构增持」只是一个**已披露事实**，不是
         「这家公司会涨」的结论。本项目曾做过严格的研究验证：连续 2 或 3 个季度的机构
         行为，没有被证明带来增量经济价值。因此看板只展示证据，不做预测。
 
-        ### 你需要注意的限制 <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Limitations to keep in mind</span>
+        ### 你需要注意的限制 / Limitations to keep in mind
 
         - 数据有延迟（报告季度 ≠ 实时持仓）*data is delayed (report quarter ≠ real-time)*。
         - 未解析的证券身份会明确标出（UNRESOLVED / AMBIGUOUS / CONFLICT），系统不会猜
@@ -52,11 +55,14 @@ def run() -> None:
         - 修订（amendment）会更新最新有效状态，来源链保留 *amendments update effective state; source chain kept*。
         - 保密处理可能使「当季未披露」不等于「不持有」
           *confidential treatment means "not disclosed" ≠ "not held"*。
+        - 「已核验申报主体」仅表示申报主体身份已核验；不代表策略独立、基金质量、投资观点或推荐。
+          *"Verified filing entities" means filer identity has been verified only. It does not establish
+          strategy independence, fund quality, an investment view, or a recommendation.*
         """
     )
     st.divider()
     if DOC.exists():
-        st.markdown(f"#### 更详细的说明（面向研究者） <span style='color:#5B7186;font-size:.8em;font-weight:500;'>/ Detailed notes (for researchers)</span>")
+        st.markdown("#### 更详细的说明（面向研究者） / Detailed notes (for researchers)")
         st.markdown(DOC.read_text(encoding="utf-8"))
     else:
         st.info("方法论文档缺失 / Methodology document missing.")

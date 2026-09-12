@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import sqlite3
 import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -10,6 +13,7 @@ from thirteenf.database import (
     SCHEMA_VERSION,
     add_quality_event,
     connect,
+    connect_readonly,
     ensure_security,
     init_db,
     replace_holdings,
@@ -63,6 +67,66 @@ def test_schema_and_upsert_idempotent(tmp_path):
     conn.close()
 
 
+def test_schema_models_raw_fields_and_effective_positions(tmp_path):
+    conn = _conn(tmp_path)
+    holding_columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(holdings)")
+    }
+    assert {
+        "ssh_prnamt_type",
+        "investment_discretion",
+        "other_manager",
+    } <= holding_columns
+
+    filing_columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(filings)")
+    }
+    assert {
+        "accepted_at",
+        "amendment_number",
+        "amendment_type",
+        "amendment_status",
+        "cover_checksum",
+        "cover_raw_path",
+    } <= filing_columns
+
+    effective_columns = {
+        row[1] for row in conn.execute("PRAGMA table_info(effective_positions)")
+    }
+    assert {
+        "effective_period_id",
+        "security_id",
+        "put_call",
+        "shares_type",
+        "shares",
+        "value",
+        "portfolio_weight",
+        "provenance_json",
+    } <= effective_columns
+    assert "shares_type" in {
+        row[1] for row in conn.execute("PRAGMA table_info(position_changes)")
+    }
+    assert "shares_type" in {
+        row[1] for row in conn.execute("PRAGMA table_info(consensus_scores)")
+    }
+    assert "shares_type" in {
+        row[1] for row in conn.execute("PRAGMA table_info(trends)")
+    }
+    conn.close()
+
+
+def test_readonly_connection_cannot_write(tmp_path):
+    path = tmp_path / "readonly.db"
+    writable = connect(path)
+    init_db(writable)
+    writable.close()
+
+    readonly = connect_readonly(path, immutable=True)
+    with pytest.raises(sqlite3.OperationalError, match="readonly"):
+        readonly.execute("CREATE TABLE forbidden(x)")
+    readonly.close()
+
+
 def test_holdings_replace_is_idempotent(tmp_path):
     conn = _conn(tmp_path)
     mid = upsert_manager(conn, name="TEST", cik=123)
@@ -89,6 +153,9 @@ def test_holdings_replace_is_idempotent(tmp_path):
         put_call = ""
         shares = 100
         value = 1000
+        ssh_prnamt_type = "SH"
+        investment_discretion = "SOLE"
+        other_manager = "7"
 
     replace_holdings(conn, filing_id=fid, manager_id=mid, report_period="2026-06-30", rows=[Row()])
     n1 = conn.execute("SELECT COUNT(*) FROM holdings WHERE filing_id=?", (fid,)).fetchone()[0]
@@ -96,6 +163,14 @@ def test_holdings_replace_is_idempotent(tmp_path):
     n2 = conn.execute("SELECT COUNT(*) FROM holdings WHERE filing_id=?", (fid,)).fetchone()[0]
     assert n1 == 1
     assert n2 == 1
+    raw_fields = conn.execute(
+        """
+        SELECT ssh_prnamt_type, investment_discretion, other_manager
+        FROM holdings WHERE filing_id=?
+        """,
+        (fid,),
+    ).fetchone()
+    assert tuple(raw_fields) == ("SH", "SOLE", "7")
     conn.close()
 
 
@@ -122,6 +197,8 @@ def test_security_and_quality_event(tmp_path):
         mapping_date="2026-08-24",
     )
     assert sid == sid2
+    revoked = conn.execute("SELECT ticker, mapping_status FROM securities WHERE security_id=?", (sid,)).fetchone()
+    assert tuple(revoked) == (None, "UNRESOLVED")
     add_quality_event(
         conn,
         event_type="UNRESOLVED_CUSIP",
@@ -131,4 +208,3 @@ def test_security_and_quality_event(tmp_path):
     n = conn.execute("SELECT COUNT(*) FROM quality_events").fetchone()[0]
     assert n == 1
     conn.close()
-

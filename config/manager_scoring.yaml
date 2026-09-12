@@ -12,7 +12,8 @@
 # All 30 product labels are listed for completeness. Rows without a tier are
 # NOT_APPROVED and excluded from consensus until governance reviews them.
 
-methodology_version: "0.1.0"
+methodology_version: "0.1.1"
+# Version alignment only: no manager approvals or tier/weight changes.
 
 tiers:
   # Tier -> consensus weight used by the governed layer.

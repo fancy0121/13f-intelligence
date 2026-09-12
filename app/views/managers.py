@@ -12,7 +12,14 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T, searchable_select
+from ui import (
+    B,
+    T,
+    display_code,
+    display_manager_name,
+    display_security_name,
+    searchable_select,
+)
 
 
 def _fmt(x, pct=False, default="N/A"):
@@ -41,7 +48,10 @@ def run() -> None:
     if not managers:
         st.info(T("INSUFFICIENT_DATA：暂无机构数据。", "INSUFFICIENT_DATA: no manager data yet."))
         return
-    id_by_name = {m["name"]: m["manager_id"] for m in managers}
+    id_by_name = {
+        display_manager_name(m["name"]): m["manager_id"]
+        for m in managers
+    }
     names = sorted(id_by_name)
     selected = searchable_select(
         T("选择机构", "Select Manager"),
@@ -57,6 +67,10 @@ def run() -> None:
         st.info(T("INSUFFICIENT_DATA。", "INSUFFICIENT_DATA."))
         return
 
+    if ev.quality.get("source_status") == "SOURCE_QUARANTINED":
+        st.error(T("该机构最新源季度已隔离：以下空值是证据不足，不是零持仓或退出。 [SOURCE_QUARANTINED]",
+                   "Latest source quarter quarantined: empty values mean insufficient evidence, not zero holdings or EXIT. [SOURCE_QUARANTINED]"))
+
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric(T("报告季度", "Quarter"), ev.latest_report_period or "N/A")
     c2.metric(T("filing 日期", "Filing Date"), ev.latest_filing_date or "N/A")
@@ -65,32 +79,36 @@ def run() -> None:
     c4.metric(T("陈旧", "Stale"), T("是", "Yes") if ev.stale else T("否", "No"))
     c5.metric(T("修订", "Amended"), T("是", "Yes") if ev.amended else T("否", "No"))
     st.caption(
-        T(
-            f"验证状态：{ev.validation_status} | 持仓数：{ev.position_count} | "
-            f"报告总值：{ev.total_value if ev.total_value is not None else 'N/A'}",
-            f"Validation: {ev.validation_status} | Positions: {ev.position_count} | "
-            f"Total value: {ev.total_value if ev.total_value is not None else 'N/A'}",
-        )
+        f"{T('验证状态', 'Validation')}: {display_code(ev.validation_status)} | "
+        f"{T('持仓数', 'Positions')}: {ev.position_count if ev.quality.get('source_status') == 'READY' else 'N/A'} | "
+        f"{T('报告总值（美元）', 'Total value (USD)')}: {_fmt(ev.total_value)}"
     )
+
+    if ev.quality.get("source_status") == "SOURCE_QUARANTINED":
+        st.info(T("INSUFFICIENT_DATA：这一季度的持仓与变化不展示，也不使用旧季度替代。",
+                  "INSUFFICIENT_DATA: this quarter's holdings and changes are withheld; older quarters are not substituted."))
+        return
 
     st.divider()
     st.markdown(f"#### {T('最新报告季度变化', 'Latest Quarter Changes')} (NEW / ADD / REDUCE / EXIT)")
     if any(ev.latest_changes.values()):
         for ct in ("NEW", "ADD", "REDUCE", "EXIT"):
             rows = ev.latest_changes.get(ct, [])
-            st.markdown(f"**{ct}** ({len(rows)})")
+            st.markdown(f"**{display_code(ct)}** ({len(rows)})")
             if rows:
                 st.dataframe(
                     [
                         {
-                            "CUSIP": r["cusip"],
-                            T("发行方", "Issuer"): r["issuer"],
+                            T("CUSIP 编号", "CUSIP"): r["cusip"],
+                            T("公司名称", "Company Name"): display_security_name(
+                                r["cusip"], r["issuer"]
+                            ),
                             T("份额变化", "Shares Change"):
-                                r["shares_now"] if r["shares_prev"] is None
-                                else (r["shares_now"] - (r["shares_prev"] or 0)),
+                                (r["shares_now"] or 0) - (r["shares_prev"] or 0),
                             T("权重(前/后)", "Weight (prev/now)"):
-                                f"{r['weight_prev']} / {r['weight_now']}",
-                            T("解析状态", "Resolution"): r["resolution_status"],
+                                f"{_fmt(r['weight_prev'], pct=True)} / "
+                                f"{_fmt(r['weight_now'], pct=True)}",
+                            T("解析状态", "Resolution"): display_code(r["resolution_status"]),
                         }
                         for r in rows[:50]
                     ],
@@ -106,14 +124,16 @@ def run() -> None:
         st.dataframe(
             [
                 {
-                    "Ticker": r["ticker"] or r["cusip"],
-                    "CUSIP": r["cusip"],
-                    T("发行方", "Issuer"): r["issuer"],
+                    T("股票代码", "Ticker"): r["ticker"] or r["cusip"],
+                    T("CUSIP 编号", "CUSIP"): r["cusip"],
+                    T("公司名称", "Company Name"): display_security_name(
+                        r["cusip"], r["issuer"]
+                    ),
                     T("份额", "Shares"): _fmt(r["shares"]),
-                    T("价值", "Value"): _fmt(r["value"]),
+                    T("价值（美元）", "Value (USD)"): _fmt(r["value"]),
                     T("权重", "Weight"): _fmt(r["weight"], pct=True),
                     T("类别", "Put/Call"): r["put_call"] or T("股票", "Equity"),
-                    T("解析状态", "Resolution"): r["resolution_status"],
+                    T("解析状态", "Resolution"): display_code(r["resolution_status"]),
                 }
                 for r in ev.top_holdings
             ],
@@ -138,8 +158,10 @@ def run() -> None:
     st.write(f"- {T('Top10 持仓中未解析/冲突', 'Unresolved/conflict in top 10')}："
              f"{ev.quality['unresolved_or_conflict_top10']}")
     st.write(f"- {T('缺失报告季度数', 'Missing quarters')}：{ev.quality['missing_periods']}")
-    st.write(f"- {T('修订', 'Amended')}：{ev.quality['amended']}；"
-             f"{T('陈旧', 'Stale')}：{ev.quality['stale']}")
+    st.write(
+        f"- {T('修订', 'Amended')}：{T('是', 'Yes') if ev.quality['amended'] else T('否', 'No')}；"
+        f"{T('陈旧', 'Stale')}：{T('是', 'Yes') if ev.quality['stale'] else T('否', 'No')}"
+    )
     st.caption(
         B(
             "注：重复活动是已披露行为的描述性事实，不代表预测性意义（见方法论页）",

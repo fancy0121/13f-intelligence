@@ -1,19 +1,24 @@
 """Objective position-change engine (deterministic, no LLM).
 
-Computes per (manager, security, put_call, report_period):
+Computes per (manager, security, put_call, shares_type, report_period):
   - portfolio weight (value / filing total value)
   - NEW / ADD / REDUCE / EXIT / UNCHANGED
   - shares_prev / shares_now / share_change / share_change_pct
   - weight_prev / weight_now / weight_change
 
-Effective-filing semantics: for each (manager, report_period) the amendment
-(13F-HR/A), when present, supersedes the original 13F-HR; the latest filing
-date wins. Raw filings are never deleted or overwritten.
+All analytical comparisons consume effective_positions. Raw holdings remain
+an immutable audit layer and are never selected directly here.
 """
 
 from __future__ import annotations
 
 import sqlite3
+from datetime import date
+
+from thirteenf.effective import (
+    load_effective_positions,
+    rebuild_effective_positions,
+)
 
 CHANGE_TYPES = ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")
 
@@ -24,67 +29,52 @@ def compute_portfolio_weights(conn: sqlite3.Connection) -> int:
     Only filings with ingest_status='OK' and at least one holding are used.
     Returns number of holdings updated.
     """
-    cur = conn.execute(
+    # Materialize filing totals once. A correlated aggregate here otherwise
+    # scans all holdings again per row on SQLite (quadratic on real 13F data).
+    totals = conn.execute(
         """
-        UPDATE holdings
-        SET portfolio_weight = (
-            SELECT value * 1.0 / total.value_total
-            FROM (
-                SELECT filing_id, SUM(value) AS value_total
-                FROM holdings
-                WHERE value IS NOT NULL
-                GROUP BY filing_id
-            ) AS total
-            WHERE total.filing_id = holdings.filing_id
-        )
-        WHERE holdings.value IS NOT NULL
+        SELECT SUM(h.value), h.filing_id
+        FROM holdings h JOIN filings f ON f.filing_id=h.filing_id
+        WHERE f.ingest_status='OK' AND h.value IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM filings q WHERE q.manager_id=f.manager_id
+                          AND q.report_period=f.report_period AND q.ingest_status='QUARANTINED')
+        GROUP BY h.filing_id
         """
+    ).fetchall()
+    conn.execute("UPDATE holdings SET portfolio_weight=NULL")
+    cur = conn.executemany(
+        "UPDATE holdings SET portfolio_weight=value * 1.0 / ? "
+        "WHERE filing_id=? AND value IS NOT NULL", totals,
     )
     conn.commit()
     return cur.rowcount
 
 
-def effective_filings(conn: sqlite3.Connection) -> list[tuple[int, str, int]]:
-    """Return (manager_id, report_period, filing_id) for the effective filing:
-    prefer 13F-HR/A over 13F-HR for the same period; newest filing_date wins.
-    """
-    rows = conn.execute(
-        """
-        SELECT manager_id, report_period, filing_id,
-               ROW_NUMBER() OVER (
-                   PARTITION BY manager_id, report_period
-                   ORDER BY is_amendment DESC, filing_date DESC, filing_id DESC
-               ) AS rn
-        FROM filings
-        WHERE ingest_status = 'OK'
-        """
-    ).fetchall()
-    return [(r[0], r[1], r[2]) for r in rows if r[3] == 1]
 
+def effective_filings(
+    conn: sqlite3.Connection,
+    methodology_version: str | None = None,
+) -> list[tuple[int, str, int]]:
+    """Return the selected BASE filing for each READY effective period."""
 
-def _holding_map(
-    conn: sqlite3.Connection, filing_id: int
-) -> dict[tuple[int, str], dict]:
+    params: tuple[object, ...] = ()
+    version_filter = ""
+    if methodology_version is not None:
+        version_filter = " AND ep.methodology_version=?"
+        params = (methodology_version,)
     rows = conn.execute(
-        """
-        SELECT s.security_id, h.put_call, h.shares, h.portfolio_weight, h.value
-        FROM holdings h
-        JOIN securities s ON s.cusip = h.cusip
-        WHERE h.filing_id = ?
+        f"""
+        SELECT ep.manager_id, ep.report_period, efc.filing_id
+        FROM effective_periods ep
+        JOIN effective_filing_components efc
+          ON efc.effective_period_id=ep.effective_period_id
+         AND efc.component_role='BASE'
+        WHERE ep.status='READY'{version_filter}
+        ORDER BY ep.manager_id, ep.report_period
         """,
-        (filing_id,),
+        params,
     ).fetchall()
-    out: dict[tuple[int, str], dict] = {}
-    for security_id, put_call, shares, weight, value in rows:
-        key = (security_id, put_call or "")
-        out[key] = {
-            "security_id": security_id,
-            "put_call": put_call or "",
-            "shares": shares,
-            "weight": weight,
-            "value": value,
-        }
-    return out
+    return [(row[0], row[1], row[2]) for row in rows]
 
 
 def classify(prev: dict | None, now: dict) -> str:
@@ -103,44 +93,71 @@ def classify(prev: dict | None, now: dict) -> str:
 def compute_position_changes(
     conn: sqlite3.Connection, methodology_version: str
 ) -> int:
-    """Compute position_changes for all effective filing pairs, ordered by
-    report period. Returns number of rows inserted.
-    """
-    effective = effective_filings(conn)
-    by_manager: dict[int, list[tuple[str, int]]] = {}
-    for manager_id, report_period, filing_id in effective:
-        by_manager.setdefault(manager_id, []).append((report_period, filing_id))
+    """Compute transitions from READY effective periods only."""
 
-    conn.execute("DELETE FROM position_changes")
+    rebuild_effective_positions(conn, methodology_version)
+    periods = conn.execute(
+        """
+        SELECT manager_id, report_period, status
+        FROM effective_periods
+        WHERE methodology_version=?
+        ORDER BY manager_id, report_period
+        """,
+        (methodology_version,),
+    ).fetchall()
+    by_manager: dict[int, list[tuple[str, str]]] = {}
+    for manager_id, report_period, status in periods:
+        by_manager.setdefault(manager_id, []).append((report_period, status))
+
+    conn.execute(
+        "DELETE FROM position_changes WHERE methodology_version=?",
+        (methodology_version,),
+    )
     inserted = 0
-    for manager_id, period_filings in by_manager.items():
-        period_filings.sort(key=lambda x: x[0])
-        prev: dict[tuple[int, str], dict] | None = None
+    for manager_id, manager_periods in by_manager.items():
+        prev: dict[tuple[int, str, str], dict] | None = None
         prev_period: str | None = None
-        for report_period, filing_id in period_filings:
-            now = _holding_map(conn, filing_id)
-            if prev is None:
-                # First period: everything is NEW, prev values are None.
-                for key, rec in now.items():
-                    inserted += _insert_change(
-                        conn,
-                        manager_id=manager_id,
-                        security_id=rec["security_id"],
-                        put_call=rec["put_call"],
-                        report_period=report_period,
-                        change_type="NEW",
-                        shares_prev=None,
-                        shares_now=rec["shares"],
-                        share_change=None,
-                        share_change_pct=None,
-                        weight_prev=None,
-                        weight_now=rec["weight"],
-                        weight_change=None,
-                        methodology_version=methodology_version,
-                    )
+        seen_period = False
+        comparison_blocked = False
+        for report_period, status in manager_periods:
+            if status != "READY":
+                seen_period = True
+                prev = None
+                prev_period = None
+                comparison_blocked = True
+                continue
+            positions = load_effective_positions(
+                conn,
+                manager_id,
+                report_period,
+                methodology_version,
+            )
+            now = {
+                key: {
+                    "security_id": position.security_id,
+                    "put_call": position.put_call,
+                    "shares_type": position.shares_type,
+                    "shares": position.shares,
+                    "weight": position.portfolio_weight,
+                    "value": position.value,
+                }
+                for key, position in positions.items()
+            }
+            if (
+                not seen_period
+                or comparison_blocked
+                or prev is None
+                or prev_period is None
+                or not _is_next_quarter(prev_period, report_period)
+            ):
+                _record_missing_comparison(
+                    conn,
+                    manager_id=manager_id,
+                    report_period=report_period,
+                    methodology_version=methodology_version,
+                )
             else:
-                keys = set(prev) | set(now)
-                for key in keys:
+                for key in sorted(set(prev) | set(now)):
                     p = prev.get(key)
                     n = now.get(key)
                     if p is None:
@@ -167,6 +184,7 @@ def compute_position_changes(
                         manager_id=manager_id,
                         security_id=key[0],
                         put_call=key[1],
+                        shares_type=key[2],
                         report_period=report_period,
                         change_type=change_type,
                         shares_prev=shares_prev,
@@ -178,25 +196,72 @@ def compute_position_changes(
                         weight_change=weight_change,
                         methodology_version=methodology_version,
                     )
+            seen_period = True
             prev = now
             prev_period = report_period
+            comparison_blocked = False
     conn.commit()
     return inserted
+
+
+def _is_next_quarter(previous: str, current: str) -> bool:
+    previous_date = date.fromisoformat(previous)
+    current_date = date.fromisoformat(current)
+    previous_index = previous_date.year * 4 + (previous_date.month - 1) // 3
+    current_index = current_date.year * 4 + (current_date.month - 1) // 3
+    return current_index == previous_index + 1
+
+
+def _record_missing_comparison(
+    conn: sqlite3.Connection,
+    *,
+    manager_id: int,
+    report_period: str,
+    methodology_version: str,
+) -> None:
+    message = (
+        "missing or incomplete prior effective quarter; "
+        f"methodology={methodology_version}"
+    )
+    conn.execute(
+        """
+        INSERT INTO quality_events(
+            event_type, manager_id, report_period, severity, message,
+            created_at_utc
+        )
+        SELECT 'MISSING_HISTORICAL_COMPARISON', ?, ?, 'WARN', ?, datetime('now')
+        WHERE NOT EXISTS (
+            SELECT 1 FROM quality_events
+            WHERE event_type='MISSING_HISTORICAL_COMPARISON'
+              AND manager_id=? AND report_period=? AND message=?
+        )
+        """,
+        (
+            manager_id,
+            report_period,
+            message,
+            manager_id,
+            report_period,
+            message,
+        ),
+    )
 
 
 def _insert_change(conn, **kwargs) -> int:
     conn.execute(
         """
         INSERT INTO position_changes(
-            manager_id, security_id, put_call, report_period, change_type,
+            manager_id, security_id, put_call, shares_type, report_period,
+            change_type,
             shares_prev, shares_now, share_change, share_change_pct,
             weight_prev, weight_now, weight_change, methodology_version
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             kwargs["manager_id"],
             kwargs["security_id"],
             kwargs["put_call"],
+            kwargs["shares_type"],
             kwargs["report_period"],
             kwargs["change_type"],
             kwargs["shares_prev"],

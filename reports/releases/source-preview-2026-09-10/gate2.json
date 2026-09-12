@@ -1,0 +1,145 @@
+{
+  "automatic_status": "PASS",
+  "checked_transitions": 38,
+  "context": {
+    "db_sha256": "848ee61f3568bacb15972d771df0126d761ecf2e6a7ebabbec93d8948604c5c0",
+    "effective_fingerprint": "6855a4ef46af5754427724ffefce066fc0f1a8787faa9440bb8673ed0ce6032e",
+    "gate_hash": "ef9cc0417f02269fcda2788b553a8e46902dd2060fe9d42906f6c58ec36c88d4",
+    "methodology_version": "0.1.1",
+    "raw_fingerprint": "1b2cabd9ab30862bafe5dba84088bf1ce1b415965b2b6e1dc46e58d00d0729a7",
+    "runtime_hash": "14e8432df7c9c61e57b7ee72bf1393317a007d8152ef4209424ad23bc5f8468d"
+  },
+  "effective_version": "v3:6855a4ef46af5754427724ffefce066fc0f1a8787faa9440bb8673ed0ce6032e",
+  "human_status": "NOT_REVIEWED",
+  "manager_ids": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "manual_errors": [],
+  "manual_packet": "reports/releases/source-preview-2026-09-10/manual-review.csv",
+  "mismatches": [],
+  "period_pairs": [
+    [
+      "2023-09-30",
+      "2023-12-31"
+    ],
+    [
+      "2023-12-31",
+      "2024-03-31"
+    ],
+    [
+      "2024-03-31",
+      "2024-06-30"
+    ],
+    [
+      "2024-06-30",
+      "2024-09-30"
+    ],
+    [
+      "2024-09-30",
+      "2024-12-31"
+    ],
+    [
+      "2024-12-31",
+      "2025-03-31"
+    ],
+    [
+      "2025-03-31",
+      "2025-06-30"
+    ],
+    [
+      "2025-06-30",
+      "2025-09-30"
+    ],
+    [
+      "2025-09-30",
+      "2025-12-31"
+    ],
+    [
+      "2025-12-31",
+      "2026-03-31"
+    ],
+    [
+      "2026-03-31",
+      "2026-06-30"
+    ]
+  ],
+  "quarantine": {
+    "checked_raw_rows": 855,
+    "errors": [],
+    "manager_periods": [
+      [
+        18,
+        "2025-03-31"
+      ],
+      [
+        20,
+        "2023-09-30"
+      ],
+      [
+        20,
+        "2023-12-31"
+      ],
+      [
+        20,
+        "2024-09-30"
+      ],
+      [
+        20,
+        "2024-12-31"
+      ],
+      [
+        20,
+        "2025-06-30"
+      ],
+      [
+        20,
+        "2025-09-30"
+      ],
+      [
+        20,
+        "2026-03-31"
+      ],
+      [
+        20,
+        "2026-06-30"
+      ],
+      [
+        23,
+        "2025-09-30"
+      ],
+      [
+        24,
+        "2023-12-31"
+      ],
+      [
+        26,
+        "2026-06-30"
+      ],
+      [
+        28,
+        "2023-09-30"
+      ],
+      [
+        28,
+        "2024-03-31"
+      ],
+      [
+        28,
+        "2024-06-30"
+      ],
+      [
+        28,
+        "2024-09-30"
+      ]
+    ],
+    "policy_sha256": "346908151cb6db2dbac2b9549e8360176fe55c65d97a62ffcb9436f5911814b8",
+    "quarantined_filings": 17,
+    "source_filings": 16,
+    "status": "PASS"
+  },
+  "releaseable": false
+}

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -43,3 +45,113 @@ def test_parse_int_same_line(update_data):
 def test_parse_int_missing_and_invalid(update_data):
     assert update_data._parse_int("no stats here\n", "failures") is None
     assert update_data._parse_int("raw_files=333 failures=abc\n", "failures") is None
+
+
+def _prepare_update_paths(update_data, monkeypatch, tmp_path):
+    db_path = tmp_path / "thirteenf.db"
+    conn = sqlite3.connect(db_path)
+    conn.executescript(
+        "CREATE TABLE filings(filing_id INTEGER);"
+        "CREATE TABLE holdings(holding_id INTEGER);"
+    )
+    conn.commit()
+    conn.close()
+    monkeypatch.setattr(update_data, "DB", db_path)
+    monkeypatch.setattr(update_data, "STATUS_PATH", tmp_path / "last_update.json")
+    monkeypatch.setattr(update_data, "LOG_PATH", tmp_path / "last_update.log")
+
+
+def test_rate_limit_rps_flag_is_forwarded(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        if step == "ingest":
+            return 0, "raw_files=1 failures=0"
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--rate-limit-rps", "2.5"]) == 0
+    ingest_args = next(args for step, args in calls if step == "ingest")
+    assert ingest_args[-2:] == ["--rate-limit-rps", "2.5"]
+
+
+def test_absent_rate_flag_does_not_mask_environment(
+    update_data, monkeypatch, tmp_path
+):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        if step == "ingest":
+            return 0, "raw_files=1 failures=0"
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main([]) == 0
+    ingest_args = next(args for step, args in calls if step == "ingest")
+    assert "--rate-limit-rps" not in ingest_args
+    assert "--rate-limit-s" not in ingest_args
+
+
+def test_changed_filing_failure_blocks_release(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 1, "raw_files=2 failures=1 changed_failures=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--release-mode"]) == 1
+    assert [step for step, _ in calls] == ["ingest"]
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding="utf-8"))
+    assert status["releaseable"] is False
+
+
+def test_normalize_only_forwards_raw_root_and_database(
+    update_data, monkeypatch, tmp_path
+):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    raw_root = tmp_path / "raw"
+    calls = []
+
+    def fake_run(step, args):
+        calls.append((step, args))
+        return 0, "processed=1 failed=0 pending_amendments=0 promoted=1"
+
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(
+        ["--normalize-only", "--raw-root", str(raw_root), "--db", str(update_data.DB)]
+    ) == 0
+    assert [step for step, _ in calls] == ["normalize"]
+    normalize_args = calls[0][1]
+    assert normalize_args[normalize_args.index("--raw-root") + 1] == str(raw_root)
+    assert normalize_args[normalize_args.index("--db-path") + 1] == str(update_data.DB)
+
+
+def test_successful_ingestion_does_not_mean_release_approved(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    monkeypatch.setattr(update_data, '_run', lambda step, args: (
+        0, 'raw_files=1 failures=0' if step == 'ingest' else
+        'processed=1 failed=0 pending_amendments=0 promoted=1'))
+    assert update_data.main(['--release-mode']) == 0
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding='utf-8'))
+    assert status['releaseable'] is False
+    assert status['validation_status'] == 'NOT_VALIDATED'
+
+
+def test_explicit_quarantine_policy_is_forwarded_not_a_release_approval(update_data, monkeypatch, tmp_path):
+    _prepare_update_paths(update_data, monkeypatch, tmp_path)
+    calls = []
+    def fake_run(step, args):
+        calls.append(args)
+        return 0, "processed=343 failed=0 pending_amendments=0 promoted=1 quarantined_source_filings=16"
+    monkeypatch.setattr(update_data, "_run", fake_run)
+    assert update_data.main(["--normalize-only", "--quarantine-policy", "approved.json"]) == 0
+    assert calls[0][-2:] == ["--quarantine-policy", "approved.json"]
+    status = json.loads(update_data.STATUS_PATH.read_text(encoding="utf-8"))
+    assert status["quarantined_source_filings"] == 16
+    assert status["releaseable"] is False

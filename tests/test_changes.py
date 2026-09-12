@@ -20,6 +20,28 @@ from thirteenf.database import (
     upsert_filing,
     upsert_manager,
 )
+from thirteenf.effective import rebuild_effective_positions
+from thirteenf.parser import AmendmentType
+
+
+def test_weights_do_not_rescan_whole_table_for_every_holding(tmp_path):
+    conn, mid, _, _ = _seed(tmp_path)
+    _filing(conn, mid, "2026-06-30", "perf-test",
+            [_Row(i, "AAAA11111", "AAA Inc", 1, 10) for i in range(1, 1001)])
+    # Deterministic VM budget rather than a hardware-dependent timing assertion.
+    ticks = 0
+    def budget():
+        nonlocal ticks
+        ticks += 1
+        return ticks > 200
+    conn.set_progress_handler(budget, 1000)
+    try:
+        assert compute_portfolio_weights(conn) == 1000
+        conn.set_progress_handler(None, 0)
+        assert conn.execute("SELECT DISTINCT portfolio_weight FROM holdings").fetchall() == [(0.001,)]
+    finally:
+        conn.set_progress_handler(None, 0)
+        conn.close()
 
 
 def _seed(tmp_path):
@@ -50,12 +72,17 @@ def _seed(tmp_path):
 
 
 class _Row:
-    def __init__(self, ordinal, cusip, issuer, shares, value, put_call=""):
+    def __init__(
+        self, ordinal, cusip, issuer, shares, value, put_call="", shares_type="SH"
+    ):
         self.row_ordinal = ordinal
         self.cusip = cusip
         self.name_of_issuer = issuer
         self.title_of_class = "COM"
         self.put_call = put_call
+        self.ssh_prnamt_type = shares_type
+        self.investment_discretion = "SOLE"
+        self.other_manager = ""
         self.shares = shares
         self.value = value
 
@@ -74,6 +101,7 @@ def _filing(conn, mid, period, accession, rows):
         raw_path="/raw",
         fetched_at_utc=None,
         ingest_status="OK",
+        accepted_at="2026-08-14T10:00:00Z",
     )
     replace_holdings(
         conn,
@@ -109,6 +137,7 @@ def test_portfolio_weight_and_changes(tmp_path):
     )
 
     compute_portfolio_weights(conn)
+    rebuild_effective_positions(conn, "0.1.0")
     # Q1: A weight = 3000/3000 = 1.0 ; Q2: A=1000/6000=0.1667, B=0.8333
     q1_a = conn.execute(
         "SELECT portfolio_weight FROM holdings WHERE report_period='2026-03-31'"
@@ -116,7 +145,14 @@ def test_portfolio_weight_and_changes(tmp_path):
     assert abs(q1_a - 1.0) < 1e-9
 
     n = compute_position_changes(conn, "0.1.0")
-    assert n == 3  # Q1: A NEW; Q2: A REDUCE, B NEW
+    assert n == 2  # Q1 has no baseline; Q2: A REDUCE, B NEW.
+    assert conn.execute(
+        "SELECT COUNT(*) FROM position_changes WHERE report_period='2026-03-31'"
+    ).fetchone()[0] == 0
+    assert conn.execute(
+        "SELECT COUNT(*) FROM quality_events WHERE "
+        "event_type='MISSING_HISTORICAL_COMPARISON' AND report_period='2026-03-31'"
+    ).fetchone()[0] == 1
     row_a = conn.execute(
         """
         SELECT change_type, shares_prev, shares_now, share_change,
@@ -164,6 +200,7 @@ def test_shares_up_weight_down_is_not_conviction(tmp_path):
         ],
     )
     compute_portfolio_weights(conn)
+    rebuild_effective_positions(conn, "0.1.0")
     compute_position_changes(conn, "0.1.0")
     row = conn.execute(
         """
@@ -176,6 +213,82 @@ def test_shares_up_weight_down_is_not_conviction(tmp_path):
     q2 = [r for r in row if r[0] == "ADD"][0]
     assert q2[1] == 50
     assert q2[2] < 0
+    conn.close()
+
+
+def test_duplicate_raw_rows_are_aggregated_before_change_classification(tmp_path):
+    conn, mid, sid_a, _ = _seed(tmp_path)
+    _filing(
+        conn,
+        mid,
+        "2026-03-31",
+        "Q1",
+        [
+            _Row(1, "AAAA11111", "AAA Inc", 100, 1000),
+            _Row(2, "AAAA11111", "AAA Inc", 200, 2000),
+        ],
+    )
+    _filing(
+        conn,
+        mid,
+        "2026-06-30",
+        "Q2",
+        [
+            _Row(1, "AAAA11111", "AAA Inc", 100, 1000),
+            _Row(2, "AAAA11111", "AAA Inc", 250, 2500),
+        ],
+    )
+
+    compute_position_changes(conn, "0.1.0")
+    rows = conn.execute(
+        """
+        SELECT change_type, shares_prev, shares_now, share_change
+        FROM position_changes
+        WHERE security_id=? AND report_period='2026-06-30'
+          AND put_call='' AND shares_type='SH'
+        """,
+        (sid_a,),
+    ).fetchall()
+    assert [tuple(row) for row in rows] == [("ADD", 300, 350, 50)]
+    conn.close()
+
+
+def test_missing_quarter_produces_no_transition_and_one_quality_event(tmp_path):
+    conn, mid, sid_a, _ = _seed(tmp_path)
+    _filing(
+        conn,
+        mid,
+        "2025-12-31",
+        "Q1",
+        [_Row(1, "AAAA11111", "AAA Inc", 100, 1000)],
+    )
+    _filing(
+        conn,
+        mid,
+        "2026-06-30",
+        "Q3",
+        [_Row(1, "AAAA11111", "AAA Inc", 200, 2000)],
+    )
+
+    compute_position_changes(conn, "0.1.0")
+    q3_count = conn.execute(
+        """
+        SELECT COUNT(*) FROM position_changes
+        WHERE security_id=? AND report_period='2026-06-30'
+        """,
+        (sid_a,),
+    ).fetchone()[0]
+    assert q3_count == 0
+    compute_position_changes(conn, "0.1.0")
+    quality_count = conn.execute(
+        """
+        SELECT COUNT(*) FROM quality_events
+        WHERE event_type='MISSING_HISTORICAL_COMPARISON'
+          AND manager_id=? AND report_period='2026-06-30'
+        """,
+        (mid,),
+    ).fetchone()[0]
+    assert quality_count == 1
     conn.close()
 
 
@@ -195,6 +308,10 @@ def test_amendment_supersedes_original(tmp_path):
         raw_path="/raw",
         fetched_at_utc=None,
         ingest_status="OK",
+        accepted_at="2026-08-20T10:00:00Z",
+        amendment_number=1,
+        amendment_type=AmendmentType.RESTATEMENT,
+        amendment_status="PARSED",
     )
     replace_holdings(
         conn,
@@ -203,9 +320,9 @@ def test_amendment_supersedes_original(tmp_path):
         report_period="2026-06-30",
         rows=[_Row(1, "AAAA11111", "AAA Inc", 200, 200)],
     )
-    effective = effective_filings(conn)
+    rebuild_effective_positions(conn, "0.1.0")
+    effective = effective_filings(conn, "0.1.0")
     chosen = [e for e in effective if e[0] == mid and e[1] == "2026-06-30"]
     assert len(chosen) == 1
     assert chosen[0][2] == fid_a  # amendment chosen
     conn.close()
-

@@ -139,7 +139,7 @@ def test_task9_portfolio_page_editor(tmp_path):
 
     p = tmp_path / "portfolio.csv"
     p.write_text("# header\nticker,weight\n", encoding="utf-8")
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
     at.session_state["portfolio_path"] = str(p)
     at.run()
     assert not at.exception, at.exception
@@ -151,12 +151,130 @@ def test_task9_portfolio_page_editor(tmp_path):
     assert any(r["ticker"] == "GOOGL" for r in rows)
 
 
+def test_task9_portfolio_ambiguous_choice_survives_rerun(tmp_path):
+    """Regression: selecting one ALPHABET candidate must not dismiss the flow."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    p = tmp_path / "portfolio.csv"
+    p.write_text("# header\nticker,weight\n", encoding="utf-8")
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    at.session_state["portfolio_path"] = str(p)
+    at.run()
+
+    at.text_input[0].set_value("ALPHABET")
+    at.text_input[1].set_value("0.05")
+    at.button[0].click()
+    at.run()
+
+    candidate = next(b for b in at.button if "GOOGL" in b.label)
+    candidate.click()
+    at.run()
+
+    add_selected = next(b for b in at.button if b.label.startswith("添加所选"))
+    add_selected.click()
+    at.run()
+
+    assert load_portfolio_rows(p) == [{"ticker": "GOOGL", "weight": "0.05"}]
+
+
+def test_task9_new_unique_search_clears_stale_ambiguous_candidates(tmp_path):
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    p = tmp_path / "portfolio.csv"
+    p.write_text("# header\nticker,weight\n", encoding="utf-8")
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    at.session_state["portfolio_path"] = str(p)
+    at.run()
+
+    at.text_input[0].set_value("ALPHABET")
+    at.text_input[1].set_value("0.05")
+    at.button[0].click()
+    at.run()
+    assert any("GOOGL" in b.label for b in at.button)
+
+    at.text_input[0].set_value("AAPL")
+    at.text_input[1].set_value("0.10")
+    at.button[0].click()
+    at.run()
+
+    assert load_portfolio_rows(p) == [{"ticker": "AAPL", "weight": "0.10"}]
+    assert not any("GOOGL" in b.label for b in at.button)
+
+
+def test_task9_public_portfolios_are_isolated_by_browser_session(monkeypatch, tmp_path):
+    """A public visitor must never read or overwrite another visitor's holdings."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+    import store as ui_store
+    import thirteenf.product.evidence as evidence_module
+
+    monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
+    # Isolate privacy behavior; public release attestation is tested separately.
+    monkeypatch.setattr(ui_store, "public_snapshot_error", lambda: None)
+    shared = tmp_path / "shared.csv"
+    shared.write_text("ticker,weight\nMSFT,0.25\n", encoding="utf-8")
+    before = shared.read_bytes()
+    monkeypatch.setenv("THIRTEENF_PORTFOLIO", str(shared))
+    original_load = evidence_module.load_portfolio_rows
+    def no_shared_read(path):
+        assert Path(path) != shared, "public UI must not read shared portfolio"
+        return original_load(path)
+    def no_write(*args, **kwargs):
+        raise AssertionError("public portfolio must not write files")
+    monkeypatch.setattr(evidence_module, "load_portfolio_rows", no_shared_read)
+    monkeypatch.setattr(evidence_module, "save_portfolio_rows", no_write)
+    first = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    first.session_state["portfolio_path"] = str(shared)
+    first.run()
+    second.run()
+    assert not first.exception and not second.exception
+    assert first.session_state["public_portfolio_rows"] == []
+    first.text_input[0].set_value("GOOGL")
+    first.button[0].click()
+    first.run()
+    assert not first.exception
+    assert first.session_state["public_portfolio_rows"] == [{"ticker": "GOOGL", "weight": ""}]
+    second.run()
+    assert second.session_state["public_portfolio_rows"] == []
+    assert shared.read_bytes() == before
+
+
+def test_public_observations_are_isolated_by_browser_session(monkeypatch):
+    """Public research notes must not leak across unauthenticated visitors."""
+    pytest.importorskip("streamlit.testing")
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
+    first = AppTest.from_file(str(ROOT / "app" / "views" / "observation.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "views" / "observation.py"), default_timeout=30)
+    first.run()
+    second.run()
+
+    assert not first.exception and not second.exception
+    first_store = first.session_state["public_observation_store"]
+    second_store = second.session_state["public_observation_store"]
+    assert first_store is not second_store
+    assert first_store.dir is second_store.dir is None
+    first_store.start_episode({"research_question": "private question"})
+    assert second_store.episodes() == []
+
+
 # TASK 10: update workflow orchestration path.
 def test_task10_update_script_present_and_references_existing_pipeline():
     script = ROOT / "scripts" / "update_data.py"
     assert script.exists()
     text = script.read_text(encoding="utf-8")
-    assert '"ingest"' in text and '"normalize"' in text and '"analyze"' in text
+    assert '"ingest"' in text and '"normalize"' in text
+    assert '"promoted"' in text and '"--release-mode"' in text
+    normalization = (ROOT / "src" / "thirteenf" / "normalization.py").read_text(
+        encoding="utf-8"
+    )
+    assert "compute_position_changes" in normalization
+    assert "compute_consensus" in normalization
+    assert "compute_trends" in normalization
     bat = (ROOT / "UPDATE_13F_DATA.bat").read_text(encoding="utf-8")
     assert "update_data.py" in bat
 

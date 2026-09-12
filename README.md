@@ -3,6 +3,31 @@
 > 将 SEC Form 13F 原始披露转化为结构化、可验证、可追溯的机构持仓行为证据，并用于
 > 投资组合的交叉验证。
 
+## 当前交付状态（2026-09-10 源码候选版）
+
+**商用状态：NOT_READY；本分支用于源码审阅，不是已放行的生产服务。**
+
+当前是带确定性分析内核的证据研究看板，不是已验收的无人值守商业服务。
+已从冻结的真实 SEC 原件独立重建两份 v3 候选库，29 个机构、343 份申报；
+16 个有原文矛盾的机构季度按批准政策隔离，不改原始数字。
+Gate 1 自动对账和 Gate 2 自动核验已通过；Gate 2 人工签字仍未完成，正式发布仍被阻止。
+旧 schema v2 数据库未被覆盖。不能把 HTTP `ok`、自动测试或隔离批准当成商用验收。
+当前 CI 改为只读离线测试，临时阻止旧流程直接发布未验证镜像；这不等于自动发布已经完成。
+公开交接见 [候选源码说明与验收状态](reports/releases/source-preview-2026-09-10/README.md)。
+人工 Gate 2 为 `NOT_REVIEWED`；不包含生产镜像、数据库、原始缓存或私人持仓。
+本分支的公开不等于 VPS 已更新，也不等于自动更新、回滚和通知已完成。
+
+### 已批准隔离政策的明确入口（离线，非发布）
+
+```powershell
+python -m thirteenf normalize --raw-root data/raw --db-path data/private/review-candidate.db --methodology 0.1.1 --quarantine-policy config/source_quarantine.json
+```
+
+日常更新脚本也支持显式 `--quarantine-policy config/source_quarantine.json`。
+不提供政策时仍严格拒绝控制总数不一致。政策只覆盖固定16份双 checksum 原件；
+新异常、新字节、缺少批准原件或需要解封的 amendment 必须重新审查，不能自动扩容。
+候选建库成功不触发提交、推送、镜像发布或 VPS 更新。
+
 ## 项目是什么
 
 - SEC EDGAR 13F-HR / 13F-HR/A 的确定性 ingestion、normalization、position change
@@ -14,14 +39,15 @@
 
 - 不是荐股系统，不产生 BUY / SELL 信号，不进行自动交易。
 - 不用第三方数据库或 LLM 替代 SEC 原始数据作为事实真相源。
-- 13F 不是完整投资观点：不披露空头、衍生品、成本、精确交易时机。
+- 13F 不是完整投资观点：不披露空头，衍生品披露不完整，不提供真实成本、精确交易时机。
 
 ## 安装
 
 要求 Python >= 3.11。
 
 ```powershell
-cd C:\Users\ASUS\Documents\挣钱项目组\13f-intelligence
+git clone --branch codex/unattended-refresh-deploy https://github.com/fancy0121/13f-intelligence.git
+cd 13f-intelligence
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e .[dev]
@@ -29,11 +55,14 @@ pip install -e .[dev]
 
 ## 更新数据（从 SEC 下载原始 filing）
 
+先在环境变量 `SEC_USER_AGENT` 中设置真实的维护名称与联系邮箱。不要提交进 Git；
+`.env.example` 只是格式示例，项目不会自动加载 `.env`。占位邮箱会在联网前被拒绝。
+
 ```powershell
 python -m thirteenf ingest --managers config/managers.csv
 ```
 
-仅 `validation_status=VERIFIED` 且带 CIK 的机构会进入 ingestion；REQUIRES_REVIEW
+仅 `validation_status=VERIFIED` 或 `VERIFIED_WITH_SCOPE` 且带 CIK 的机构会进入 ingestion；REQUIRES_REVIEW
 机构不会下载。下载内容保存到 `data/raw/`（gitignored），每条含 `manifest.json`
 （checksum、source URL、时间戳）。
 
@@ -41,8 +70,8 @@ python -m thirteenf ingest --managers config/managers.csv
 
 ```powershell
 python -m thirteenf normalize          # raw -> SQLite (offline)
-python -m thirteenf analyze            # weights + position changes + consensus + trends + quality
 python -m thirteenf score              # 应用治理评分（默认全部 NOT_APPROVED）
+python -m thirteenf analyze            # 评分变更后重算；weights + changes + consensus + trends + quality
 ```
 
 一键重建：
@@ -57,7 +86,16 @@ python -m thirteenf rebuild
 streamlit run app/app.py
 ```
 
-五个页面：总览 / 机构 / 个股 / 共识 / 我的组合（界面中文，标识符英文）。
+目前七个页面：总览 / 机构 / 证券 / 活动探索 / 我的组合 / 方法论与限制 / 研究观察。
+界面使用中英文；公司中文名未核验时明确显示“中文名待核验”，不自动编造。
+活动探索是描述性事实排序，不是 Weighted Consensus 页面。
+治理评分尚未批准时，共识及趋势不得作为已有生产能力宣传。
+
+本地 UI 保存的实际持仓位于被 Git 忽略的 `data/private/portfolio.csv`；
+旧 `config/portfolio.csv` 仅供首次兼容读取。公开模式的组合与研究记录仅保留在当前服务端会话内存，
+不落盘，不读取全局持仓文件；不等于浏览器本地存储。CLI 的 `--portfolio` 参数可显式指定私有组合路径。
+公开模式还要求真实 Gate 报告绑定的发布清单，缺失或与数据/代码校验不符即显示 `NOT_VALIDATED`。
+本仓库目前没有可用于生产的发布清单；测试中的合成清单不能复制用于上线。
 
 ### Manager Scope（VERIFIED_WITH_SCOPE）
 
@@ -102,5 +140,5 @@ python scripts/gate2_review.py
 
 ## 状态
 
-v0.1 已交付（见最终执行报告）。Gate 3 真实世界验证前保持
-`PENDING_REAL_WORLD_VALIDATION`。
+源码候选版可供审阅和离线测试，不宣称完整 v0.1 或商用交付。
+人工 Gate 2：`NOT_REVIEWED`；Gate 3：`PENDING_REAL_WORLD_VALIDATION`。

@@ -1,20 +1,57 @@
-"""Parse SEC 13F INFORMATION TABLE XML into normalized holding rows.
+"""Hardened parsers for SEC Form 13F XML components.
 
-The XML is namespace-prefixed (`<n1:informationTable>` or default namespace);
-all field access is namespace-agnostic via local-name XPath. Missing or
-malformed fields are tolerated (set to None / empty) so that a single bad row
-does not silently drop the whole filing; malformed XML raises XmlParseError.
+The cover page determines amendment semantics. The INFORMATION TABLE parser
+preserves every reported row and validates fields that drive deterministic
+analytics. XML namespaces are handled by local name because SEC schema
+versions use different namespace URIs.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
 
 from lxml import etree
 
 
+_UNSAFE_XML_DECLARATION = re.compile(br"<!\s*(?:DOCTYPE|ENTITY)\b", re.IGNORECASE)
+_NONNEGATIVE_INTEGER = re.compile(r"^(?:0|[1-9][0-9]*)$")
+
+
 class XmlParseError(ValueError):
-    """Raised when the document cannot be parsed as XML."""
+    """Raised when an XML component is unsafe, malformed, or contradictory."""
+
+
+class HoldingValidationError(XmlParseError):
+    """Raised when a holding row cannot safely feed numeric analysis."""
+
+    def __init__(self, row_ordinal: int, field: str, value: str) -> None:
+        self.row_ordinal = row_ordinal
+        self.field = field
+        self.value = value
+        shown = value if value else "<missing>"
+        super().__init__(
+            f"holding row {row_ordinal}: invalid {field} value {shown!r}"
+        )
+
+
+class AmendmentType(str, Enum):
+    """Normalized SEC amendment semantics used by the effective-state engine."""
+
+    RESTATEMENT = "RESTATEMENT"
+    ADD_NEW_HOLDINGS = "ADD_NEW_HOLDINGS"
+
+
+@dataclass(frozen=True)
+class CoverMetadata:
+    report_period: str
+    amendment_number: int | None
+    amendment_type: AmendmentType | None
+    submission_type: str
+    table_entry_total: int | None = None
+    table_value_total: int | None = None
 
 
 @dataclass(frozen=True)
@@ -23,78 +60,170 @@ class HoldingRow:
     name_of_issuer: str
     title_of_class: str
     cusip: str
-    value: int | None
-    shares: float | None
+    value: int
+    shares: int
     put_call: str
     ssh_prnamt_type: str
     investment_discretion: str
     other_manager: str
 
 
-def parse_info_table(xml_bytes: bytes) -> list[HoldingRow]:
-    """Parse an INFORMATION TABLE XML document into HoldingRow objects."""
+def _safe_parser() -> etree.XMLParser:
+    return etree.XMLParser(
+        resolve_entities=False,
+        no_network=True,
+        load_dtd=False,
+        recover=False,
+        huge_tree=False,
+    )
+
+
+def _parse_xml(xml_bytes: bytes):
+    if _UNSAFE_XML_DECLARATION.search(xml_bytes.replace(b'\x00', b'')):
+        raise XmlParseError("DTD and entity declarations are not allowed")
     try:
-        root = etree.fromstring(xml_bytes)
-    except etree.XMLSyntaxError as exc:
+        return etree.fromstring(xml_bytes, parser=_safe_parser())
+    except (etree.XMLSyntaxError, ValueError) as exc:
         raise XmlParseError(f"malformed XML: {exc}") from exc
 
+
+def parse_cover_page(xml_bytes: bytes) -> CoverMetadata:
+    """Parse report period and amendment semantics from a 13F primary document."""
+
+    root = _parse_xml(xml_bytes)
+    submission_type = _first_text(root, "submissionType").upper()
+    if submission_type not in {'13F-HR', '13F-HR/A'}:
+        raise XmlParseError('unsupported submissionType')
+    totals = []
+    for field in ('tableEntryTotal', 'tableValueTotal'):
+        value = _first_text(root, field)
+        totals.append(_required_nonnegative_int(value, 0, field) if value else None)
+    report_text = _first_text(root, "reportCalendarOrQuarter")
+    if not report_text:
+        raise XmlParseError("cover page is missing reportCalendarOrQuarter")
+    report_period = _normalize_report_period(report_text)
+
+    is_amendment_text = _first_text(root, "isAmendment").lower()
+    flag_nodes = root.xpath("//*[local-name()='isAmendment']")
+    if not flag_nodes and submission_type == "13F-HR":
+        # SEC v1.9 COVER_PAGE declares this element optional (minOccurs=0).
+        # The explicit HR form establishes the base filing; amendment metadata
+        # below must still be absent. Empty/invalid present flags are not defaults.
+        is_amendment_text = "false"
+    if len(flag_nodes) > 1:
+        raise XmlParseError("duplicate isAmendment")
+    if is_amendment_text not in {"true", "false"}:
+        raise XmlParseError("cover page has invalid or missing isAmendment")
+    is_amendment = is_amendment_text == "true"
+    form_is_amendment = submission_type.endswith("/A")
+    if form_is_amendment != is_amendment:
+        raise XmlParseError(
+            "submissionType and isAmendment provide contradictory amendment status"
+        )
+
+    amendment_type_nodes = root.xpath("//*[local-name()='amendmentType']")
+    amendment_number_text = _first_text(root, "amendmentNo")
+    if not is_amendment:
+        if amendment_number_text or amendment_type_nodes:
+            raise XmlParseError("non-amendment cover contains amendment metadata")
+        return CoverMetadata(report_period, None, None, submission_type, *totals)
+
+    if len(amendment_type_nodes) != 1:
+        raise XmlParseError("amendment must contain exactly one amendment type")
+    if not _NONNEGATIVE_INTEGER.fullmatch(amendment_number_text):
+        raise XmlParseError("amendment has invalid or missing amendmentNo")
+    amendment_number = int(amendment_number_text)
+    if amendment_number < 1:
+        raise XmlParseError("amendmentNo must be at least 1")
+
+    raw_type = (amendment_type_nodes[0].text or "").strip().upper()
+    if raw_type == "RESTATEMENT":
+        amendment_type = AmendmentType.RESTATEMENT
+    elif raw_type == "NEW HOLDINGS":
+        amendment_type = AmendmentType.ADD_NEW_HOLDINGS
+    else:
+        raise XmlParseError(f"unsupported amendmentType {raw_type!r}")
+    return CoverMetadata(
+        report_period,
+        amendment_number,
+        amendment_type,
+        submission_type,
+        *totals,
+    )
+
+
+def parse_info_table(xml_bytes: bytes) -> list[HoldingRow]:
+    """Parse and validate an INFORMATION TABLE into lossless row identities."""
+
+    root = _parse_xml(xml_bytes)
+    if etree.QName(root).localname != 'informationTable':
+        raise XmlParseError('expected an INFORMATION TABLE document')
     rows: list[HoldingRow] = []
     info_tables = root.xpath(
         "//*[local-name()='infoTable' and "
         "ancestor::*[local-name()='informationTable']]"
     )
     if not info_tables:
-        info_tables = root.xpath("//*[local-name()='infoTable']")
+        raise XmlParseError('empty INFORMATION TABLE requires manual review')
 
     for ordinal, node in enumerate(info_tables, start=1):
         text = lambda name: _child_text(node, name)  # noqa: E731
-        value_text = text("value")
-        shares_text = text("sshPrnamt")
-        put_call = (text("putCall") or "").strip().upper()
-        if put_call not in ("PUT", "CALL"):
-            put_call = ""
+        for field in ('nameOfIssuer', 'titleOfClass', 'cusip'):
+            if not text(field):
+                raise HoldingValidationError(ordinal, field, '')
+        put_call = text("putCall").upper()
+        if put_call not in {"", "PUT", "CALL"}:
+            raise HoldingValidationError(ordinal, "putCall", put_call)
+        shares_type = text("sshPrnamtType").upper()
+        if shares_type not in {"SH", "PRN"}:
+            raise HoldingValidationError(ordinal, "sshPrnamtType", shares_type)
         rows.append(
             HoldingRow(
                 row_ordinal=ordinal,
-                name_of_issuer=(text("nameOfIssuer") or "").strip(),
-                title_of_class=(text("titleOfClass") or "").strip(),
-                cusip=(text("cusip") or "").strip().upper(),
-                value=_to_int(value_text),
-                shares=_to_float(shares_text),
+                name_of_issuer=text("nameOfIssuer"),
+                title_of_class=text("titleOfClass"),
+                cusip=text("cusip").upper(),
+                value=_required_nonnegative_int(text("value"), ordinal, "value"),
+                shares=_required_nonnegative_int(
+                    text("sshPrnamt"), ordinal, "shares"
+                ),
                 put_call=put_call,
-                ssh_prnamt_type=(text("sshPrnamtType") or "").strip(),
-                investment_discretion=(text("investmentDiscretion") or "").strip(),
-                other_manager=(text("otherManager") or "").strip(),
+                ssh_prnamt_type=shares_type,
+                investment_discretion=text("investmentDiscretion"),
+                other_manager=text("otherManager"),
             )
         )
     return rows
 
 
-def _child_text(node, local_name: str) -> str:
-    # sshPrnamt / sshPrnamtType live inside <shrsOrPrnAmt>; other fields are
-    # direct children. Descendant search handles both safely because we always
-    # match on local-name (e.g. value vs votingAuthority/Sole never collide).
-    children = node.xpath(f".//*[local-name()='{local_name}']")
-    if not children:
+def _first_text(node, local_name: str) -> str:
+    matches = node.xpath(f"//*[local-name()='{local_name}']")
+    if not matches:
         return ""
-    return (children[0].text or "").strip()
+    return (matches[0].text or "").strip()
 
 
-def _to_int(text: str) -> int | None:
-    text = text.replace(",", "").strip()
-    if not text:
-        return None
-    try:
-        return int(float(text))
-    except ValueError:
-        return None
+def _child_text(node, local_name: str) -> str:
+    matches = node.xpath(f".//*[local-name()='{local_name}']")
+    if not matches:
+        return ""
+    return (matches[0].text or "").strip()
 
 
-def _to_float(text: str) -> float | None:
-    text = text.replace(",", "").strip()
-    if not text:
-        return None
-    try:
-        return float(text)
-    except ValueError:
-        return None
+def _required_nonnegative_int(text: str, row_ordinal: int, field: str) -> int:
+    normalized = text.strip()
+    if not _NONNEGATIVE_INTEGER.fullmatch(normalized):
+        raise HoldingValidationError(row_ordinal, field, text)
+    result = int(normalized)
+    if result > 2**63 - 1:
+        raise HoldingValidationError(row_ordinal, field, text)
+    return result
+
+
+def _normalize_report_period(value: str) -> str:
+    for format_string in ("%m-%d-%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(value, format_string).date().isoformat()
+        except ValueError:
+            continue
+    raise XmlParseError(f"invalid reportCalendarOrQuarter {value!r}")

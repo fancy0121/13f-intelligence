@@ -13,6 +13,7 @@ if str(ROOT / "src") not in sys.path:
 if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
+from store import configured_database_path, database_validation_error, public_snapshot_error
 from ui import BRAND_HTML, FOOTER_HTML, T, inject_style
 
 st.set_page_config(
@@ -46,20 +47,26 @@ def main() -> None:
         )
     )
 
-    if not (ROOT / "data" / "thirteenf.db").exists():
-        st.error(T("数据库不存在。请先运行数据构建后重试。", "Database not found. Please build the data first."))
-        st.stop()
-
     pages = [
-        st.Page("pages/overview.py", title=T("总览", "Overview"), default=True),
-        st.Page("pages/managers.py", title=T("机构", "Managers")),
-        st.Page("pages/securities.py", title=T("证券", "Securities")),
-        st.Page("pages/activity.py", title=T("活动探索", "Activity")),
-        st.Page("pages/portfolio.py", title=T("我的组合", "My Portfolio")),
-        st.Page("pages/methodology.py", title=T("方法论与限制", "Methodology")),
-        st.Page("pages/observation.py", title=T("研究观察", "Research Log")),
+        st.Page("views/overview.py", title=T("总览", "Overview"), default=True),
+        st.Page("views/managers.py", title=T("机构", "Managers")),
+        st.Page("views/securities.py", title=T("证券", "Securities")),
+        st.Page("views/activity.py", title=T("活动探索", "Activity")),
+        st.Page("views/portfolio.py", title=T("我的组合", "My Portfolio")),
+        st.Page("views/methodology.py", title=T("方法论与限制", "Methodology")),
+        st.Page("views/observation.py", title=T("研究观察", "Research Log")),
     ]
+    # Keep views outside the legacy pages directory so cold-start deep links
+    # always execute this shared entrypoint. Register routes before st.stop.
     pg = st.navigation(pages)
+    validation_error = database_validation_error(configured_database_path()) or public_snapshot_error()
+    if validation_error:
+        st.error(T(
+            "数据库需重建：当前数据快照尚未验证，页面已停止。 [NOT_VALIDATED]",
+            "Database rebuild required: the current data snapshot is not validated; pages are stopped. [NOT_VALIDATED]",
+        ))
+        st.caption(validation_error)
+        st.stop()
     pg.run()
     st.markdown(FOOTER_HTML, unsafe_allow_html=True)
 

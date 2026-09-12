@@ -3,7 +3,7 @@
 - Generated: 2026-08-24
 - Protocol: v0.1
 - Git SHA: 69e728f0e1394c953d752add7d5f4a2cedcf7bea
-- DB snapshot: C:\Users\ASUS\Documents\挣钱项目组\13f-intelligence\data\thirteenf.db
+- DB snapshot: data/thirteenf.db
 - Quarters dev: 2023-09-30, 2023-12-31, 2024-03-31, 2024-06-30, 2024-09-30, 2024-12-31, 2025-03-31, 2025-06-30
 - Quarters holdout: 2025-09-30, 2025-12-31, 2026-03-31, 2026-06-30
 - Variants: A0, A1_2Q, A1_3Q, A2, A3
