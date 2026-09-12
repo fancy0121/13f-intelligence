@@ -67,6 +67,10 @@ def run() -> None:
         st.info(T("INSUFFICIENT_DATA。", "INSUFFICIENT_DATA."))
         return
 
+    if ev.quality.get("source_status") == "SOURCE_QUARANTINED":
+        st.error(T("该机构最新源季度已隔离：以下空值是证据不足，不是零持仓或退出。 [SOURCE_QUARANTINED]",
+                   "Latest source quarter quarantined: empty values mean insufficient evidence, not zero holdings or EXIT. [SOURCE_QUARANTINED]"))
+
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric(T("报告季度", "Quarter"), ev.latest_report_period or "N/A")
     c2.metric(T("filing 日期", "Filing Date"), ev.latest_filing_date or "N/A")
@@ -76,9 +80,14 @@ def run() -> None:
     c5.metric(T("修订", "Amended"), T("是", "Yes") if ev.amended else T("否", "No"))
     st.caption(
         f"{T('验证状态', 'Validation')}: {display_code(ev.validation_status)} | "
-        f"{T('持仓数', 'Positions')}: {ev.position_count} | "
-        f"{T('报告总值', 'Total value')}: {_fmt(ev.total_value)}"
+        f"{T('持仓数', 'Positions')}: {ev.position_count if ev.quality.get('source_status') == 'READY' else 'N/A'} | "
+        f"{T('报告总值（美元）', 'Total value (USD)')}: {_fmt(ev.total_value)}"
     )
+
+    if ev.quality.get("source_status") == "SOURCE_QUARANTINED":
+        st.info(T("INSUFFICIENT_DATA：这一季度的持仓与变化不展示，也不使用旧季度替代。",
+                  "INSUFFICIENT_DATA: this quarter's holdings and changes are withheld; older quarters are not substituted."))
+        return
 
     st.divider()
     st.markdown(f"#### {T('最新报告季度变化', 'Latest Quarter Changes')} (NEW / ADD / REDUCE / EXIT)")
@@ -121,7 +130,7 @@ def run() -> None:
                         r["cusip"], r["issuer"]
                     ),
                     T("份额", "Shares"): _fmt(r["shares"]),
-                    T("价值", "Value"): _fmt(r["value"]),
+                    T("价值（美元）", "Value (USD)"): _fmt(r["value"]),
                     T("权重", "Weight"): _fmt(r["weight"], pct=True),
                     T("类别", "Put/Call"): r["put_call"] or T("股票", "Equity"),
                     T("解析状态", "Resolution"): display_code(r["resolution_status"]),

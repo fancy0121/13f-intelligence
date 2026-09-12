@@ -11,8 +11,6 @@ import io
 import json
 import os
 import sys
-import tempfile
-import uuid
 from pathlib import Path
 
 import streamlit as st
@@ -59,16 +57,11 @@ MISUSE_RISKS = {
 
 
 def _store() -> ObservationStore:
-    storage_dir = OBS_DIR
     if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes"):
-        if "public_observation_dir" not in st.session_state:
-            st.session_state["public_observation_dir"] = str(
-                Path(tempfile.gettempdir())
-                / "thirteenf-observations"
-                / str(uuid.uuid4())
-            )
-        storage_dir = Path(st.session_state["public_observation_dir"])
-    return ObservationStore(storage_dir)
+        if "public_observation_store" not in st.session_state:
+            st.session_state["public_observation_store"] = ObservationStore(None)
+        return st.session_state["public_observation_store"]
+    return ObservationStore(OBS_DIR)
 
 
 def _csv_download(episodes: list[dict]) -> bytes:

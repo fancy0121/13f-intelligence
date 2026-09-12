@@ -13,7 +13,7 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T, display_code
+from ui import B, T, display_code, display_manager_name
 
 
 def run() -> None:
@@ -30,7 +30,7 @@ def run() -> None:
     res = store.resolution_summary()
     verified = sum(v for k, v in res.items() if k in (
         "VERIFIED_EXACT", "VERIFIED_MULTI_SOURCE", "VERIFIED_HISTORICAL"))
-    total_res = sum(res.values()) or 1
+    total_res = sum(res.values())
     q = store.quality_events()
     events = store.event_counts(period)
     latest_filing = store.latest_filing_info()
@@ -49,8 +49,8 @@ def run() -> None:
     c6.metric(T("修订 filing", "Amendments"), amended)
     c7, c8 = st.columns(2)
     c7.metric(
-        T("已解析证券覆盖", "Resolved Coverage"),
-        f"{verified/total_res:.1%}",
+        T("映射表已解析比例", "Mapping-table Resolution"),
+        f"{verified/total_res:.1%}" if total_res else "INSUFFICIENT_DATA",
         delta=f"{verified}/{sum(res.values())}",
         delta_color="off",
     )
@@ -85,10 +85,10 @@ def run() -> None:
             "**" + T("filing 日期", "FILING DATE") + "**：" +
             T("这份报告实际公开的日期，例如 2026-08-14。",
               "The date the report was actually made public, e.g. 2026-08-14.") + "\n\n"
-            "- " + T("也就是说，2026-06-30 不等于「机构在 2026-06-30 当天知道这些持仓」。",
-                     "So 2026-06-30 does not mean the manager knew these holdings on that day.") + "\n"
-            "- " + T("13F 允许最长 45 天延迟，所以看板上的信息总是有延迟的，不是实时仓位。",
-                     "13F allows up to 45 days of lag; the dashboard is always delayed, never real-time.")
+            "- " + T("也就是说，公众不能在 2026-06-30 当天据此得知这些持仓；应以 filing 实际公开时间为准。",
+                     "So the public could not know these holdings on 2026-06-30; use the filing's actual public date.") + "\n"
+            "- " + T("13F 通常在季末后 45 天内提交；修订与保密处理可能更晚，绝非实时仓位。",
+                     "13F is normally filed within 45 days after quarter-end; amendments and confidential treatment may delay it further. Never real-time.")
         )
 
     with st.expander(T("如何使用本看板（快速开始）", "How to use this dashboard")):
@@ -120,8 +120,8 @@ def run() -> None:
         )
     )
     chart_data = pd.DataFrame(
-        {"count": [events[k] for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")]},
-        index=["NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED"],
+        {T("事件数", "Event count"): [events[k] for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")]},
+        index=[display_code(k) for k in ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")],
     )
     st.bar_chart(chart_data)
     st.markdown(T("按证券维度查看：请前往「活动探索」页（仅描述性排序）。",
@@ -129,6 +129,15 @@ def run() -> None:
 
     st.divider()
     st.markdown(f"#### {T('数据质量状态', 'Data Quality Status')}")
+    quarantined = store.quarantined_periods()
+    if quarantined:
+        st.dataframe([
+            {T("机构", "Manager"): display_manager_name(row["manager"]),
+             T("报告季度", "Quarter"): row["report_period"],
+             T("隔离申报", "Quarantined accessions"): row["accessions"],
+             T("状态", "Status"): T("源数据已隔离", "SOURCE_QUARANTINED")}
+            for row in quarantined
+        ], hide_index=True, width="stretch")
     if not q:
         st.success(T("未发现数据质量事件。", "No data quality events found."))
     else:

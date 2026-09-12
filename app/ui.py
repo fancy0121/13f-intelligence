@@ -126,12 +126,15 @@ _CODE_LABELS = {
     "OTHER_13F_SECURITY": ("其他 13F 证券", "Other 13F security"),
     "PREFERRED_OR_HYBRID": ("优先或混合证券", "Preferred or hybrid security"),
     "INSUFFICIENT_DATA": ("数据不足", "Insufficient data"),
+    "INSUFFICIENT_COMPARISON": ("缺少可比季度", "Insufficient comparison"),
+    "MISSING_HISTORICAL_COMPARISON": ("缺少历史比较数据", "Missing historical comparison"),
     "LOW_BREADTH": ("覆盖面较低", "Low breadth"),
     "NO_RECENT_CHANGE": ("近期无变化", "No recent change"),
     "MIXED_ACTIVITY": ("增减并存", "Mixed activity"),
     "MORE_ADDS_THAN_REDUCTIONS": ("增持多于减持", "More adds than reductions"),
     "MORE_REDUCTIONS_THAN_ADDS": ("减持多于增持", "More reductions than adds"),
     "INCOMPLETE_QUARTER": ("季度不完整", "Incomplete quarter"),
+    "SOURCE_QUARANTINED": ("源数据隔离", "Source quarantined"),
     "STALE_FILING": ("披露陈旧", "Stale filing"),
     "UNRESOLVED_CUSIP": ("CUSIP 未解析", "Unresolved CUSIP"),
     "FAILED_INGESTION": ("采集失败", "Failed ingestion"),
@@ -172,7 +175,8 @@ FOOTER_HTML = """
   <b>13F Institutional Evidence System · v0.5.1</b> ｜
   Source: SEC EDGAR original 13F disclosures · 数据来源：SEC EDGAR 原始 13F 披露<br/>
   Evidence only, no investment advice. Report quarter ≠ real-time holdings
-  (up to 45-day disclosure lag). 仅展示证据，不含投资建议；报告季度 ≠ 实时持仓（最长 45 天披露延迟）。<br/>
+  (normally filed within 45 days after quarter-end; amendments and confidential treatment may delay disclosure further).
+  仅展示证据，不含投资建议；报告通常在季末后 45 天内提交，修订及保密处理可能使披露更晚。<br/>
   中文名称仅用于界面阅读，SEC 英文法定名与 CUSIP 仍是身份依据；未核验中文名会明确标记。
   Chinese names are display aids only; SEC legal names and CUSIPs remain authoritative.
 </div>

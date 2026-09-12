@@ -139,7 +139,7 @@ def test_task9_portfolio_page_editor(tmp_path):
 
     p = tmp_path / "portfolio.csv"
     p.write_text("# header\nticker,weight\n", encoding="utf-8")
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
     at.session_state["portfolio_path"] = str(p)
     at.run()
     assert not at.exception, at.exception
@@ -158,7 +158,7 @@ def test_task9_portfolio_ambiguous_choice_survives_rerun(tmp_path):
 
     p = tmp_path / "portfolio.csv"
     p.write_text("# header\nticker,weight\n", encoding="utf-8")
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
     at.session_state["portfolio_path"] = str(p)
     at.run()
 
@@ -184,7 +184,7 @@ def test_task9_new_unique_search_clears_stale_ambiguous_candidates(tmp_path):
 
     p = tmp_path / "portfolio.csv"
     p.write_text("# header\nticker,weight\n", encoding="utf-8")
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
     at.session_state["portfolio_path"] = str(p)
     at.run()
 
@@ -203,22 +203,43 @@ def test_task9_new_unique_search_clears_stale_ambiguous_candidates(tmp_path):
     assert not any("GOOGL" in b.label for b in at.button)
 
 
-def test_task9_public_portfolios_are_isolated_by_browser_session(monkeypatch):
+def test_task9_public_portfolios_are_isolated_by_browser_session(monkeypatch, tmp_path):
     """A public visitor must never read or overwrite another visitor's holdings."""
     pytest.importorskip("streamlit.testing")
     from streamlit.testing.v1 import AppTest
+    import store as ui_store
+    import thirteenf.product.evidence as evidence_module
 
     monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
-    first = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
-    second = AppTest.from_file(str(ROOT / "app" / "pages" / "portfolio.py"), default_timeout=30)
+    # Isolate privacy behavior; public release attestation is tested separately.
+    monkeypatch.setattr(ui_store, "public_snapshot_error", lambda: None)
+    shared = tmp_path / "shared.csv"
+    shared.write_text("ticker,weight\nMSFT,0.25\n", encoding="utf-8")
+    before = shared.read_bytes()
+    monkeypatch.setenv("THIRTEENF_PORTFOLIO", str(shared))
+    original_load = evidence_module.load_portfolio_rows
+    def no_shared_read(path):
+        assert Path(path) != shared, "public UI must not read shared portfolio"
+        return original_load(path)
+    def no_write(*args, **kwargs):
+        raise AssertionError("public portfolio must not write files")
+    monkeypatch.setattr(evidence_module, "load_portfolio_rows", no_shared_read)
+    monkeypatch.setattr(evidence_module, "save_portfolio_rows", no_write)
+    first = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "views" / "portfolio.py"), default_timeout=30)
+    first.session_state["portfolio_path"] = str(shared)
     first.run()
     second.run()
-
-    first_path = str(first.session_state["public_portfolio_path"])
-    second_path = str(second.session_state["public_portfolio_path"])
-    assert first_path != second_path
-    assert "config/portfolio.csv" not in first_path.replace("\\", "/")
-    assert "config/portfolio.csv" not in second_path.replace("\\", "/")
+    assert not first.exception and not second.exception
+    assert first.session_state["public_portfolio_rows"] == []
+    first.text_input[0].set_value("GOOGL")
+    first.button[0].click()
+    first.run()
+    assert not first.exception
+    assert first.session_state["public_portfolio_rows"] == [{"ticker": "GOOGL", "weight": ""}]
+    second.run()
+    assert second.session_state["public_portfolio_rows"] == []
+    assert shared.read_bytes() == before
 
 
 def test_public_observations_are_isolated_by_browser_session(monkeypatch):
@@ -227,14 +248,18 @@ def test_public_observations_are_isolated_by_browser_session(monkeypatch):
     from streamlit.testing.v1 import AppTest
 
     monkeypatch.setenv("THIRTEENF_PUBLIC_MODE", "1")
-    first = AppTest.from_file(str(ROOT / "app" / "pages" / "observation.py"), default_timeout=30)
-    second = AppTest.from_file(str(ROOT / "app" / "pages" / "observation.py"), default_timeout=30)
+    first = AppTest.from_file(str(ROOT / "app" / "views" / "observation.py"), default_timeout=30)
+    second = AppTest.from_file(str(ROOT / "app" / "views" / "observation.py"), default_timeout=30)
     first.run()
     second.run()
 
-    assert str(first.session_state["public_observation_dir"]) != str(
-        second.session_state["public_observation_dir"]
-    )
+    assert not first.exception and not second.exception
+    first_store = first.session_state["public_observation_store"]
+    second_store = second.session_state["public_observation_store"]
+    assert first_store is not second_store
+    assert first_store.dir is second_store.dir is None
+    first_store.start_episode({"research_question": "private question"})
+    assert second_store.episodes() == []
 
 
 # TASK 10: update workflow orchestration path.

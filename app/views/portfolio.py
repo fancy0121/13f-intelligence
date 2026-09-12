@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import os
 import sys
-import tempfile
-import uuid
 from pathlib import Path
 
 import streamlit as st
@@ -14,7 +12,7 @@ if str(ROOT / "src") not in sys.path:
 if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
-from store import get_store
+from store import get_store, load_local_portfolio
 from thirteenf.product.evidence import load_portfolio_rows, save_portfolio_rows
 from ui import (
     B,
@@ -27,22 +25,16 @@ from ui import (
 )
 
 
-def _portfolio_path() -> Path:
+def _portfolio_path() -> Path | None:
+    if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes"):
+        return None
     session = st.session_state.get("portfolio_path")
     if session:
         return Path(session)
     env = os.environ.get("THIRTEENF_PORTFOLIO")
     if env:
         return Path(env)
-    if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes"):
-        if "public_portfolio_path" not in st.session_state:
-            st.session_state["public_portfolio_path"] = str(
-                Path(tempfile.gettempdir())
-                / "thirteenf-portfolios"
-                / f"{uuid.uuid4()}.csv"
-            )
-        return Path(st.session_state["public_portfolio_path"])
-    return ROOT / "config" / "portfolio.csv"
+    return load_local_portfolio(ROOT)[0]
 
 
 def run() -> None:
@@ -58,8 +50,14 @@ def run() -> None:
         )
     )
     store = get_store()
+    public_mode = os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes")
     portfolio_path = _portfolio_path()
-    rows = load_portfolio_rows(portfolio_path)
+    if public_mode:
+        rows = st.session_state.setdefault("public_portfolio_rows", [])
+    elif portfolio_path == load_local_portfolio(ROOT)[0]:
+        _, rows = load_local_portfolio(ROOT)
+    else:
+        rows = load_portfolio_rows(portfolio_path)
 
     st.divider()
     st.markdown(f"#### {T('我的持仓（可直接编辑）', 'My Holdings (editable)')}")
@@ -88,7 +86,10 @@ def run() -> None:
             m = matches[0]
             rows = [r for r in rows if r["ticker"] != (m["ticker"] or m["cusip"])]
             rows.append({"ticker": m["ticker"] or m["cusip"], "weight": weight})
-            save_portfolio_rows(portfolio_path, rows)
+            if public_mode:
+                st.session_state["public_portfolio_rows"] = rows
+            else:
+                save_portfolio_rows(portfolio_path, rows)
             st.success(T(f"已添加 {m['ticker'] or m['cusip']}（{m['cusip']}）。",
                          f"Added {m['ticker'] or m['cusip']} ({m['cusip']})."))
             st.rerun()
@@ -121,7 +122,10 @@ def run() -> None:
             m = labels[choice]
             rows = [r for r in rows if r["ticker"] != (m["ticker"] or m["cusip"])]
             rows.append({"ticker": m["ticker"] or m["cusip"], "weight": pending["weight"]})
-            save_portfolio_rows(portfolio_path, rows)
+            if public_mode:
+                st.session_state["public_portfolio_rows"] = rows
+            else:
+                save_portfolio_rows(portfolio_path, rows)
             st.session_state.pop("portfolio_pending", None)
             st.session_state.pop("portfolio_pick_sel", None)
             st.session_state.pop("portfolio_pick_q", None)
@@ -141,13 +145,16 @@ def run() -> None:
                 ):
                     keep.append(r)
             if st.form_submit_button(T("保存修改", "Save changes")):
-                save_portfolio_rows(portfolio_path, keep)
+                if public_mode:
+                    st.session_state["public_portfolio_rows"] = keep
+                else:
+                    save_portfolio_rows(portfolio_path, keep)
                 st.success(T("已保存。", "Saved."))
                 st.rerun()
 
     st.divider()
     st.markdown(f"#### {T('持仓事实交叉验证（对称展示）', 'Factual cross-check (symmetric)')}")
-    out = store.portfolio_evidence(portfolio_path)
+    out = store.portfolio_evidence(portfolio_path, rows=rows) if public_mode else store.portfolio_evidence(portfolio_path)
     if out == "SETUP_REQUIRED":
         st.warning(
             T("SETUP_REQUIRED：你的持仓列表为空。请在上方添加你的第一只股票。系统不会生成演示组合。",
@@ -166,10 +173,10 @@ def run() -> None:
                     T("权重", "Weight"): r["weight"],
                     T("状态", "Status"): display_code(r["status"]),
                     T("持有机构实体数", "Entities"): r["holder_entity_count"],
-                    T("独立增持", "Ind. ADD"): r["independent_add_manager_count"],
-                    T("独立减持", "Ind. REDUCE"): r["independent_reduce_manager_count"],
-                    T("独立退出", "Ind. EXIT"): r["independent_exit_manager_count"],
-                    T("独立新增", "Ind. NEW"): r["independent_new_manager_count"],
+                    T("已核验申报主体增持", "Verified filing entities ADD"): r["independent_add_manager_count"],
+                    T("已核验申报主体减持", "Verified filing entities REDUCE"): r["independent_reduce_manager_count"],
+                    T("已核验申报主体退出", "Verified filing entities EXIT"): r["independent_exit_manager_count"],
+                    T("已核验申报主体新增", "Verified filing entities NEW"): r["independent_new_manager_count"],
                     T("重复增持", "Repeated ADD"): r["repeated_add_manager_count"],
                     T("重复减持", "Repeated REDUCE"): r["repeated_reduce_manager_count"],
                     T("活动状态", "Activity"): display_code(r["activity_state"]),
@@ -199,14 +206,13 @@ def run() -> None:
                       "To remove, check the row and click Save changes.") + "\n"
             "5. " + (
                 T(
-                    "公开版持仓只属于当前浏览器会话，不会与其他访客共享；刷新会话或重新部署后会清空。",
-                    "On the public site, holdings belong only to this browser session and are never shared "
-                    "with other visitors; a new session or redeploy clears them.",
+                    "公开版持仓仅保留在当前服务端会话内存中，不写入服务器文件；会话结束后清空。",
+                    "On the public site, holdings stay only in current server-session memory and are not written to server files; they clear when the session ends.",
                 )
                 if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes")
                 else T(
-                    "本地版持仓保存在 `config/portfolio.csv`，下次打开看板会自动载入。",
-                    "In the local app, holdings are stored in `config/portfolio.csv` and reload automatically.",
+                    "本地版持仓保存在私有目录，下次打开看板会自动载入。",
+                    "In the local app, holdings are stored in a private local directory and reload automatically.",
                 )
             )
         )

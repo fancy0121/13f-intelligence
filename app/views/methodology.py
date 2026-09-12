@@ -35,12 +35,15 @@ def run() -> None:
         13F 只看得到 **多头持仓**。它看不到 *13F only shows long holdings. It cannot see*：
 
         - 空头仓位 *short positions*
-        - 衍生品、期权、期货、对冲 *derivatives, options, futures, hedges*
+        - 完整衍生品和对冲敞口（部分 PUT/CALL 会披露，但不能据此还原完整组合）
+          *complete derivatives and hedging exposure (some PUT/CALL positions are disclosed, not a complete portfolio)*
         - 确切的买入/卖出时间 *exact purchase/sale timing*
         - 买入成本 *cost basis*
         - 机构是否因为保密申请而未披露某些持仓 *confidential-treatment omissions*
 
-        而且 13F 允许最长 45 天延迟。所以「机构增持」只是一个**已披露事实**，不是
+        13F 通常在季末后 45 天内提交，修订与保密处理可能更晚。
+        *Normally filed within 45 days after quarter-end; amendments and confidential treatment may delay disclosure further.*
+        所以「机构增持」只是一个**已披露事实**，不是
         「这家公司会涨」的结论。本项目曾做过严格的研究验证：连续 2 或 3 个季度的机构
         行为，没有被证明带来增量经济价值。因此看板只展示证据，不做预测。
 
@@ -52,6 +55,9 @@ def run() -> None:
         - 修订（amendment）会更新最新有效状态，来源链保留 *amendments update effective state; source chain kept*。
         - 保密处理可能使「当季未披露」不等于「不持有」
           *confidential treatment means "not disclosed" ≠ "not held"*。
+        - 「已核验申报主体」仅表示申报主体身份已核验；不代表策略独立、基金质量、投资观点或推荐。
+          *"Verified filing entities" means filer identity has been verified only. It does not establish
+          strategy independence, fund quality, an investment view, or a recommendation.*
         """
     )
     st.divider()

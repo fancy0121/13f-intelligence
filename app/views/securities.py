@@ -118,15 +118,15 @@ def run() -> None:
         f"{T('天', 'days')}"
     )
     st.caption(
-        T("报告季度 ≠ 实时持仓；13F 存在最长 45 天披露延迟。",
-          "Report quarter ≠ real-time holdings; 13F has up to 45 days of disclosure lag.")
+        T("报告季度 ≠ 实时持仓；通常在季末后 45 天内提交，修订及保密处理可能使披露更晚。",
+          "Report quarter is not real-time: normally filed within 45 days after quarter-end; amendments and confidential treatment may delay it further.")
     )
 
     st.divider()
     st.markdown(f"#### {T('最新报告季度机构持有与变化', 'Latest-quarter holders and changes')}")
     st.write(
         f"{T('机构实体数', 'Entities')}：{ev.holder_entity_count} | "
-        f"{T('已验证独立机构数', 'Verified independent')}：{ev.verified_independent_manager_count} | "
+        f"{T('已核验申报主体数', 'Verified filing entities')}：{ev.verified_independent_manager_count} | "
         f"{T('活动状态', 'Activity')}：{display_code(ev.activity_state)}"
     )
     if ev.holders:
@@ -134,7 +134,7 @@ def run() -> None:
             [
                 {
                     T("机构名称", "Manager Name"): display_manager_name(h["manager"]),
-                    T("独立验证", "Independent"): T("是", "Yes") if h["independent"] else T("否", "No"),
+                    T("申报主体已核验", "Filing entity verified"): T("是", "Yes") if h["independent"] else T("否", "No"),
                     T("变化类型", "Change"): display_code(h["change_type"]),
                     T("份额(前/后)", "Shares (prev/now)"):
                         f"{_fmt(h['shares_prev'])} / {_fmt(h['shares_now'])}",
@@ -148,6 +148,10 @@ def run() -> None:
             ],
             width='stretch',
         )
+    elif ev.activity_state == "INSUFFICIENT_COMPARISON":
+        st.info(T("该季度存在跟踪机构持仓，但缺少相邻可比季度，未给出“无变化”结论。",
+                  "Tracked holders exist this quarter, but an adjacent comparable quarter is missing; "
+                  "no no-change conclusion is shown."))
     else:
         st.info(T("该季度无跟踪机构持有（可能数据缺失或陈旧）。",
                   "No tracked manager held this security in the latest quarter "
@@ -160,10 +164,13 @@ def run() -> None:
     for col, key in zip(cols, ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")):
         col.metric(display_code(key), ac[key])
     st.write(
-        f"- {T('独立机构增持计数', 'Independent ADD count')}（≥2Q ADD）：{ev.repeated_add_manager_count}\n"
-        f"- {T('独立机构减持计数', 'Independent REDUCE count')}（≥2Q REDUCE）：{ev.repeated_reduce_manager_count}"
+        f"- {T('已核验申报主体重复增持计数', 'Verified filing entities repeated ADD count')}（≥2Q ADD）：{ev.repeated_add_manager_count}\n"
+        f"- {T('已核验申报主体重复减持计数', 'Verified filing entities repeated REDUCE count')}（≥2Q REDUCE）：{ev.repeated_reduce_manager_count}"
     )
     st.caption(
+        B("增持与减持/退出同权重展示；若缺少可比季度会明确标记，不以 0 代替。",
+          "Adds and reduces/exits are shown with equal weight; missing comparisons are labelled, not replaced by 0.")
+        if ev.activity_state == "INSUFFICIENT_COMPARISON" else
         B("增持与减持/退出同权重展示；缺失一侧显示 0",
           "Adds and reduces/exits are shown with equal weight; missing side shows 0")
     )
@@ -178,6 +185,11 @@ def run() -> None:
                     T("持有机构", "Holders"): t["holders"],
                     T("增持", "Adds"): t["adds"],
                     T("减持", "Reduces"): t["reduces"],
+                    T("比较状态", "Comparison status"): (
+                        display_code("INSUFFICIENT_COMPARISON")
+                        if t["adds"] is None or t["reduces"] is None
+                        else T("可比较", "Comparable")
+                    ),
                 }
                 for t in ev.timeline if t["holders"] or t["adds"] or t["reduces"]
             ],

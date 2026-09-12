@@ -22,7 +22,7 @@ from ui import B
 
 
 def _run(page: str):
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / page), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / page), default_timeout=30)
     at.run()
     assert not at.exception, at.exception
     return at
@@ -35,18 +35,45 @@ def test_bilingual_sentence_has_no_duplicate_terminal_punctuation():
 def test_overview_page_smoke():
     at = _run("overview.py")
     assert any(m.label.startswith("最新报告季度") for m in at.metric)
+    assert any("NOT_VALIDATED" in str(w.value) and "本地" in str(w.value) for w in at.warning)
 
 
 def test_overview_quality_codes_are_bilingual():
     at = _run("overview.py")
     visible = "\n".join(str(m.value) for m in at.markdown)
     assert "季度不完整 / Incomplete quarter [INCOMPLETE_QUARTER]" in visible
+    assert "缺少历史比较数据 / Missing historical comparison [MISSING_HISTORICAL_COMPARISON]" in visible
+
+
+def test_quarantine_banner_is_red_and_bilingual(product_bundle, tmp_path, monkeypatch):
+    import shutil
+    import sqlite3
+    from thirteenf.changes import compute_position_changes
+    copied = tmp_path / "quarantined.db"
+    shutil.copy2(product_bundle.db, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("UPDATE filings SET ingest_status='QUARANTINED' WHERE report_period='2026-06-30'")
+    compute_position_changes(conn, "0.1.0")
+    conn.commit()
+    conn.close()
+    monkeypatch.setenv("THIRTEENF_DB_PATH", str(copied))
+    at = _run("overview.py")
+    assert any("SOURCE_QUARANTINED" in e.value and "隔离" in e.value for e in at.error)
+    assert any(str(m.value) == "2026-06-30" for m in at.metric)
+    from ui import display_code
+    assert display_code("SOURCE_QUARANTINED") == "源数据隔离 / Source quarantined [SOURCE_QUARANTINED]"
+    manager_page = _run("managers.py")
+    manager_page.text_input[0].set_value("Berkshire").run()
+    assert not manager_page.exception
+    assert not any("Positions: 0" in str(c.value) for c in manager_page.caption)
+    assert any("INSUFFICIENT_DATA" in str(i.value) for i in manager_page.info)
 
 
 def test_overview_long_metric_values_use_compact_display():
     at = _run("overview.py")
     metrics = {m.label: str(m.value) for m in at.metric}
-    assert re.fullmatch(r"\d+\.\d%", metrics["已解析证券覆盖 / Resolved Coverage"])
+    assert re.fullmatch(r"\d+\.\d%", metrics["映射表已解析比例 / Mapping-table Resolution"])
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", metrics["本地数据更新 / Local Data Updated"])
 
 
@@ -157,6 +184,19 @@ def test_single_security_match_opens_with_bilingual_status_without_extra_click()
     assert {"新增 / NEW", "增持 / ADD", "减持 / REDUCE", "退出 / EXIT", "未变化 / UNCHANGED"} <= set(metrics)
 
 
+def test_missing_comparison_does_not_mix_text_into_numeric_timeline(caplog):
+    import pandas as pd
+    at = _run("securities.py")
+    at.text_input[0].set_value("GOOGL")
+    at.run()
+    assert not at.exception
+    frame = next(d.value for d in at.dataframe if "比较状态 / Comparison status" in d.value.columns)
+    missing = frame[frame["比较状态 / Comparison status"].str.contains("INSUFFICIENT_COMPARISON")]
+    assert not missing.empty
+    assert missing["增持 / Adds"].apply(pd.isna).all()
+    assert "Serialization of dataframe to Arrow table was unsuccessful" not in caplog.text
+
+
 def test_security_status_and_economic_type_samples_render_without_exception():
     samples: set[str] = set()
     for relative, field in (
@@ -188,15 +228,15 @@ def test_activity_page_smoke():
 
 def test_activity_keyboard_selection_has_bilingual_table_columns():
     at = _run("activity.py")
-    at.text_input[0].set_value("Independent ADD")
+    at.text_input[0].set_value("Verified filing entities ADD")
     at.run()
     assert not at.exception, at.exception
     columns = set(at.dataframe[0].value.columns)
     assert {
-        "独立新增 / Independent NEW",
-        "独立增持 / Independent ADD",
-        "独立减持 / Independent REDUCE",
-        "独立退出 / Independent EXIT",
+        "已核验申报主体新增 / Verified filing entities NEW",
+        "已核验申报主体增持 / Verified filing entities ADD",
+        "已核验申报主体减持 / Verified filing entities REDUCE",
+        "已核验申报主体退出 / Verified filing entities EXIT",
         "重复增持 / Repeated ADD",
         "重复减持 / Repeated REDUCE",
     } <= columns
