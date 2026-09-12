@@ -17,4 +17,8 @@ data/last_update.json
 data/last_update.log
 reports/research_repro
 .streamlit/secrets.toml
-
+.env
+.env.*
+data/raw
+data/private
+config/portfolio.csv

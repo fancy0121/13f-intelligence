@@ -1,0 +1,65 @@
+{
+  "recorded_at_utc": "2026-09-12T04:06:39.055744+00:00",
+  "delivery_kind": "SOURCE_PREVIEW_ONLY",
+  "commercial_status": "NOT_READY",
+  "production_releaseable": false,
+  "context": {
+    "raw_fingerprint": "1b2cabd9ab30862bafe5dba84088bf1ce1b415965b2b6e1dc46e58d00d0729a7",
+    "effective_fingerprint": "6855a4ef46af5754427724ffefce066fc0f1a8787faa9440bb8673ed0ce6032e",
+    "db_sha256": "848ee61f3568bacb15972d771df0126d761ecf2e6a7ebabbec93d8948604c5c0",
+    "runtime_hash": "14e8432df7c9c61e57b7ee72bf1393317a007d8152ef4209424ad23bc5f8468d",
+    "methodology_version": "0.1.1",
+    "gate_hash": "ef9cc0417f02269fcda2788b553a8e46902dd2060fe9d42906f6c58ec36c88d4"
+  },
+  "context_rechecked": true,
+  "tests": {
+    "tests": 436,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "test_report_sha256": "8b1735d59b1ee1b271ad6e0a5946b172d0cfc0384ad15d8ff6696caef997964b",
+  "test_command": "python -m pytest -q",
+  "compileall": "PASS",
+  "diff_check": "PASS",
+  "gate1": {
+    "status": "PASS",
+    "checked_rows": 150
+  },
+  "gate2": {
+    "automatic_status": "PASS",
+    "human_status": "NOT_REVIEWED",
+    "releaseable": false,
+    "checked_transitions": 38,
+    "human_fields_blank": true
+  },
+  "gate3": "PENDING_REAL_WORLD_VALIDATION",
+  "quarantine": {
+    "manager_periods": 16,
+    "filings": 17,
+    "checked_raw_rows": 855
+  },
+  "independent_rebuilds": {
+    "matches": true,
+    "scope": "Two actual frozen-source rebuilds on 2026-09-10, excluding created_at_utc/applied_at_utc"
+  },
+  "browser_qa": {
+    "performed_on": "2026-09-10",
+    "cold_start_local_managers": "PASS: first non-root URL rendered seven bilingual routes and manager selection",
+    "cold_start_public_observation": "PASS: first non-root URL blocked without release evidence",
+    "scope": "Local processes, not VPS or public production"
+  },
+  "external_review": {
+    "gemini": "Two static review rounds; incorrect suggestions rejected; no local tests or human sign-off by Gemini",
+    "claude": "NOT_EXECUTED: existing unrelated unsent draft preserved"
+  },
+  "not_verified": [
+    "Human Gate2",
+    "Commercial launch",
+    "VPS deployment/rollback/notifications",
+    "Mobile/load/full accessibility",
+    "Data licensing and paid-user utility"
+  ],
+  "source_frozen_on": "2026-09-07",
+  "production_deployed": false
+}
