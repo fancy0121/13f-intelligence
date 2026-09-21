@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import pytest
 import sys
 from pathlib import Path
 
@@ -22,12 +23,17 @@ from thirteenf.trends import compute_trends
 
 
 class _Row:
-    def __init__(self, ordinal, cusip, issuer, shares, value, put_call=""):
+    def __init__(
+        self, ordinal, cusip, issuer, shares, value, put_call="", shares_type="SH"
+    ):
         self.row_ordinal = ordinal
         self.cusip = cusip
         self.name_of_issuer = issuer
         self.title_of_class = "COM"
         self.put_call = put_call
+        self.ssh_prnamt_type = shares_type
+        self.investment_discretion = "SOLE"
+        self.other_manager = ""
         self.shares = shares
         self.value = value
 
@@ -93,6 +99,7 @@ def _filing(conn, mid, period, accession, rows):
         raw_path="/raw",
         fetched_at_utc=None,
         ingest_status="OK",
+        accepted_at="2026-08-14T10:00:00Z",
     )
     replace_holdings(
         conn,
@@ -149,6 +156,38 @@ def test_consensus_empty_without_approved(tmp_path):
     conn.close()
 
 
+def test_consensus_never_merges_shares_and_principal_amounts(tmp_path):
+    conn, mids, sid = _seed(tmp_path)
+    manager_id = mids["M1"]
+    conn.executemany(
+        """
+        INSERT INTO position_changes(
+            manager_id, security_id, report_period, put_call, shares_type,
+            change_type, shares_prev, shares_now, share_change,
+            share_change_pct, weight_prev, weight_now, weight_change,
+            methodology_version
+        ) VALUES (?, ?, '2026-06-30', '', ?, ?, 100, ?, ?, ?, 0.1, 0.2,
+                  0.1, '0.1.0')
+        """,
+        [
+            (manager_id, sid, "SH", "ADD", 200, 100, 1.0),
+            (manager_id, sid, "PRN", "REDUCE", 50, -50, -0.5),
+        ],
+    )
+    conn.commit()
+    assert compute_consensus(conn, methodology_version="0.1.0") == 2
+    rows = conn.execute(
+        """
+        SELECT shares_type, consensus_score FROM consensus_scores
+        ORDER BY shares_type
+        """
+    ).fetchall()
+    scores = {row[0]: row[1] for row in rows}
+    assert scores["SH"] > 0
+    assert scores["PRN"] < 0
+    conn.close()
+
+
 def test_trend_insufficient_history_when_no_consensus(tmp_path):
     conn, mids, sid = _seed(tmp_path)
     conn.execute("UPDATE managers SET scoring_status='NOT_APPROVED', signal_quality=NULL")
@@ -161,3 +200,34 @@ def test_trend_insufficient_history_when_no_consensus(tmp_path):
     assert n == 0
     conn.close()
 
+
+def test_removed_manager_approval_is_revoked(tmp_path):
+    conn, mids, _ = _seed(tmp_path)
+    for period, amount in (("2026-03-31", 100), ("2026-06-30", 200)):
+        _filing(conn, mids["M1"], period, period, [_Row(1, "AAAA11111", "AAA Inc", amount, amount * 10)])
+    compute_position_changes(conn, "0.1.0")
+    assert compute_consensus(conn, methodology_version="0.1.0") > 0
+    assert compute_trends(conn, methodology_version="0.1.0") > 0
+    scoring = _scoring(tmp_path)
+    scoring.write_text('methodology_version: "0.1.0"\nmanagers: {}\n', encoding="utf-8")
+    result = apply_scoring(conn, scoring, methodology_version="0.1.0")
+    assert result == {"approved": 0, "not_approved": 3}
+    assert conn.execute("SELECT COUNT(*) FROM managers WHERE scoring_status='APPROVED'").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM consensus_scores").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM trends").fetchone()[0] == 0
+    conn.close()
+
+
+def test_scoring_version_mismatch_leaves_approvals_unchanged(tmp_path):
+    conn, _, _ = _seed(tmp_path)
+    with pytest.raises(ValueError, match="version"):
+        apply_scoring(conn, _scoring(tmp_path), methodology_version="different")
+    assert conn.execute("SELECT COUNT(*) FROM managers WHERE scoring_status='APPROVED'").fetchone()[0] == 3
+    conn.close()
+
+
+def test_consensus_rejects_cross_version_scoring(tmp_path):
+    conn, _, _ = _seed(tmp_path)
+    with pytest.raises(ValueError, match="version"):
+        compute_consensus(conn, methodology_version="different")
+    conn.close()

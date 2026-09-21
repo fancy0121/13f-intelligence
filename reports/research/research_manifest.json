@@ -2,7 +2,7 @@
   "protocol_version": "v0.1",
   "git_sha": "69e728f0e1394c953d752add7d5f4a2cedcf7bea",
   "run_timestamp_utc": "2026-08-24T11:05:12.116212+00:00",
-  "db_snapshot": "C:\\Users\\ASUS\\Documents\\挣钱项目组\\13f-intelligence\\data\\thirteenf.db",
+  "db_snapshot": "data/thirteenf.db",
   "quarters_dev": [
     "2023-09-30",
     "2023-12-31",

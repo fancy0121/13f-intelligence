@@ -1,33 +1,28 @@
-"""One-click data update orchestrator (v0.5.1).
-
-Reuses the EXISTING approved pipeline only:
-  python -m thirteenf ingest     (SEC download -> raw cache)
-  python -m thirteenf normalize  (raw -> SQLite, idempotent)
-  python -m thirteenf analyze    (weights + position changes + quality)
-
-Writes data/last_update.json (status artifact) and data/last_update.log.
-Does NOT run predictive research. On failure, leaves the existing DB intact.
-"""
+"""Fail-closed SEC refresh and atomic local release-database rebuild."""
 
 from __future__ import annotations
 
+import argparse
 import json
+import sqlite3
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
 
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "thirteenf.db"
+RAW_ROOT = ROOT / "data" / "raw"
 STATUS_PATH = ROOT / "data" / "last_update.json"
 LOG_PATH = ROOT / "data" / "last_update.log"
 
 
 def _run(step: str, args: list[str]) -> tuple[int, str]:
-    proc = subprocess.run(
+    process = subprocess.run(
         [sys.executable, "-m", "thirteenf.cli", *args],
         cwd=ROOT,
         capture_output=True,
@@ -35,22 +30,21 @@ def _run(step: str, args: list[str]) -> tuple[int, str]:
         encoding="utf-8",
         errors="replace",
     )
-    output = (proc.stdout or "") + (proc.stderr or "")
+    output = (process.stdout or "") + (process.stderr or "")
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG_PATH, "a", encoding="utf-8") as fh:
-        fh.write(f"\n===== {step} ({datetime.now(timezone.utc).isoformat()}) =====\n")
-        fh.write(output)
-        fh.write(f"\n[exit {proc.returncode}]\n")
-    if proc.returncode != 0:
-        print(f"[{step}] exited {proc.returncode}; output tail:")
+    with LOG_PATH.open("a", encoding="utf-8") as handle:
+        handle.write(
+            f"\n===== {step} ({datetime.now(timezone.utc).isoformat()}) =====\n"
+        )
+        handle.write(output)
+        handle.write(f"\n[exit {process.returncode}]\n")
+    if process.returncode != 0:
+        print(f"[{step}] exited {process.returncode}; output tail:")
         print(output[-4000:])
-    return proc.returncode, output
+    return process.returncode, output
 
 
 def _parse_int(output: str, key: str) -> int | None:
-    # cli.py prints stats like "raw_files=333 failures=6" on ONE line, so a
-    # naive line-start match for "failures=" fails and the ingest run is
-    # misclassified as a crash. Match any "<key>=<int>" token within a line.
     needle = key + "="
     for line in output.splitlines():
         if needle not in line:
@@ -64,90 +58,149 @@ def _parse_int(output: str, key: str) -> int | None:
     return None
 
 
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--normalize-only", action="store_true")
+    parser.add_argument("--release-mode", action="store_true")
+    parser.add_argument("--rate-limit-rps", type=float)
+    parser.add_argument("--raw-root", default=str(RAW_ROOT))
+    parser.add_argument("--db", default=None)
+    parser.add_argument("--quarantine-policy", default=None,
+                        help="Explicit approved source exclusion policy; never a release approval")
+    return parser
+
+
+def _database_counts(db_path: Path) -> tuple[int | None, int | None]:
+    try:
+        connection = sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
+        filings = connection.execute("SELECT COUNT(*) FROM filings").fetchone()[0]
+        holdings = connection.execute("SELECT COUNT(*) FROM holdings").fetchone()[0]
+        connection.close()
+        return int(filings), int(holdings)
+    except (OSError, sqlite3.Error):
+        return None, None
+
+
+def _write_status(status: dict) -> None:
+    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATUS_PATH.write_text(
+        json.dumps(status, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
-    argv = argv if argv is not None else sys.argv[1:]
-    check_only = "--check" in argv
-    rate_limit = 5.0
-    if "--rate-limit" in argv:
-        try:
-            rate_limit = float(argv[argv.index("--rate-limit") + 1])
-        except (IndexError, ValueError):
-            rate_limit = 5.0
+    try:
+        args = _parser().parse_args(argv if argv is not None else sys.argv[1:])
+    except SystemExit as exc:
+        return int(exc.code)
+
+    db_path = Path(args.db) if args.db else Path(DB)
+    raw_root = Path(args.raw_root)
+    normalize_only = bool(args.normalize_only or args.check)
     started = datetime.now(timezone.utc).isoformat()
     errors: list[str] = []
     warnings: list[str] = []
+    raw_files = None
+    processed = None
+    quarantined = None
 
-    # 1. ingest (network) unless --check
-    raw_files_added = None
-    if not check_only:
-        code, out = _run(
+    if not normalize_only:
+        ingest_args = [
             "ingest",
-            [
-                "ingest", "--managers", str(ROOT / "config" / "managers.csv"),
-                "--rate-limit-s", str(rate_limit),
-            ],
-        )
-        raw_files_added = _parse_int(out, "raw_files")
-        failures = _parse_int(out, "failures")
-        if code != 0 and failures is None:
-            # No stats printed -> the ingest process crashed before finishing.
-            errors.append(f"ingest crashed (exit {code})")
-        elif failures:
-            # Completed but with benign per-filing failures (e.g., no info
-            # table); normalize handles these gracefully - record as warning.
-            warnings.append(f"ingest partial failures={failures} (continue)")
+            "--managers",
+            str(ROOT / "config" / "managers.csv"),
+            "--raw-root",
+            str(raw_root),
+        ]
+        if args.rate_limit_rps is not None:
+            ingest_args.extend(["--rate-limit-rps", str(args.rate_limit_rps)])
+        if args.release_mode:
+            ingest_args.append("--release-mode")
+        code, output = _run("ingest", ingest_args)
+        raw_files = _parse_int(output, "raw_files")
+        failures = _parse_int(output, "failures")
+        changed_failures = _parse_int(output, "changed_failures") or 0
+        if code != 0:
+            errors.append(f"ingest failed (exit {code})")
+        if failures is None:
+            errors.append("ingest did not emit a complete failure count")
+        elif failures > 0:
+            errors.append(f"ingest reported failures={failures}")
+        if changed_failures > 0:
+            errors.append(f"changed filing failures={changed_failures}")
 
-    # 2. normalize (offline, idempotent)
-    code, out = _run("normalize", ["normalize", "--db-path", str(DB)])
-    filings = _parse_int(out, "filings")
-    if code != 0:
-        errors.append(f"normalize failed (exit {code})")
+    if not errors:
+        normalize_args = [
+            "normalize",
+            "--raw-root",
+            str(raw_root),
+            "--db-path",
+            str(db_path),
+            "--managers",
+            str(ROOT / "config" / "managers.csv"),
+            "--mappings",
+            str(ROOT / "config" / "ticker_mappings.csv"),
+            "--scoring",
+            str(ROOT / "config" / "manager_scoring.yaml"),
+        ]
+        if args.quarantine_policy:
+            normalize_args.extend(["--quarantine-policy", args.quarantine_policy])
+        code, output = _run("normalize", normalize_args)
+        quarantined = _parse_int(output, "quarantined_source_filings")
+        processed = _parse_int(output, "processed")
+        failed = _parse_int(output, "failed")
+        pending = _parse_int(output, "pending_amendments")
+        promoted = _parse_int(output, "promoted")
+        if code != 0:
+            errors.append(f"normalize failed (exit {code})")
+        if processed is None or failed is None or pending is None or promoted is None:
+            errors.append("normalize did not emit complete terminal statistics")
+        else:
+            if failed > 0:
+                errors.append(f"normalize reported failures={failed}")
+            if pending > 0:
+                errors.append(f"pending amendments={pending}")
+            if promoted != 1:
+                errors.append("staging database was not promoted")
 
-    # 3. analyze (offline, idempotent)
-    code, out = _run("analyze", ["analyze", "--db-path", str(DB)])
-    if code != 0:
-        errors.append(f"analyze failed (exit {code})")
-
-    # filings + holdings processed (from DB counts)
-    filings_count = None
-    holdings = None
-    try:
-        import sqlite3
-
-        con = sqlite3.connect(DB)
-        filings_count = con.execute("SELECT COUNT(*) FROM filings").fetchone()[0]
-        holdings = con.execute("SELECT COUNT(*) FROM holdings").fetchone()[0]
-        con.close()
-    except Exception as exc:  # noqa: BLE001
-        errors.append(f"status read failed: {exc}")
-
+    filings_count, holdings_count = _database_counts(db_path)
     success = not errors
-    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Network policy selection is not Gate 1/2 or publication approval.
+    releaseable = False
+    if success:
+        warnings.append('NOT_VALIDATED: independent release gates still required')
     status = {
         "last_update_started_at": started,
         "last_update_finished_at": datetime.now(timezone.utc).isoformat(),
-        "source": "check" if check_only else "full",
+        "source": "normalize_only" if normalize_only else "full",
         "success": success,
-        "raw_files_added": raw_files_added,
-        "filings_processed": filings if filings is not None else filings_count,
-        "holdings_processed": holdings,
+        "releaseable": releaseable,
+        "validation_status": "NOT_VALIDATED",
+        "raw_files": raw_files,
+        "filings_processed": processed if processed is not None else filings_count,
+        "quarantined_source_filings": quarantined,
+        "holdings_processed": holdings_count,
         "errors": errors,
         "warnings": warnings,
         "log_path": str(LOG_PATH),
     }
-    STATUS_PATH.write_text(
-        json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    _write_status(status)
 
     if success:
-        print(f"Update OK. filings={filings} holdings={holdings} raw_added={raw_files_added}")
+        label = "RELEASEABLE" if releaseable else "NOT_RELEASEABLE"
+        print(
+            f"Update OK [{label}]. filings={status['filings_processed']} "
+            f"holdings={holdings_count} raw_files={raw_files}"
+        )
         print(f"Status artifact: {STATUS_PATH}")
         print(f"Log: {LOG_PATH}")
         return 0
-    print("Update failed. Existing dashboard data remains available.")
+    print("Update failed. Existing dashboard database was not replaced.")
     print(f"See log: {LOG_PATH}")
-    for e in errors:
-        print(" -", e)
+    for error in errors:
+        print(" -", error)
     return 1
 
 

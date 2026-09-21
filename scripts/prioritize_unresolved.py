@@ -27,7 +27,7 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from thirteenf.database import connect, init_db
+from thirteenf.database import connect_readonly
 
 
 def load_portfolio_tickers(path: Path) -> list[str]:
@@ -51,29 +51,32 @@ def main() -> int:
     parser.add_argument("--portfolio", default=str(ROOT / "config" / "portfolio.csv"))
     parser.add_argument("--out", default=str(ROOT / "reports" / "unresolved_priority.md"))
     parser.add_argument("--top", type=int, default=30)
+    parser.add_argument("--methodology", default="0.1.0")
     args = parser.parse_args()
 
-    conn = connect(args.db)
-    init_db(conn)
+    conn = connect_readonly(args.db, immutable=True)
 
     portfolio_tickers = load_portfolio_tickers(Path(args.portfolio))
     latest_period = conn.execute(
-        "SELECT MAX(report_period) FROM filings WHERE ingest_status='OK'"
+        "SELECT MAX(report_period) FROM effective_periods WHERE status='READY' AND methodology_version=?",
+        (args.methodology,),
     ).fetchone()[0]
 
     by_holders = conn.execute(
         """
         SELECT s.cusip, MAX(s.issuer) AS issuer,
-               COUNT(DISTINCT pc.manager_id) AS holders,
-               SUM(pc.weight_now * 0) AS unused
-        FROM position_changes pc
+               COUNT(DISTINCT pc.manager_id) AS holders, 0 AS unused
+        FROM effective_positions pc
+        JOIN effective_periods ep ON ep.effective_period_id=pc.effective_period_id
         JOIN securities s ON s.security_id = pc.security_id
         WHERE s.mapping_status = 'UNRESOLVED'
+          AND pc.report_period=? AND ep.methodology_version=? AND ep.status='READY'
+          AND pc.put_call='' AND pc.shares_type='SH'
         GROUP BY s.cusip
         ORDER BY holders DESC, s.cusip
         LIMIT ?
         """,
-        (args.top,),
+        (latest_period or "", args.methodology, args.top),
     ).fetchall()
 
     by_value = conn.execute(
@@ -81,15 +84,18 @@ def main() -> int:
         SELECT s.cusip, MAX(s.issuer) AS issuer,
                SUM(h.value) AS total_value,
                COUNT(DISTINCT h.manager_id) AS holders
-        FROM holdings h
-        JOIN securities s ON s.cusip = h.cusip
+        FROM effective_positions h
+        JOIN effective_periods ep ON ep.effective_period_id=h.effective_period_id
+        JOIN securities s ON s.security_id = h.security_id
         WHERE s.mapping_status = 'UNRESOLVED'
           AND h.report_period = ?
+          AND ep.methodology_version=? AND ep.status='READY'
+          AND h.put_call='' AND h.shares_type='SH'
         GROUP BY s.cusip
         ORDER BY total_value DESC
         LIMIT ?
         """,
-        (latest_period or "", args.top),
+        (latest_period or "", args.methodology, args.top),
     ).fetchall()
 
     total_unresolved = conn.execute(
@@ -103,6 +109,7 @@ def main() -> int:
         f"> Generated: {date.today().isoformat()}",
         f"> Unresolved securities: {total_unresolved} / {total_securities}",
         f"> Latest report period: {latest_period or 'N/A'}",
+        "> Scope: READY effective non-option SH positions; values in USD. Raw filings are never summed across amendments.",
         "",
         "## P0 — My Portfolio",
         "",
@@ -131,7 +138,7 @@ def main() -> int:
         "",
         "## By latest-period total value (top)",
         "",
-        "| CUSIP | Issuer | Total value | Holders |",
+        "| CUSIP | Issuer | Total value (USD) | Holders |",
         "|---|---|---|---|",
     ]
     for cusip, issuer, total_value, holders in by_value:
@@ -158,4 +165,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

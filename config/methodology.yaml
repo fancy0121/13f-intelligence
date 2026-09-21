@@ -1,6 +1,12 @@
 # Methodology version governing all deterministic analytics.
 # Any change to rules/thresholds MUST bump version and trigger recompute + retest.
-methodology_version: "0.1.0"
+methodology_version: "0.1.1"
+
+source_quarantine:
+  policy: config/source_quarantine.json
+  scope: exact_source_bytes_and_control_totals
+  action: exclude_entire_manager_period
+  unknown_anomaly: fail_closed
 
 position_change:
   # Thresholds are intentionally strict for v0.1; no tolerance fuzz.
@@ -21,4 +27,3 @@ trend:
     - 8
   stable_abs_threshold: 0.1
   reversal_requires_quarters: 2
-

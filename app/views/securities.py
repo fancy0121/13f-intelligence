@@ -12,7 +12,22 @@ if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
 from store import get_store
-from ui import B, T, searchable_select
+from ui import (
+    B,
+    T,
+    display_code,
+    display_manager_name,
+    display_security_name,
+    searchable_select,
+    security_option_label,
+    security_search_with_display_names,
+)
+
+
+def _fmt(x, pct=False, default="N/A"):
+    if x is None:
+        return default
+    return f"{x:.4%}" if pct else f"{x:,.0f}"
 
 
 def run() -> None:
@@ -46,7 +61,7 @@ def run() -> None:
         )
         return
 
-    matches = store.security_search(query)
+    matches = security_search_with_display_names(store, query)
     if not matches:
         st.warning(
             T(
@@ -61,29 +76,37 @@ def run() -> None:
             f"{len(matches)} security match(es)" + (" (multiple - please select)" if len(matches) > 1 else ""),
         )
     )
-    labels = {f"{m['ticker'] or m['cusip']} ({m['cusip']})": m["cusip"] for m in matches}
-    choice = searchable_select(
-        T("选择证券", "Select Security"),
-        list(labels),
-        key="security_pick",
-        help_text=T("输入关键字筛选候选，点击按钮选择", "Type to filter candidates, click to select"),
-    )
-    if choice is None:
-        st.info(T("请选择一个证券。", "Please select a security."))
-        return
-    ev = store.security_evidence(labels[choice])
+    labels = {security_option_label(m): m["cusip"] for m in matches}
+    if len(labels) == 1:
+        selected_cusip = next(iter(labels.values()))
+    else:
+        choice = searchable_select(
+            T("选择证券", "Select Security"),
+            list(labels),
+            key="security_pick",
+            help_text=T("输入关键字筛选候选，点击按钮选择", "Type to filter candidates, click to select"),
+        )
+        if choice is None:
+            st.info(T("请选择一个证券。", "Please select a security."))
+            return
+        selected_cusip = labels[choice]
+    ev = store.security_evidence(selected_cusip)
     if ev is None:
         st.info(T("INSUFFICIENT_DATA。", "INSUFFICIENT_DATA."))
         return
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("CUSIP", ev.cusip)
-    c2.metric("Ticker", ev.ticker or T("未验证", "unverified"))
-    c3.metric(T("解析状态", "Resolution"), ev.resolution_status)
-    c4.metric(T("经济类型", "Economic Type"), ev.economic_type or T("未知", "unknown"))
+    c1, c2 = st.columns(2)
+    c1.metric(T("CUSIP 编号", "CUSIP"), ev.cusip)
+    c2.metric(T("股票代码", "Ticker"), ev.ticker or T("未验证", "unverified"))
+    st.markdown(
+        f"**{T('解析状态', 'Resolution')}**："
+        f"{display_code(ev.resolution_status, include_raw=False)}  \n"
+        f"**{T('经济类型', 'Economic Type')}**："
+        f"{display_code(ev.economic_type, include_raw=False)}"
+    )
     st.write(
-        f"- {T('发行方', 'Issuer')}：{ev.issuer or 'N/A'} | "
-        f"{T('语义分类状态', 'Classification')}：{ev.classification_status or 'N/A'}"
+        f"- {T('公司名称', 'Company Name')}：{display_security_name(ev.cusip, ev.issuer)} | "
+        f"{T('语义分类状态', 'Classification')}：{display_code(ev.classification_status)}"
     )
 
     st.divider()
@@ -95,33 +118,40 @@ def run() -> None:
         f"{T('天', 'days')}"
     )
     st.caption(
-        T("报告季度 ≠ 实时持仓；13F 存在最长 45 天披露延迟。",
-          "Report quarter ≠ real-time holdings; 13F has up to 45 days of disclosure lag.")
+        T("报告季度 ≠ 实时持仓；通常在季末后 45 天内提交，修订及保密处理可能使披露更晚。",
+          "Report quarter is not real-time: normally filed within 45 days after quarter-end; amendments and confidential treatment may delay it further.")
     )
 
     st.divider()
     st.markdown(f"#### {T('最新报告季度机构持有与变化', 'Latest-quarter holders and changes')}")
     st.write(
         f"{T('机构实体数', 'Entities')}：{ev.holder_entity_count} | "
-        f"{T('已验证独立机构数', 'Verified independent')}：{ev.verified_independent_manager_count} | "
-        f"{T('活动状态', 'Activity')}：{ev.activity_state}"
+        f"{T('已核验申报主体数', 'Verified filing entities')}：{ev.verified_independent_manager_count} | "
+        f"{T('活动状态', 'Activity')}：{display_code(ev.activity_state)}"
     )
     if ev.holders:
         st.dataframe(
             [
                 {
-                    T("机构", "Manager"): h["manager"],
-                    T("独立验证", "Independent"): T("是", "Yes") if h["independent"] else T("否", "No"),
-                    T("变化类型", "Change"): h["change_type"],
-                    T("份额(前/后)", "Shares (prev/now)"): f"{h['shares_prev']} / {h['shares_now']}",
-                    T("份额变化%", "Shares %"): h["share_change_pct"],
-                    T("权重(前/后)", "Weight (prev/now)"): f"{h['weight_prev']} / {h['weight_now']}",
-                    T("权重变化", "Weight Δ"): h["weight_change"],
+                    T("机构名称", "Manager Name"): display_manager_name(h["manager"]),
+                    T("申报主体已核验", "Filing entity verified"): T("是", "Yes") if h["independent"] else T("否", "No"),
+                    T("变化类型", "Change"): display_code(h["change_type"]),
+                    T("份额(前/后)", "Shares (prev/now)"):
+                        f"{_fmt(h['shares_prev'])} / {_fmt(h['shares_now'])}",
+                    T("份额变化%", "Shares %"): _fmt(h["share_change_pct"], pct=True),
+                    T("权重(前/后)", "Weight (prev/now)"):
+                        f"{_fmt(h['weight_prev'], pct=True)} / "
+                        f"{_fmt(h['weight_now'], pct=True)}",
+                    T("权重变化", "Weight Δ"): _fmt(h["weight_change"], pct=True),
                 }
                 for h in ev.holders
             ],
             width='stretch',
         )
+    elif ev.activity_state == "INSUFFICIENT_COMPARISON":
+        st.info(T("该季度存在跟踪机构持仓，但缺少相邻可比季度，未给出“无变化”结论。",
+                  "Tracked holders exist this quarter, but an adjacent comparable quarter is missing; "
+                  "no no-change conclusion is shown."))
     else:
         st.info(T("该季度无跟踪机构持有（可能数据缺失或陈旧）。",
                   "No tracked manager held this security in the latest quarter "
@@ -132,12 +162,15 @@ def run() -> None:
     ac = ev.activity_counts
     cols = st.columns(5)
     for col, key in zip(cols, ("NEW", "ADD", "REDUCE", "EXIT", "UNCHANGED")):
-        col.metric(key, ac[key])
+        col.metric(display_code(key), ac[key])
     st.write(
-        f"- {T('独立机构增持计数', 'Independent ADD count')}（≥2Q ADD）：{ev.repeated_add_manager_count}\n"
-        f"- {T('独立机构减持计数', 'Independent REDUCE count')}（≥2Q REDUCE）：{ev.repeated_reduce_manager_count}"
+        f"- {T('已核验申报主体重复增持计数', 'Verified filing entities repeated ADD count')}（≥2Q ADD）：{ev.repeated_add_manager_count}\n"
+        f"- {T('已核验申报主体重复减持计数', 'Verified filing entities repeated REDUCE count')}（≥2Q REDUCE）：{ev.repeated_reduce_manager_count}"
     )
     st.caption(
+        B("增持与减持/退出同权重展示；若缺少可比季度会明确标记，不以 0 代替。",
+          "Adds and reduces/exits are shown with equal weight; missing comparisons are labelled, not replaced by 0.")
+        if ev.activity_state == "INSUFFICIENT_COMPARISON" else
         B("增持与减持/退出同权重展示；缺失一侧显示 0",
           "Adds and reduces/exits are shown with equal weight; missing side shows 0")
     )
@@ -152,6 +185,11 @@ def run() -> None:
                     T("持有机构", "Holders"): t["holders"],
                     T("增持", "Adds"): t["adds"],
                     T("减持", "Reduces"): t["reduces"],
+                    T("比较状态", "Comparison status"): (
+                        display_code("INSUFFICIENT_COMPARISON")
+                        if t["adds"] is None or t["reduces"] is None
+                        else T("可比较", "Comparable")
+                    ),
                 }
                 for t in ev.timeline if t["holders"] or t["adds"] or t["reduces"]
             ],
@@ -160,10 +198,10 @@ def run() -> None:
 
     st.divider()
     st.markdown(f"#### {T('质量', 'Quality')}")
-    st.write(f"- {T('解析状态', 'Resolution')}：{ev.quality['resolution_status']}")
+    st.write(f"- {T('解析状态', 'Resolution')}：{display_code(ev.quality['resolution_status'])}")
     st.write(
-        f"- {T('经济类型', 'Economic Type')}：{ev.quality['economic_type'] or T('未知', 'unknown')}；"
-        f"{T('分类状态', 'Classification')}：{ev.quality['classification_status'] or T('未知', 'unknown')}"
+        f"- {T('经济类型', 'Economic Type')}：{display_code(ev.quality['economic_type'])}；"
+        f"{T('分类状态', 'Classification')}：{display_code(ev.quality['classification_status'])}"
     )
 
 

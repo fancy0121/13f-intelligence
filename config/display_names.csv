@@ -1,0 +1,107 @@
+entity_type,entity_key,name_zh,status,source
+manager,AKRE CAPITAL MANAGEMENT LLC,阿克雷资本管理,PROJECT_CURATED,project_glossary_v1
+manager,"Altimeter Capital Management, LP",Altimeter 资本管理,PROJECT_CURATED,project_glossary_v1
+manager,Appaloosa LP,阿帕卢萨资本,PROJECT_CURATED,project_glossary_v1
+manager,BAUPOST GROUP LLC/MA,包普斯特集团,PROJECT_CURATED,project_glossary_v1
+manager,BERKSHIRE HATHAWAY INC,伯克希尔·哈撒韦,PROJECT_CURATED,project_glossary_v1
+manager,"BlackRock, Inc.",贝莱德,PROJECT_CURATED,project_glossary_v1
+manager,"Bridgewater Associates, LP",桥水基金,PROJECT_CURATED,project_glossary_v1
+manager,CITADEL ADVISORS LLC,城堡投资顾问,PROJECT_CURATED,project_glossary_v1
+manager,COATUE MANAGEMENT LLC,蔻图资本管理,PROJECT_CURATED,project_glossary_v1
+manager,D1 Capital Partners L.P.,D1 资本合伙,PROJECT_CURATED,project_glossary_v1
+manager,"Dragoneer Investment Group, LLC",Dragoneer 投资集团,PROJECT_CURATED,project_glossary_v1
+manager,Duquesne Family Office LLC,杜肯家族办公室,PROJECT_CURATED,project_glossary_v1
+manager,Elliott Investment Management L.P.,埃利奥特投资管理,PROJECT_CURATED,project_glossary_v1
+manager,GREENLIGHT CAPITAL INC,绿光资本,PROJECT_CURATED,project_glossary_v1
+manager,Himalaya Capital Management LLC,喜马拉雅资本管理,PROJECT_CURATED,project_glossary_v1
+manager,LONE PINE CAPITAL LLC,孤松资本,PROJECT_CURATED,project_glossary_v1
+manager,MAVERICK CAPITAL LTD,Maverick 资本,PROJECT_CURATED,project_glossary_v1
+manager,"Pershing Square Capital Management, L.P.",潘兴广场资本管理,PROJECT_CURATED,project_glossary_v1
+manager,RENAISSANCE TECHNOLOGIES LLC,文艺复兴科技,PROJECT_CURATED,project_glossary_v1
+manager,SOROS FUND MANAGEMENT LLC,索罗斯基金管理,PROJECT_CURATED,project_glossary_v1
+manager,STATE STREET CORP,道富集团,PROJECT_CURATED,project_glossary_v1
+manager,"Scion Asset Management, LLC",Scion 资产管理,PROJECT_CURATED,project_glossary_v1
+manager,TCI Fund Management Ltd,TCI 基金管理,PROJECT_CURATED,project_glossary_v1
+manager,TIGER GLOBAL MANAGEMENT LLC,老虎环球管理,PROJECT_CURATED,project_glossary_v1
+manager,"TRIAN FUND MANAGEMENT, L.P.",特里安基金管理,PROJECT_CURATED,project_glossary_v1
+manager,Third Point LLC,第三点资本,PROJECT_CURATED,project_glossary_v1
+manager,VANGUARD GROUP INC,先锋领航集团,PROJECT_CURATED,project_glossary_v1
+manager,VIKING GLOBAL INVESTORS LP,维京环球投资,PROJECT_CURATED,project_glossary_v1
+manager,"ValueAct Holdings, L.P.",ValueAct 控股,PROJECT_CURATED,project_glossary_v1
+security,037833100,苹果公司,PROJECT_CURATED,project_glossary_v1
+security,67066G104,英伟达,PROJECT_CURATED,project_glossary_v1
+security,594918104,微软公司,PROJECT_CURATED,project_glossary_v1
+security,023135106,亚马逊公司,PROJECT_CURATED,project_glossary_v1
+security,30303M102,Meta 平台公司,PROJECT_CURATED,project_glossary_v1
+security,02079K305,字母表公司,PROJECT_CURATED,project_glossary_v1
+security,02079K107,字母表公司,PROJECT_CURATED,project_glossary_v1
+security,11135F101,博通公司,PROJECT_CURATED,project_glossary_v1
+security,88160R101,特斯拉公司,PROJECT_CURATED,project_glossary_v1
+security,46625H100,摩根大通,PROJECT_CURATED,project_glossary_v1
+security,084670702,伯克希尔·哈撒韦,PROJECT_CURATED,project_glossary_v1
+security,532457108,礼来公司,PROJECT_CURATED,project_glossary_v1
+security,060505104,美国银行,PROJECT_CURATED,project_glossary_v1
+security,92826C839,维萨公司,PROJECT_CURATED,project_glossary_v1
+security,025816109,美国运通,PROJECT_CURATED,project_glossary_v1
+security,191216100,可口可乐公司,PROJECT_CURATED,project_glossary_v1
+security,166764100,雪佛龙,PROJECT_CURATED,project_glossary_v1
+security,30231G102,埃克森美孚,PROJECT_CURATED,project_glossary_v1
+security,478160104,强生公司,PROJECT_CURATED,project_glossary_v1
+security,57636Q104,万事达卡,PROJECT_CURATED,project_glossary_v1
+security,64110L106,奈飞公司,PROJECT_CURATED,project_glossary_v1
+security,931142103,沃尔玛,PROJECT_CURATED,project_glossary_v1
+security,007903107,超威半导体,PROJECT_CURATED,project_glossary_v1
+security,595112103,美光科技,PROJECT_CURATED,project_glossary_v1
+security,369604301,通用电气航空航天,PROJECT_CURATED,project_glossary_v1
+security,22160K105,开市客,PROJECT_CURATED,project_glossary_v1
+security,00287Y109,艾伯维,PROJECT_CURATED,project_glossary_v1
+security,91324P102,联合健康集团,PROJECT_CURATED,project_glossary_v1
+security,69608A108,帕兰提尔科技,PROJECT_CURATED,project_glossary_v1
+security,68389X105,甲骨文公司,PROJECT_CURATED,project_glossary_v1
+security,437076102,家得宝,PROJECT_CURATED,project_glossary_v1
+security,742718109,宝洁公司,PROJECT_CURATED,project_glossary_v1
+security,17275R102,思科公司,PROJECT_CURATED,project_glossary_v1
+security,149123101,卡特彼勒,PROJECT_CURATED,project_glossary_v1
+security,459200101,IBM 公司,PROJECT_CURATED,project_glossary_v1
+security,38141G104,高盛集团,PROJECT_CURATED,project_glossary_v1
+security,615369105,穆迪公司,PROJECT_CURATED,project_glossary_v1
+security,512807306,泛林集团,PROJECT_CURATED,project_glossary_v1
+security,038222105,应用材料公司,PROJECT_CURATED,project_glossary_v1
+security,79466L302,赛富时,PROJECT_CURATED,project_glossary_v1
+security,58933Y105,默沙东,PROJECT_CURATED,project_glossary_v1
+security,949746101,富国银行,PROJECT_CURATED,project_glossary_v1
+security,75513E101,RTX 公司,PROJECT_CURATED,project_glossary_v1
+security,617446448,摩根士丹利,PROJECT_CURATED,project_glossary_v1
+security,458140100,英特尔,PROJECT_CURATED,project_glossary_v1
+security,718172109,菲利普莫里斯国际,PROJECT_CURATED,project_glossary_v1
+security,580135101,麦当劳,PROJECT_CURATED,project_glossary_v1
+security,172967424,花旗集团,PROJECT_CURATED,project_glossary_v1
+security,254687106,华特迪士尼,PROJECT_CURATED,project_glossary_v1
+security,002824100,雅培公司,PROJECT_CURATED,project_glossary_v1
+security,674599105,西方石油,PROJECT_CURATED,project_glossary_v1
+security,78409V104,标普全球,PROJECT_CURATED,project_glossary_v1
+security,G54950103,林德公司,PROJECT_CURATED,project_glossary_v1
+security,747525103,高通公司,PROJECT_CURATED,project_glossary_v1
+security,36828A101,GE Vernova,PROJECT_CURATED,project_glossary_v1
+security,882508104,德州仪器,PROJECT_CURATED,project_glossary_v1
+security,713448108,百事公司,PROJECT_CURATED,project_glossary_v1
+security,09857L108,Booking 控股,PROJECT_CURATED,project_glossary_v1
+security,H1467J104,安达保险集团,PROJECT_CURATED,project_glossary_v1
+security,461202103,Intuit 公司,PROJECT_CURATED,project_glossary_v1
+security,90353T100,优步科技,PROJECT_CURATED,project_glossary_v1
+security,539830109,洛克希德·马丁,PROJECT_CURATED,project_glossary_v1
+security,482480100,科磊公司,PROJECT_CURATED,project_glossary_v1
+security,92343V104,威瑞森通信,PROJECT_CURATED,project_glossary_v1
+security,031162100,安进公司,PROJECT_CURATED,project_glossary_v1
+security,46120E602,直觉外科公司,PROJECT_CURATED,project_glossary_v1
+security,81762P102,ServiceNow 公司,PROJECT_CURATED,project_glossary_v1
+security,883556102,赛默飞世尔科技,PROJECT_CURATED,project_glossary_v1
+security,00206R102,AT&T 公司,PROJECT_CURATED,project_glossary_v1
+security,00724F101,奥多比,PROJECT_CURATED,project_glossary_v1
+security,65339F101,新纪元能源,PROJECT_CURATED,project_glossary_v1
+security,097023105,波音公司,PROJECT_CURATED,project_glossary_v1
+security,697435105,派拓网络,PROJECT_CURATED,project_glossary_v1
+security,03831W108,AppLovin 公司,PROJECT_CURATED,project_glossary_v1
+security,375558103,吉利德科学,PROJECT_CURATED,project_glossary_v1
+security,G1151C101,埃森哲,PROJECT_CURATED,project_glossary_v1
+security,872540109,TJX 公司,PROJECT_CURATED,project_glossary_v1

@@ -6,6 +6,8 @@ import inspect
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -62,6 +64,71 @@ def test_valid_episode(tmp_path):
     ep = s.start_episode(_pre())
     done = s.finish_episode(ep["episode_id"], _post())
     assert done["episode_validity"] == "VALID"
+
+
+def test_finish_appends_snapshot_and_preserves_start_record_bytes(tmp_path):
+    s = ObservationStore(tmp_path / "obs")
+    ep = s.start_episode(_pre())
+    start_bytes = s.episodes_path.read_bytes()
+
+    done = s.finish_episode(ep["episode_id"], _post())
+
+    assert done["episode_validity"] == "VALID"
+    lines = s.episodes_path.read_bytes().splitlines(keepends=True)
+    assert lines[0] == start_bytes
+    assert len(lines) == 2
+    assert s.episodes()[0]["episode_validity"] == "VALID"
+
+
+def test_start_rejects_duplicate_episode_id(tmp_path):
+    s = ObservationStore(tmp_path / "obs")
+    s.start_episode({**_pre(), "episode_id": "same-id"})
+
+    with pytest.raises(ValueError, match="duplicate episode_id"):
+        s.start_episode({**_pre(question="another"), "episode_id": "same-id"})
+
+
+def test_second_finish_rejected_without_altering_log(tmp_path):
+    s = ObservationStore(tmp_path / "obs")
+    ep = s.start_episode(_pre())
+    s.finish_episode(ep["episode_id"], _post())
+    before = s.episodes_path.read_bytes()
+    with pytest.raises(ValueError, match="already finished"):
+        s.finish_episode(ep["episode_id"], _post(new_fact_found="false"))
+    assert s.episodes_path.read_bytes() == before
+
+
+@pytest.mark.parametrize("finish", [False, True])
+def test_duplicate_events_in_existing_log_rejected(tmp_path, finish):
+    s = ObservationStore(tmp_path / "obs")
+    ep = s.start_episode(_pre())
+    if finish:
+        s.finish_episode(ep["episode_id"], _post())
+    data = s.episodes_path.read_bytes()
+    s.episodes_path.write_bytes(data + data.splitlines(keepends=True)[-1])
+    with pytest.raises(ValueError, match="duplicate"):
+        s.episodes()
+
+
+def test_memory_observation_store_never_opens_files(monkeypatch):
+    def forbid(*args, **kwargs):
+        raise AssertionError("memory observation must not access files")
+    monkeypatch.setattr("builtins.open", forbid)
+    monkeypatch.setattr(Path, "mkdir", forbid)
+    first, second = ObservationStore(None), ObservationStore(None)
+    ep = first.start_episode(_pre())
+    first.finish_episode(ep["episode_id"], _post())
+    assert first.episodes()[0]["episode_validity"] == "VALID"
+    assert second.episodes() == []
+    assert first.dir is first.episodes_path is first.errors_path is None
+
+
+def test_malformed_episode_jsonl_is_not_silently_skipped(tmp_path):
+    s = ObservationStore(tmp_path / "obs")
+    s.episodes_path.write_text('{"episode_id":"ok"}\nnot-json\n', encoding="utf-8")
+
+    with pytest.raises(ValueError, match="malformed JSONL.*line 2"):
+        s.episodes()
 
 
 def test_invalid_no_pre_use(tmp_path):

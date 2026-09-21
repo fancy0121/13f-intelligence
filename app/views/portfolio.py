@@ -12,19 +12,29 @@ if str(ROOT / "src") not in sys.path:
 if str(ROOT / "app") not in sys.path:
     sys.path.insert(0, str(ROOT / "app"))
 
-from store import get_store
+from store import get_store, load_local_portfolio
 from thirteenf.product.evidence import load_portfolio_rows, save_portfolio_rows
-from ui import B, T, searchable_select
+from ui import (
+    B,
+    T,
+    display_code,
+    display_security_name,
+    searchable_select,
+    security_option_label,
+    security_search_with_display_names,
+)
 
 
-def _portfolio_path() -> Path:
+def _portfolio_path() -> Path | None:
+    if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes"):
+        return None
     session = st.session_state.get("portfolio_path")
     if session:
         return Path(session)
     env = os.environ.get("THIRTEENF_PORTFOLIO")
     if env:
         return Path(env)
-    return ROOT / "config" / "portfolio.csv"
+    return load_local_portfolio(ROOT)[0]
 
 
 def run() -> None:
@@ -40,8 +50,14 @@ def run() -> None:
         )
     )
     store = get_store()
+    public_mode = os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes")
     portfolio_path = _portfolio_path()
-    rows = load_portfolio_rows(portfolio_path)
+    if public_mode:
+        rows = st.session_state.setdefault("public_portfolio_rows", [])
+    elif portfolio_path == load_local_portfolio(ROOT)[0]:
+        _, rows = load_local_portfolio(ROOT)
+    else:
+        rows = load_portfolio_rows(portfolio_path)
 
     st.divider()
     st.markdown(f"#### {T('我的持仓（可直接编辑）', 'My Holdings (editable)')}")
@@ -62,37 +78,60 @@ def run() -> None:
         ).strip()
         add_submitted = st.form_submit_button(T("查找并添加", "Find & Add"))
     if add_submitted and ticker:
-        matches = store.security_search(ticker)
+        matches = security_search_with_display_names(store, ticker)
+        st.session_state.pop("portfolio_pending", None)
+        st.session_state.pop("portfolio_pick_sel", None)
+        st.session_state.pop("portfolio_pick_q", None)
         if len(matches) == 1:
             m = matches[0]
             rows = [r for r in rows if r["ticker"] != (m["ticker"] or m["cusip"])]
             rows.append({"ticker": m["ticker"] or m["cusip"], "weight": weight})
-            save_portfolio_rows(portfolio_path, rows)
+            if public_mode:
+                st.session_state["public_portfolio_rows"] = rows
+            else:
+                save_portfolio_rows(portfolio_path, rows)
             st.success(T(f"已添加 {m['ticker'] or m['cusip']}（{m['cusip']}）。",
                          f"Added {m['ticker'] or m['cusip']} ({m['cusip']})."))
             st.rerun()
         elif len(matches) > 1:
-            st.warning(T("找到多个候选，请选择正确的证券：", "Multiple candidates - please choose:"))
-            labels = {f"{m['ticker'] or m['cusip']} ({m['cusip']})": m for m in matches}
-            choice = searchable_select(
-                T("候选", "Candidates"),
-                list(labels),
-                key="portfolio_pick",
-                help_text=T("输入关键字筛选候选，点击按钮选择", "Type to filter candidates, click to select"),
-            )
-            if choice is not None and st.button(T("添加所选", "Add selected")):
-                m = labels[choice]
-                rows = [r for r in rows if r["ticker"] != (m["ticker"] or m["cusip"])]
-                rows.append({"ticker": m["ticker"] or m["cusip"], "weight": weight})
-                save_portfolio_rows(portfolio_path, rows)
-                st.success(T(f"已添加 {m['ticker'] or m['cusip']}（{m['cusip']}）。",
-                             f"Added {m['ticker'] or m['cusip']} ({m['cusip']})."))
-                st.rerun()
+            st.session_state["portfolio_pending"] = {
+                "matches": matches,
+                "weight": weight,
+            }
         else:
+            st.session_state.pop("portfolio_pending", None)
             st.warning(
                 T("未找到匹配证券（可能是未解析身份）。系统不会猜测映射。",
                   "No matching security (possibly unresolved identity). No guessed mappings.")
             )
+
+    pending = st.session_state.get("portfolio_pending")
+    if pending:
+        st.warning(T("找到多个候选，请选择正确的证券：", "Multiple candidates - please choose:"))
+        labels = {
+            security_option_label(m): m
+            for m in pending["matches"]
+        }
+        choice = searchable_select(
+            T("候选", "Candidates"),
+            list(labels),
+            key="portfolio_pick",
+            help_text=T("输入关键字筛选候选，点击按钮选择", "Type to filter candidates, click to select"),
+        )
+        if choice is not None and st.button(T("添加所选", "Add selected")):
+            m = labels[choice]
+            rows = [r for r in rows if r["ticker"] != (m["ticker"] or m["cusip"])]
+            rows.append({"ticker": m["ticker"] or m["cusip"], "weight": pending["weight"]})
+            if public_mode:
+                st.session_state["public_portfolio_rows"] = rows
+            else:
+                save_portfolio_rows(portfolio_path, rows)
+            st.session_state.pop("portfolio_pending", None)
+            st.session_state.pop("portfolio_pick_sel", None)
+            st.session_state.pop("portfolio_pick_q", None)
+            st.success(T(f"已添加 {m['ticker'] or m['cusip']}（{m['cusip']}）。",
+                         f"Added {m['ticker'] or m['cusip']} ({m['cusip']})."))
+            st.rerun()
 
     if rows:
         st.markdown(f"##### {T('当前持仓（勾选后点保存可删除）', 'Current holdings (check to remove, then save)')}")
@@ -106,13 +145,16 @@ def run() -> None:
                 ):
                     keep.append(r)
             if st.form_submit_button(T("保存修改", "Save changes")):
-                save_portfolio_rows(portfolio_path, keep)
+                if public_mode:
+                    st.session_state["public_portfolio_rows"] = keep
+                else:
+                    save_portfolio_rows(portfolio_path, keep)
                 st.success(T("已保存。", "Saved."))
                 st.rerun()
 
     st.divider()
     st.markdown(f"#### {T('持仓事实交叉验证（对称展示）', 'Factual cross-check (symmetric)')}")
-    out = store.portfolio_evidence(portfolio_path)
+    out = store.portfolio_evidence(portfolio_path, rows=rows) if public_mode else store.portfolio_evidence(portfolio_path)
     if out == "SETUP_REQUIRED":
         st.warning(
             T("SETUP_REQUIRED：你的持仓列表为空。请在上方添加你的第一只股票。系统不会生成演示组合。",
@@ -123,19 +165,23 @@ def run() -> None:
         st.dataframe(
             [
                 {
-                    "Ticker": r["ticker"],
+                    T("股票代码", "Ticker"): r["ticker"],
+                    T("公司名称", "Company Name"): (
+                        display_security_name(r["cusip"], r.get("issuer"))
+                        if r.get("cusip") else T("未解析", "Unresolved")
+                    ),
                     T("权重", "Weight"): r["weight"],
-                    T("状态", "Status"): r["status"],
+                    T("状态", "Status"): display_code(r["status"]),
                     T("持有机构实体数", "Entities"): r["holder_entity_count"],
-                    T("独立增持", "Ind. ADD"): r["independent_add_manager_count"],
-                    T("独立减持", "Ind. REDUCE"): r["independent_reduce_manager_count"],
-                    T("独立退出", "Ind. EXIT"): r["independent_exit_manager_count"],
-                    T("独立新增", "Ind. NEW"): r["independent_new_manager_count"],
+                    T("已核验申报主体增持", "Verified filing entities ADD"): r["independent_add_manager_count"],
+                    T("已核验申报主体减持", "Verified filing entities REDUCE"): r["independent_reduce_manager_count"],
+                    T("已核验申报主体退出", "Verified filing entities EXIT"): r["independent_exit_manager_count"],
+                    T("已核验申报主体新增", "Verified filing entities NEW"): r["independent_new_manager_count"],
                     T("重复增持", "Repeated ADD"): r["repeated_add_manager_count"],
                     T("重复减持", "Repeated REDUCE"): r["repeated_reduce_manager_count"],
-                    T("活动状态", "Activity"): r["activity_state"],
+                    T("活动状态", "Activity"): display_code(r["activity_state"]),
                     T("数据距今(天)", "Days since filing"): r["days_since_filing"],
-                    T("解析状态", "Resolution"): r["resolution_status"],
+                    T("解析状态", "Resolution"): display_code(r["resolution_status"]),
                 }
                 for r in out
             ],
@@ -158,8 +204,17 @@ def run() -> None:
                       "freshness, identity quality).") + "\n"
             "4. " + T("删除时勾选对应行并点「保存修改」。",
                       "To remove, check the row and click Save changes.") + "\n"
-            "5. " + T("你的持仓保存在本地 `config/portfolio.csv`，下次打开看板会自动载入。",
-                      "Your holdings are stored in `config/portfolio.csv` and reload automatically.")
+            "5. " + (
+                T(
+                    "公开版持仓仅保留在当前服务端会话内存中，不写入服务器文件；会话结束后清空。",
+                    "On the public site, holdings stay only in current server-session memory and are not written to server files; they clear when the session ends.",
+                )
+                if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() in ("1", "true", "yes")
+                else T(
+                    "本地版持仓保存在私有目录，下次打开看板会自动载入。",
+                    "In the local app, holdings are stored in a private local directory and reload automatically.",
+                )
+            )
         )
 
 

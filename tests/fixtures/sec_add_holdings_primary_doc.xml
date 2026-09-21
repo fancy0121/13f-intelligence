@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Minimal semantic extract from an official SEC filing; personal contact fields omitted.
+Source: https://www.sec.gov/Archives/edgar/data/1055964/000114036126029214/primary_doc.xml
+Rendered verification: https://www.sec.gov/Archives/edgar/data/1055964/000114036126029214/xslForm13F_X02/primary_doc.xml
+CIK: 1055964
+Accession: 0001140361-26-029214
+Retrieved/verified: 2026-09-05
+Extracted-node payload SHA-256 (the edgarSubmission element only, UTF-8, LF): 24b0d9ea7240e6627289a7a731536de4da21a98b377b5f8700b69091a2bdd127
+-->
+<edgarSubmission xmlns="http://www.sec.gov/edgar/thirteenffiler">
+  <headerData>
+    <submissionType>13F-HR/A</submissionType>
+  </headerData>
+  <formData>
+    <coverPage>
+      <reportCalendarOrQuarter>03-31-2026</reportCalendarOrQuarter>
+      <isAmendment>true</isAmendment>
+      <amendmentNo>1</amendmentNo>
+      <amendmentInfo>
+        <amendmentType>NEW HOLDINGS</amendmentType>
+      </amendmentInfo>
+    </coverPage>
+  </formData>
+</edgarSubmission>

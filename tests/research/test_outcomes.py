@@ -51,7 +51,7 @@ def test_symbol_mapping_only_curated(tmp_path):
     p = tmp_path / "symbols.csv"
     p.write_text(
         "cusip,symbol,exchange,source,effective_date,verified_at,verified_by,notes\n"
-        "037833100,AAPL,NMS,MANUAL_REVIEW,2021-01-01,2026-08-24,ASUS,\n",
+        "037833100,AAPL,NMS,MANUAL_REVIEW,2021-01-01,2026-08-24,TEST_REVIEWER,\n",
         encoding="utf-8",
     )
     mappings = load_symbol_mappings(p)

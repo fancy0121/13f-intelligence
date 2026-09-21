@@ -1,0 +1,382 @@
+{
+  "checked_rows": 150,
+  "context": {
+    "db_sha256": "848ee61f3568bacb15972d771df0126d761ecf2e6a7ebabbec93d8948604c5c0",
+    "effective_fingerprint": "6855a4ef46af5754427724ffefce066fc0f1a8787faa9440bb8673ed0ce6032e",
+    "gate_hash": "ef9cc0417f02269fcda2788b553a8e46902dd2060fe9d42906f6c58ec36c88d4",
+    "methodology_version": "0.1.1",
+    "raw_fingerprint": "1b2cabd9ab30862bafe5dba84088bf1ce1b415965b2b6e1dc46e58d00d0729a7",
+    "runtime_hash": "14e8432df7c9c61e57b7ee72bf1393317a007d8152ef4209424ad23bc5f8468d"
+  },
+  "manager_ids": [
+    3,
+    13,
+    19,
+    28,
+    29
+  ],
+  "mismatches": [],
+  "quarantine": {
+    "checked_raw_rows": 855,
+    "errors": [],
+    "manager_periods": [
+      [
+        18,
+        "2025-03-31"
+      ],
+      [
+        20,
+        "2023-09-30"
+      ],
+      [
+        20,
+        "2023-12-31"
+      ],
+      [
+        20,
+        "2024-09-30"
+      ],
+      [
+        20,
+        "2024-12-31"
+      ],
+      [
+        20,
+        "2025-06-30"
+      ],
+      [
+        20,
+        "2025-09-30"
+      ],
+      [
+        20,
+        "2026-03-31"
+      ],
+      [
+        20,
+        "2026-06-30"
+      ],
+      [
+        23,
+        "2025-09-30"
+      ],
+      [
+        24,
+        "2023-12-31"
+      ],
+      [
+        26,
+        "2026-06-30"
+      ],
+      [
+        28,
+        "2023-09-30"
+      ],
+      [
+        28,
+        "2024-03-31"
+      ],
+      [
+        28,
+        "2024-06-30"
+      ],
+      [
+        28,
+        "2024-09-30"
+      ]
+    ],
+    "policy_sha256": "346908151cb6db2dbac2b9549e8360176fe55c65d97a62ffcb9436f5911814b8",
+    "quarantined_filings": 17,
+    "source_filings": 16,
+    "status": "PASS"
+  },
+  "releaseable": true,
+  "sampled_filings": [
+    {
+      "accession_number": "0001104659-26-016408",
+      "filing_id": 223,
+      "form_type": "13F-HR",
+      "manager_id": 19,
+      "report_period": "2025-12-31",
+      "row_ordinals": [
+        7869,
+        5320,
+        8523,
+        13380,
+        12423,
+        2884,
+        3140,
+        9934,
+        12718,
+        971
+      ]
+    },
+    {
+      "accession_number": "0001104659-26-062477",
+      "filing_id": 224,
+      "form_type": "13F-HR",
+      "manager_id": 19,
+      "report_period": "2026-03-31",
+      "row_ordinals": [
+        6672,
+        1265,
+        14204,
+        8085,
+        5379,
+        9113,
+        2012,
+        10644,
+        2619,
+        8616
+      ]
+    },
+    {
+      "accession_number": "0001104659-26-104387",
+      "filing_id": 226,
+      "form_type": "13F-HR/A",
+      "manager_id": 19,
+      "report_period": "2026-06-30",
+      "row_ordinals": [
+        6657,
+        10211,
+        14412,
+        10658,
+        12382,
+        3211,
+        5627,
+        10833,
+        1045,
+        6930
+      ]
+    },
+    {
+      "accession_number": "0000919574-26-003414",
+      "filing_id": 150,
+      "form_type": "13F-HR/A",
+      "manager_id": 13,
+      "report_period": "2025-12-31",
+      "row_ordinals": [
+        190,
+        33,
+        130,
+        94,
+        23,
+        142,
+        219,
+        103,
+        199,
+        193
+      ]
+    },
+    {
+      "accession_number": "0000919574-26-003501",
+      "filing_id": 151,
+      "form_type": "13F-HR",
+      "manager_id": 13,
+      "report_period": "2026-03-31",
+      "row_ordinals": [
+        141,
+        196,
+        80,
+        63,
+        132,
+        31,
+        51,
+        84,
+        142,
+        25
+      ]
+    },
+    {
+      "accession_number": "0000919574-26-005478",
+      "filing_id": 152,
+      "form_type": "13F-HR",
+      "manager_id": 13,
+      "report_period": "2026-06-30",
+      "row_ordinals": [
+        168,
+        44,
+        166,
+        1,
+        89,
+        107,
+        176,
+        140,
+        22,
+        147
+      ]
+    },
+    {
+      "accession_number": "0002012383-26-000920",
+      "filing_id": 341,
+      "form_type": "13F-HR",
+      "manager_id": 29,
+      "report_period": "2025-12-31",
+      "row_ordinals": [
+        24462,
+        36374,
+        40918,
+        39917,
+        2277,
+        11378,
+        31790,
+        23282,
+        21317,
+        45135
+      ]
+    },
+    {
+      "accession_number": "0002012383-26-001841",
+      "filing_id": 342,
+      "form_type": "13F-HR",
+      "manager_id": 29,
+      "report_period": "2026-03-31",
+      "row_ordinals": [
+        2803,
+        12400,
+        6009,
+        49654,
+        37076,
+        30167,
+        1487,
+        45954,
+        6945,
+        48435
+      ]
+    },
+    {
+      "accession_number": "0002012383-26-003238",
+      "filing_id": 343,
+      "form_type": "13F-HR",
+      "manager_id": 29,
+      "report_period": "2026-06-30",
+      "row_ordinals": [
+        32663,
+        34333,
+        47882,
+        12101,
+        22937,
+        6138,
+        10813,
+        22122,
+        42348,
+        45401
+      ]
+    },
+    {
+      "accession_number": "0000947871-26-000150",
+      "filing_id": 34,
+      "form_type": "13F-HR",
+      "manager_id": 3,
+      "report_period": "2025-12-31",
+      "row_ordinals": [
+        50,
+        132,
+        123,
+        146,
+        53,
+        153,
+        92,
+        9,
+        118,
+        107
+      ]
+    },
+    {
+      "accession_number": "0000947871-26-000553",
+      "filing_id": 35,
+      "form_type": "13F-HR",
+      "manager_id": 3,
+      "report_period": "2026-03-31",
+      "row_ordinals": [
+        200,
+        90,
+        231,
+        138,
+        64,
+        218,
+        116,
+        181,
+        24,
+        23
+      ]
+    },
+    {
+      "accession_number": "0000947871-26-000793",
+      "filing_id": 36,
+      "form_type": "13F-HR",
+      "manager_id": 3,
+      "report_period": "2026-06-30",
+      "row_ordinals": [
+        75,
+        106,
+        101,
+        174,
+        44,
+        27,
+        137,
+        81,
+        173,
+        124
+      ]
+    },
+    {
+      "accession_number": "0001013594-26-000272",
+      "filing_id": 333,
+      "form_type": "13F-HR",
+      "manager_id": 28,
+      "report_period": "2025-12-31",
+      "row_ordinals": [
+        19,
+        8,
+        14,
+        11,
+        10,
+        1,
+        13,
+        27,
+        15,
+        24
+      ]
+    },
+    {
+      "accession_number": "0001013594-26-000613",
+      "filing_id": 334,
+      "form_type": "13F-HR",
+      "manager_id": 28,
+      "report_period": "2026-03-31",
+      "row_ordinals": [
+        9,
+        26,
+        33,
+        5,
+        21,
+        15,
+        20,
+        10,
+        29,
+        2
+      ]
+    },
+    {
+      "accession_number": "0001013594-26-000915",
+      "filing_id": 335,
+      "form_type": "13F-HR",
+      "manager_id": 28,
+      "report_period": "2026-06-30",
+      "row_ordinals": [
+        4,
+        22,
+        8,
+        19,
+        27,
+        5,
+        3,
+        25,
+        26,
+        29
+      ]
+    }
+  ],
+  "status": "PASS"
+}

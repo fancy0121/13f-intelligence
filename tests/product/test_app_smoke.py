@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import csv
+import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -12,17 +15,66 @@ pytest.importorskip("streamlit.testing")
 
 from streamlit.testing.v1 import AppTest
 
+if str(ROOT / "app") not in sys.path:
+    sys.path.insert(0, str(ROOT / "app"))
+
+from ui import B
+
 
 def _run(page: str):
-    at = AppTest.from_file(str(ROOT / "app" / "pages" / page), default_timeout=30)
+    at = AppTest.from_file(str(ROOT / "app" / "views" / page), default_timeout=30)
     at.run()
     assert not at.exception, at.exception
     return at
 
 
+def test_bilingual_sentence_has_no_duplicate_terminal_punctuation():
+    assert B("中文句子。", "English sentence.") == "中文句子。English sentence."
+
+
 def test_overview_page_smoke():
     at = _run("overview.py")
     assert any(m.label.startswith("最新报告季度") for m in at.metric)
+    assert any("NOT_VALIDATED" in str(w.value) and "本地" in str(w.value) for w in at.warning)
+
+
+def test_overview_quality_codes_are_bilingual():
+    at = _run("overview.py")
+    visible = "\n".join(str(m.value) for m in at.markdown)
+    assert "季度不完整 / Incomplete quarter [INCOMPLETE_QUARTER]" in visible
+    assert "缺少历史比较数据 / Missing historical comparison [MISSING_HISTORICAL_COMPARISON]" in visible
+
+
+def test_quarantine_banner_is_red_and_bilingual(product_bundle, tmp_path, monkeypatch):
+    import shutil
+    import sqlite3
+    from thirteenf.changes import compute_position_changes
+    copied = tmp_path / "quarantined.db"
+    shutil.copy2(product_bundle.db, copied)
+    conn = sqlite3.connect(copied)
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("UPDATE filings SET ingest_status='QUARANTINED' WHERE report_period='2026-06-30'")
+    compute_position_changes(conn, "0.1.0")
+    conn.commit()
+    conn.close()
+    monkeypatch.setenv("THIRTEENF_DB_PATH", str(copied))
+    at = _run("overview.py")
+    assert any("SOURCE_QUARANTINED" in e.value and "隔离" in e.value for e in at.error)
+    assert any(str(m.value) == "2026-06-30" for m in at.metric)
+    from ui import display_code
+    assert display_code("SOURCE_QUARANTINED") == "源数据隔离 / Source quarantined [SOURCE_QUARANTINED]"
+    manager_page = _run("managers.py")
+    manager_page.text_input[0].set_value("Berkshire").run()
+    assert not manager_page.exception
+    assert not any("Positions: 0" in str(c.value) for c in manager_page.caption)
+    assert any("INSUFFICIENT_DATA" in str(i.value) for i in manager_page.info)
+
+
+def test_overview_long_metric_values_use_compact_display():
+    at = _run("overview.py")
+    metrics = {m.label: str(m.value) for m in at.metric}
+    assert re.fullmatch(r"\d+\.\d%", metrics["映射表已解析比例 / Mapping-table Resolution"])
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", metrics["本地数据更新 / Local Data Updated"])
 
 
 def test_managers_page_smoke():
@@ -30,14 +82,174 @@ def test_managers_page_smoke():
     assert any(t.label.startswith("选择机构") for t in at.text_input)
 
 
+def test_managers_page_renders_exit_rows_without_crashing():
+    """Regression: EXIT rows have shares_now=None and must still render."""
+    at = _run("managers.py")
+    at.text_input[0].set_value("Berkshire")
+    at.run()
+    assert len(at.button) == 1
+    at.button[0].click()
+    at.run()
+    assert not at.exception, at.exception
+    assert any(m.label.startswith("报告季度") for m in at.metric)
+    visible = "\n".join(str(m.value) for m in at.markdown)
+    assert "退出 / EXIT" in visible
+    assert any(
+        "已验证 / Verified [VERIFIED]" in str(c.value)
+        for c in at.caption
+    )
+
+
+def test_manager_weight_pairs_are_human_readable():
+    at = _run("managers.py")
+    at.text_input[0].set_value("Berkshire")
+    at.run()
+    frames = [frame.value for frame in at.dataframe]
+    weight_columns = [
+        column
+        for frame in frames
+        for column in frame.columns
+        if str(column).startswith("权重(前/后)")
+    ]
+    assert weight_columns
+    for frame in frames:
+        for column in weight_columns:
+            if column not in frame.columns:
+                continue
+            values = " ".join(str(v) for v in frame[column])
+            assert "None" not in values
+            assert "e-" not in values.lower()
+
+
+def test_manager_unique_keyboard_query_selects_without_click():
+    """A unique typed query must be usable without a mouse-only candidate click."""
+    at = _run("managers.py")
+    at.text_input[0].set_value("Berkshire")
+    at.run()
+    assert not at.exception, at.exception
+    assert any(m.label.startswith("报告季度") for m in at.metric)
+
+
+def test_manager_selector_displays_chinese_and_english_names():
+    at = _run("managers.py")
+    labels = [b.label for b in at.button]
+    assert "伯克希尔·哈撒韦 / BERKSHIRE HATHAWAY INC" in labels
+    assert len(labels) == 29
+    assert all("中文名待核验" not in label for label in labels)
+
+
+def test_every_tracked_manager_detail_renders_without_exception():
+    at = _run("managers.py")
+    manager_labels = [b.label for b in at.button]
+    for label in manager_labels:
+        at.text_input[0].set_value(label)
+        at.run()
+        assert not at.exception, f"{label}: {at.exception}"
+        assert any(m.label.startswith("报告季度") for m in at.metric), label
+
+
 def test_securities_page_smoke():
     at = _run("securities.py")
     assert any(t.label.startswith("输入 Ticker") for t in at.text_input)
 
 
+def test_security_search_accepts_chinese_company_name():
+    at = _run("securities.py")
+    at.text_input[0].set_value("字母表")
+    at.run()
+    labels = [b.label for b in at.button]
+    assert any("字母表公司 / ALPHABET INC" in label for label in labels)
+
+
+def test_security_candidate_marks_missing_chinese_name_explicitly():
+    at = _run("securities.py")
+    at.text_input[0].set_value("1 800 FLOWERS")
+    at.run()
+    visible = "\n".join(str(m.value) for m in at.markdown)
+    assert "中文名待核验 / 1 800 FLOWERS COM INC" in visible
+
+
+def test_single_security_match_opens_with_bilingual_status_without_extra_click():
+    at = _run("securities.py")
+    at.text_input[0].set_value("GOOGL")
+    at.run()
+    assert not at.exception, at.exception
+    metrics = {m.label: str(m.value) for m in at.metric}
+    assert metrics["股票代码 / Ticker"] == "GOOGL"
+    assert "解析状态 / Resolution" not in metrics
+    assert "经济类型 / Economic Type" not in metrics
+    visible = "\n".join(str(m.value) for m in at.markdown)
+    assert "解析状态 / Resolution：精确验证 / Verified exact" in visible
+    assert "经济类型 / Economic Type：经营性普通股 / Operating common equity" in visible
+    assert {"新增 / NEW", "增持 / ADD", "减持 / REDUCE", "退出 / EXIT", "未变化 / UNCHANGED"} <= set(metrics)
+
+
+def test_missing_comparison_does_not_mix_text_into_numeric_timeline(caplog):
+    import pandas as pd
+    at = _run("securities.py")
+    at.text_input[0].set_value("GOOGL")
+    at.run()
+    assert not at.exception
+    frame = next(d.value for d in at.dataframe if "比较状态 / Comparison status" in d.value.columns)
+    missing = frame[frame["比较状态 / Comparison status"].str.contains("INSUFFICIENT_COMPARISON")]
+    assert not missing.empty
+    assert missing["增持 / Adds"].apply(pd.isna).all()
+    assert "Serialization of dataframe to Arrow table was unsuccessful" not in caplog.text
+
+
+def test_security_status_and_economic_type_samples_render_without_exception():
+    samples: set[str] = set()
+    for relative, field in (
+        ("reports/research/security_resolution_master.csv", "status"),
+        ("reports/research/security_semantic_classification.csv", "economic_type"),
+    ):
+        seen: set[str] = set()
+        with (ROOT / relative).open(encoding="utf-8-sig", newline="") as fh:
+            for row in csv.DictReader(fh):
+                value = row.get(field, "")
+                if value and value not in seen:
+                    samples.add(row["cusip"])
+                    seen.add(value)
+
+    at = _run("securities.py")
+    for cusip in sorted(samples):
+        at.text_input[0].set_value(cusip)
+        at.run()
+        assert not at.exception, f"{cusip}: {at.exception}"
+        visible = "\n".join(str(m.value) for m in at.markdown)
+        assert "解析状态 / Resolution：" in visible, cusip
+        assert "经济类型 / Economic Type：" in visible, cusip
+
+
 def test_activity_page_smoke():
     at = _run("activity.py")
     assert any(t.label.startswith("排序指标") for t in at.text_input)
+
+
+def test_activity_keyboard_selection_has_bilingual_table_columns():
+    at = _run("activity.py")
+    at.text_input[0].set_value("Verified filing entities ADD")
+    at.run()
+    assert not at.exception, at.exception
+    columns = set(at.dataframe[0].value.columns)
+    assert {
+        "已核验申报主体新增 / Verified filing entities NEW",
+        "已核验申报主体增持 / Verified filing entities ADD",
+        "已核验申报主体减持 / Verified filing entities REDUCE",
+        "已核验申报主体退出 / Verified filing entities EXIT",
+        "重复增持 / Repeated ADD",
+        "重复减持 / Repeated REDUCE",
+    } <= columns
+
+
+def test_every_activity_metric_renders_without_exception():
+    at = _run("activity.py")
+    metric_labels = [b.label for b in at.button]
+    for label in metric_labels:
+        at.text_input[0].set_value(label)
+        at.run()
+        assert not at.exception, f"{label}: {at.exception}"
+        assert at.dataframe, label
 
 
 def test_portfolio_page_smoke():
@@ -51,7 +263,32 @@ def test_methodology_page_smoke():
     assert not at.exception
 
 
+def test_methodology_page_does_not_render_raw_html_tags():
+    at = _run("methodology.py")
+    visible_markdown = "\n".join(str(m.value) for m in at.markdown)
+    assert "<span" not in visible_markdown
+
+
 def test_observation_page_smoke():
     at = _run("observation.py")
     assert not at.exception
     assert any(w.value.startswith("INSUFFICIENT_OBSERVATION") for w in at.warning)
+
+
+def test_observation_exports_are_real_browser_downloads():
+    at = _run("observation.py")
+    downloads = at.get("download_button")
+    assert len(downloads) == 2
+    assert {d.label for d in downloads} == {
+        "下载 CSV / Download CSV",
+        "下载 JSON / Download JSON",
+    }
+
+
+def test_observation_summary_uses_bilingual_human_readable_labels():
+    at = _run("observation.py")
+    visible = "\n".join(str(m.value) for m in at.markdown)
+    assert "证券 / Security: 0" in visible
+    assert "熟悉 / Familiar: 0" in visible
+    assert "无风险 / None [NONE]: 0" in visible
+    assert "{'security':" not in visible

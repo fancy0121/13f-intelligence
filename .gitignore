@@ -9,6 +9,8 @@ venv/
 
 # Environment / secrets
 .env
+.env.*
+!.env.example
 .streamlit/secrets.toml
 
 # Local data artifacts (rebuildable from raw / SEC)
@@ -20,6 +22,7 @@ data/raw/
 data/resolution_cache/
 # Real-use observation episodes (local, user-generated; keep out of git)
 data/real_use/
+data/private/
 # Data update status artifact and log (regenerated on update)
 data/last_update.json
 data/last_update.log
@@ -34,4 +37,13 @@ build/
 reports/research/*_full.csv
 reports/research/A3_*_signals.csv
 reports/research_repro/
+
+# Local audit history contains machine paths and intermediate failed runs.
+# Publish reviewed, redacted evidence only under reports/releases/.
+/reports/COMMERCIAL_AUDIT_2026-09-07.md
+/reports/validation/CORRECTNESS_FOUNDATION_STATUS.md
+/reports/validation/commercial-audit-2026-09-07/
+/reports/validation/correctness-foundation-2026-09-07/*
+!/reports/validation/correctness-foundation-2026-09-07/source-anomalies.csv
+/reports/validation/quarantine-2026-09-10/
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 
@@ -38,9 +39,22 @@ def load_mappings(path: Path) -> dict[str, SecurityMapping]:
             if not cusip:
                 continue
             status = (row.get("mapping_status") or "UNRESOLVED").strip().upper()
+            if cusip in mappings:
+                raise ValueError(f"duplicate CUSIP mapping: {cusip}")
+            if status not in {"VERIFIED", "UNRESOLVED", "CONFLICT", "RETIRED"}:
+                raise ValueError(f"unknown mapping status: {status}")
+            ticker = (row.get("ticker") or "").strip().upper() or None
+            if status == "VERIFIED":
+                if not ticker or not all((row.get(k) or "").strip() for k in (
+                    "mapping_source", "verified_at", "verified_by"
+                )):
+                    raise ValueError(f"VERIFIED mapping requires provenance: {cusip}")
+                date.fromisoformat(row["verified_at"].strip())
+            else:
+                ticker = None
             mappings[cusip] = SecurityMapping(
                 cusip=cusip,
-                ticker=(row.get("ticker") or "").strip() or None,
+                ticker=ticker,
                 issuer=(row.get("issuer") or "").strip() or None,
                 share_class=(row.get("share_class") or "").strip() or None,
                 mapping_status=status,
@@ -68,4 +82,3 @@ def resolve(mappings: dict[str, SecurityMapping], cusip: str) -> SecurityMapping
         verified_by="",
         notes="not in curated mapping",
     )
-

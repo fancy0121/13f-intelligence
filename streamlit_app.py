@@ -6,6 +6,7 @@ executed as the Streamlit entry script.
 
 from __future__ import annotations
 
+import runpy
 import sys
 from pathlib import Path
 
@@ -16,9 +17,8 @@ for p in (str(ROOT / "src"), str(ROOT / "app")):
 
 
 def main() -> None:
-    from app.app import main as run_app
-
-    run_app()
+    # Resolve by file identity: app/app.py can shadow the app namespace.
+    runpy.run_path(str(ROOT / "app" / "app.py"), run_name="__main__")
 
 
 if __name__ == "__main__":
