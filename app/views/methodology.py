@@ -21,7 +21,7 @@ def run() -> None:
         这份看板展示的是 **SEC Form 13F 披露的机构多头持仓事实**。每季度，大型机构要向 SEC 报告
         他们持有哪些美国证券、持有多少股、报告价值多少。看板把这些原始披露整理成：
 
-        - **NEW**：某机构第一次报告持有某只证券（新增建仓）*— first reported position*。
+        - **NEW**：本季披露、上一可比季度未披露该证券；不代表首次买入*— reported now, absent in the prior comparable quarter; not proof of a first purchase*。
         - **ADD**：某机构相比上一季度增加了持有股数（增持）*— shares increased vs prior quarter*。
         - **REDUCE**：某机构相比上一季度减少了持有股数（减持）*— shares decreased vs prior quarter*。
         - **EXIT**：某机构不再报告持有某只证券（退出）*— no longer reported*。

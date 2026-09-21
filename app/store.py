@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+from contextvars import ContextVar
+
 import os
 import sqlite3
 from pathlib import Path
@@ -46,18 +49,41 @@ def configured_managers_path() -> Path:
     return Path(os.environ.get("THIRTEENF_MANAGERS_CSV", ROOT / "config" / "managers.csv"))
 
 
+_public_validation_memo: ContextVar[dict | None] = ContextVar("public_validation_memo", default=None)
+
+
+@contextmanager
+def public_validation_scope():
+    """Reuse verification only inside one synchronous app execution, never reruns."""
+    token = _public_validation_memo.set({})
+    try:
+        yield
+    finally:
+        _public_validation_memo.reset(token)
+
+
 def public_snapshot_error() -> str | None:
     if os.environ.get("THIRTEENF_PUBLIC_MODE", "").strip().lower() not in ("1", "true", "yes"):
         return None
     manifest = Path(os.environ.get("THIRTEENF_RELEASE_MANIFEST", ROOT / "release-manifest.json"))
+    db_path = configured_database_path()
+    files = {"resolution": configured_resolution_path(),
+             "semantic": configured_semantic_path(), "managers": configured_managers_path()}
+    paths = [db_path, manifest, *files.values(), Path(str(db_path) + "-wal"), Path(str(db_path) + "-shm")]
+    identity = tuple(file_identity(path) for path in paths)
+    memo = _public_validation_memo.get()
+    if memo is not None and memo.get("verified") == identity:
+        return None
+    if memo is not None:
+        memo.clear()
     try:
-        verify_public_snapshot(configured_database_path(), manifest, {
-            "resolution": configured_resolution_path(),
-            "semantic": configured_semantic_path(),
-            "managers": configured_managers_path(),
-        })
+        verify_public_snapshot(db_path, manifest, files)
     except (OSError, ValueError, RuntimeError, TypeError, KeyError, AttributeError, sqlite3.Error):
         return "NOT_VALIDATED: public release evidence is missing, incomplete or does not match this snapshot"
+    if identity != tuple(file_identity(path) for path in paths):
+        return "NOT_VALIDATED: public snapshot changed during verification"
+    if memo is not None:
+        memo["verified"] = identity
     return None
 
 

@@ -311,3 +311,10 @@ def test_task12_no_predictive_terms_in_user_delivery():
         for w in forbidden:
             assert re.search(rf"\b{re.escape(w)}\b", text) is None, \
                 f"forbidden word in {path.name}: {w}"
+
+
+def test_new_label_does_not_claim_first_ever_purchase():
+    text = (ROOT / "app/views/methodology.py").read_text(encoding="utf-8")
+    assert "第一次报告" not in text
+    assert "first reported position" not in text
+    assert "prior comparable quarter" in text

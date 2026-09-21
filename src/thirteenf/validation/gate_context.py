@@ -48,7 +48,7 @@ def build_gate_context(bundle: GateBundle) -> GateContext:
         if Path(str(bundle.db_path) + suffix).exists():
             raise RuntimeError("database snapshot has a live sidecar")
     raw = _tree_hash(bundle.raw_root)
-    database_hash = _sha256(bundle.db_path.read_bytes())
+    database_hash = _sha256_file(bundle.db_path)
     conn = connect_readonly(bundle.db_path, immutable=True)
     try:
         if [r[0] for r in conn.execute("PRAGMA integrity_check")] != ["ok"]:
@@ -132,7 +132,7 @@ def verify_public_snapshot(db_path: Path, manifest_path: Path, files: dict[str, 
         raise RuntimeError("Gate 2 not approved")
     if gate1.get("context") != context or gate2.get("context") != context:
         raise RuntimeError("Gates refer to different snapshots")
-    if _sha256(db_path.read_bytes()) != context["db_sha256"]:
+    if _sha256_file(db_path) != context["db_sha256"]:
         raise RuntimeError("public database checksum mismatch")
     if runtime_hash() != context["runtime_hash"]:
         raise RuntimeError("public runtime checksum mismatch")
@@ -267,7 +267,7 @@ def _discovery_identity(root: Path, store: RawStore, manifests: list[dict]) -> l
 def runtime_source_hash(root: Path | None = None) -> str:
     root = root or Path(__file__).resolve().parents[3]
     patterns = (
-        "src/**/*.py", "app/**/*.py", "scripts/*.py", "config/managers.csv",
+        "src/**/*.py", "app/**/*.py", "streamlit_app.py", "scripts/*.py", "config/managers.csv",
         "config/manager_scoring.yaml", "config/methodology.yaml",
         "config/source_quarantine.json",
         "config/ticker_mappings.csv", "config/historical_symbols.csv",
@@ -306,6 +306,15 @@ def main(argv=None) -> int:
         return 1
     print(json.dumps(asdict(context), sort_keys=True))
     return 0
+
+
+def _sha256_file(path: Path) -> str:
+    """Verify every byte without allocating a database-sized buffer."""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 if __name__ == "__main__":

@@ -59,3 +59,23 @@ def test_public_snapshot_rejects_incomplete_or_different_evidence(sample_bundle,
     path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(RuntimeError):
         verify_public_snapshot(sample_bundle.db_path, path, files)
+
+
+def test_database_verification_never_materializes_entire_file(sample_bundle, tmp_path, monkeypatch):
+    from pathlib import Path
+    path, _, files = _attestation(sample_bundle, tmp_path)
+    original = Path.read_bytes
+    def guarded_read(candidate):
+        assert candidate != sample_bundle.db_path, "database must be hashed in bounded chunks"
+        return original(candidate)
+    monkeypatch.setattr(Path, "read_bytes", guarded_read)
+    verify_public_snapshot(sample_bundle.db_path, path, files)
+
+
+def test_runtime_hash_binds_cloud_entrypoint(tmp_path):
+    from thirteenf.validation.gate_context import runtime_source_hash
+    entry = tmp_path / "streamlit_app.py"
+    entry.write_text("first", encoding="utf-8")
+    before = runtime_source_hash(tmp_path)
+    entry.write_text("changed", encoding="utf-8")
+    assert runtime_source_hash(tmp_path) != before

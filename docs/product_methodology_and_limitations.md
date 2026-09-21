@@ -17,7 +17,7 @@ activity, filing freshness, amendments, security identity quality, and data qual
 
 ## 时间延迟 / Reporting Delay
 
-报告季度和 filing 日期是两个不同的事实，页面会同时展示。13F 最长可以在季度结束后 45 天提交，所以这些数据不代表实时仓位。
+报告季度和 filing 日期是两个不同的事实，页面会同时展示。13F 通常在季度结束后 45 天内提交；修订和保密处理可能更晚，所以这些数据不代表实时仓位。
 
 The report period and filing date are separate facts and appear together. A 13F
 can be filed up to 45 days after quarter end, so the data never represents a
