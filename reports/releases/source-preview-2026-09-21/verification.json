@@ -1,0 +1,48 @@
+{
+  "status": "SOURCE_PREVIEW_ONLY",
+  "commercial": "NOT_READY",
+  "production_deployed": false,
+  "tests": {
+    "count": 460,
+    "failures": 0,
+    "errors": 0,
+    "report_sha256": "58ab54815a5e04015930187735cc1195cb4905877b21aaf39785aaa95c148f6d"
+  },
+  "context": {
+    "db_sha256": "848ee61f3568bacb15972d771df0126d761ecf2e6a7ebabbec93d8948604c5c0",
+    "effective_fingerprint": "6855a4ef46af5754427724ffefce066fc0f1a8787faa9440bb8673ed0ce6032e",
+    "gate_hash": "4a2ebee8e9473060ab690539a131b2bd02030272e685092aee8c1c983aa1ff51",
+    "methodology_version": "0.1.1",
+    "raw_fingerprint": "1b2cabd9ab30862bafe5dba84088bf1ce1b415965b2b6e1dc46e58d00d0729a7",
+    "runtime_hash": "4f48fdfcf4c99201affff4cb916d8e460526c4c5c51d2df36f11ef3ca8b1cf94"
+  },
+  "gate1": {
+    "status": "PASS",
+    "rows": 150
+  },
+  "gate2": {
+    "automatic": "PASS",
+    "human": "NOT_REVIEWED",
+    "transitions": 38
+  },
+  "gate3": "PENDING_REAL_WORLD_VALIDATION",
+  "source_frozen_on": "2026-09-07",
+  "browser_qa": {
+    "date": "2026-09-21",
+    "scope": "local cloud entry; seven pages opened; keyboard Berkshire/AAPL searches; public observation blocked without attestation",
+    "not_verified": [
+      "VPS",
+      "concurrent load",
+      "mobile accessibility",
+      "automatic updates",
+      "email receipt"
+    ]
+  },
+  "hash_measurement": {
+    "database_bytes": 384479232,
+    "sha256": "848ee61f3568bacb15972d771df0126d761ecf2e6a7ebabbec93d8948604c5c0",
+    "elapsed_seconds": 0.37624239997239783,
+    "python_allocation_peak_bytes": 2106652,
+    "scope": "single local file hash; not concurrent server benchmark"
+  }
+}
