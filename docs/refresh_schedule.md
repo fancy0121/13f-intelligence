@@ -4,7 +4,7 @@
 
 2026-10-24：**SCHEDULE_CONFIGURED_NOT_YET_OBSERVED / NOT_DEPLOYED_PRODUCTION**。
 默认分支已配置定时工作流，实际 GitHub→VPS 受限 SSH、故障 Issue 和邮件到达均已验证。
-首次完整 SEC 候选采集失败后正在重试，尚未取得完整 Gate 结果；首次定时触发也尚未发生。
+真实候选重试完成采集和规范化后，被 discovery 覆盖一致性检查阻断；首次定时触发尚未发生。
 专用账号受固定命令限制，不能改写代码、授权文件和冻结基线。
 这不是客户数据库自动上线的完成证明。旧 push-to-publish 工作流已替换为只读调度测试，
 不构建或推送生产镜像。原有发布阻断与人工 Gate 不得绕过。具体回执见文末。
@@ -41,6 +41,8 @@
    未提交代码或敏感配置。PR 的存在不是激活，schedule 只在默认分支执行。
 2. VPS 上有经过审查的 `/opt/13f-intelligence` checkout、锁定环境、原始缓存、
    `scripts/refresh_candidate.py` 与本次 `scripts/refresh_schedule.py`。不从 CI 自动覆盖 VPS。
+   初始化缓存时须保留隔离政策中全部已批准 accession 的原始证据，即使已滚出 12Q。
+   只能从 SEC 精确发现并核对既有 cover/info SHA256；缺失或变化继续闭锁，不能删政策条目凑通过。
 3. 专用低权限 SSH 用户仅能访问所需缓存、候选目录和冻结服务快照；不授予 Docker/root。
    专用 authorized_keys 必须配置 restrict 与固定 command wrapper（`deploy/refresh-command.sh`），
    只接受 inspect/refresh，禁止任意命令/转发。home、.ssh、authorized_keys、代码、wrapper
@@ -82,7 +84,8 @@
 - [只读 CI](https://github.com/fancy0121/13f-intelligence/actions/runs/40067127950)：成功，不构建或发布镜像。
 - [连接演练](https://github.com/fancy0121/13f-intelligence/actions/runs/40067309595)：日历测试与实际受限 SSH 均成功；没有刷新 SEC 或切换生产。
 - [通知演练](https://github.com/fancy0121/13f-intelligence/actions/runs/40067341834)：按设计故意失败；通知 job 成功创建并指派 [Issue #3](https://github.com/fancy0121/13f-intelligence/issues/3)。已从负责人邮箱独立查到 Issue 创建、指派及 Actions 失败邮件。
-- 首次真实 SEC 候选采集失败：`raw_files=312 failures=1`，accession `0001541617-24-000004` 主文档获取失败。单文档复查 HTTP 200；已启动完整重试，结果尚未验收。不能把连接演练通过解释为全链路数据更新通过。
+- 首次采集有一份主文档获取失败；重试恢复为 `raw_files=313 failures=0`。两份滚出 12Q、但仍被已批准隔离政策要求的历史原文已从 SEC 补齐，cover/info SHA256 均与原批准值一致，未修改政策。
+- 最终真实重试 `20261024T060459Z-f619c4cf` 完成规范化：`processed=315 failed=0 pending_amendments=0 quarantined_source_filings=16`。随后在自动 Gate 前置上下文检查失败：`discovery accession coverage mismatch for CIK 1536411`。滚动 12Q 发现清单与保留隔离证据的 accession 集合边界不一致；候选流水线缺陷尚未修复。Issue #3 保持打开，未削弱一致性检查。
 - 服务基线校验和未变，现有看板健康检查 `ok`；无生产换库。Gate2 人工复核仍为 `NOT_REVIEWED`，Gate3 为 `PENDING_REAL_WORLD_VALIDATION`。
 
-调度状态：`SCHEDULE_CONFIGURED_NOT_YET_OBSERVED`。首次定时触发尚未发生；完整真实候选成功尚未确认。此前的 NOT_ACTIVATED 描述是配置前历史状态，不再代表当前配置。
+调度状态：`SCHEDULE_CONFIGURED_NOT_YET_OBSERVED`；完整数据链验收：`BLOCKED_CANDIDATE_EVIDENCE_WINDOW`。首次定时触发尚未发生，不能声称无人值守更新已完整交付。此前的 NOT_ACTIVATED 描述是配置前历史状态，不再代表当前配置。
