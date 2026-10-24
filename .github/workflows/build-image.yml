@@ -1,4 +1,4 @@
-name: 13F production publishing blocked
+name: 13F offline scheduler tests - production publishing blocked
 
 on:
   push:
@@ -10,8 +10,14 @@ permissions:
   contents: read
 
 jobs:
-  release-hold:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Preserve release hold during scheduler setup
-        run: echo "NOT_VALIDATED - no image build, push, deployment or database switch."
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Offline calendar regression
+        run: python3 -m unittest discover -s tests -p test_refresh_schedule.py -v
+      - name: Preserve production release hold
+        run: echo 'NOT_VALIDATED - no image build, push, deployment or serving database switch.'
