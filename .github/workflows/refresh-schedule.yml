@@ -1,0 +1,126 @@
+name: SEC quarterly candidate refresh
+
+on:
+  schedule:
+    # Daily DATE evaluation only; SEC is contacted ONLY on calendar due dates.
+    - cron: '17 14 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'inspect = calendar; connection-test = read-only SSH; run = due-date candidate; notification-test = deliberate failure'
+        type: choice
+        default: inspect
+        options: [inspect, connection-test, run, notification-test]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sec-calendar-refresh
+  cancel-in-progress: false
+
+jobs:
+  calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      due: ${{ steps.calendar.outputs.due }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Test calendar without SEC or production access
+        run: |
+          mkdir -p .pytest_tmp
+          python3 -m unittest discover -s tests -p test_refresh_schedule.py -v
+      - id: calendar
+        name: Evaluate calendar
+        run: |
+          python3 scripts/refresh_schedule.py > calendar.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = json.loads(Path('calendar.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('due=' + str(result['due']).lower() + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('Calendar only; not a data-update or deployment receipt.\n\n')
+              summary.write('```json\n' + json.dumps(result, indent=2) + '\n```\n')
+          PY
+
+  refresh:
+    needs: calendar
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (inputs.mode == 'notification-test' || inputs.mode == 'connection-test' ||
+      (needs.calendar.outputs.due == 'true' &&
+      (github.event_name == 'schedule' || inputs.mode == 'run')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Explicit notification drill
+        if: inputs.mode == 'notification-test'
+        run: |
+          echo 'Deliberate notification test; no SEC request or VPS change.'
+          exit 1
+      - name: Refresh private VPS candidate, never deploy
+        if: inputs.mode != 'notification-test'
+        env:
+          REFRESH_HOST: ${{ vars.REFRESH_HOST }}
+          REFRESH_USER: ${{ vars.REFRESH_USER }}
+          REFRESH_PORT: ${{ vars.REFRESH_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.REFRESH_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.REFRESH_SSH_KNOWN_HOSTS }}
+          RUN_MODE: ${{ inputs.mode }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REFRESH_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]] || { echo 'CONFIGURATION_REQUIRED: REFRESH_HOST'; exit 1; }
+          [[ "$REFRESH_USER" =~ ^[a-z_][a-z0-9_-]*$ ]] || { echo 'CONFIGURATION_REQUIRED: REFRESH_USER'; exit 1; }
+          [[ -n "$SSH_PRIVATE_KEY" && -n "$SSH_KNOWN_HOSTS" ]] || { echo 'CONFIGURATION_REQUIRED: SSH secrets'; exit 1; }
+          port="${REFRESH_PORT:-22}"
+          [[ "$port" =~ ^[0-9]{1,5}$ ]] && ((10#$port > 0 && 10#$port < 65536)) || exit 1
+          umask 077
+          key="$RUNNER_TEMP/refresh-key"
+          hosts="$RUNNER_TEMP/refresh-known-hosts"
+          trap 'rm -f "$key" "$hosts"' EXIT
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$key"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$hosts"
+          remote_command=refresh
+          if [[ "$RUN_MODE" == 'connection-test' ]]; then remote_command=inspect; fi
+          ssh -T -i "$key" -p "$port" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$hosts" -o ConnectTimeout=20 \
+            "$REFRESH_USER@$REFRESH_HOST" \
+            "$remote_command"
+          if [[ "$remote_command" == inspect ]]; then
+            echo 'SSH connection verified; no SEC refresh or deployment.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Candidate completed; NOT_DEPLOYED and human release approval still required.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  failure-notification:
+    needs: [calendar, refresh]
+    if: always() && (needs.calendar.result == 'failure' || needs.refresh.result == 'failure' || needs.refresh.result == 'cancelled')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update dedicated failure Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='[13F automation] SEC refresh requires attention'
+          number=$(gh issue list --state open --limit 100 --json number,title,author --jq '.[] | select(.title == "[13F automation] SEC refresh requires attention" and (.author.login == "github-actions[bot]" or .author.login == "app/github-actions")) | .number' | head -1)
+          body="自动刷新失败或被中断 / Refresh failed or interrupted. Run: $RUN_URL . 不代表客户数据已更新。请检查运行记录与 VPS 私有回执。邮件由 GitHub 账户通知设置控制；本步骤不证明邮件已到达。"
+          if [[ -n "$number" ]]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --assignee "$GITHUB_REPOSITORY_OWNER"
+          fi
