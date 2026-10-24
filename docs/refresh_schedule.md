@@ -2,13 +2,12 @@
 
 ## 当前状态
 
-2026-10-23：本地实现、VPS 隔离更新环境安装与离线验证完成；
-**GITHUB_SCHEDULE_NOT_ACTIVATED / NOT_DEPLOYED_PRODUCTION**。
-VPS 上 207 项核心测试通过，合规 SEC 发现接口实际访问成功；首次完整联网候选验证已启动，
-尚未取得完整 Gate 结果。专用账号受固定命令限制，不能改写代码、授权文件和冻结基线。
-这些证明不代表 GitHub 定时触发、SSH 端到端连接或通知到达已经通过。
-这不是客户数据库自动上线的完成证明。本次获准变更将旧 push-to-publish 工作流替换为
-只读调度测试，不构建或推送生产镜像。原有发布阻断与人工 Gate 不得绕过。
+2026-10-24：**SCHEDULE_CONFIGURED_NOT_YET_OBSERVED / NOT_DEPLOYED_PRODUCTION**。
+默认分支已配置定时工作流，实际 GitHub→VPS 受限 SSH、故障 Issue 和邮件到达均已验证。
+首次完整 SEC 候选采集失败后正在重试，尚未取得完整 Gate 结果；首次定时触发也尚未发生。
+专用账号受固定命令限制，不能改写代码、授权文件和冻结基线。
+这不是客户数据库自动上线的完成证明。旧 push-to-publish 工作流已替换为只读调度测试，
+不构建或推送生产镜像。原有发布阻断与人工 Gate 不得绕过。具体回执见文末。
 
 ## 已批准的周期
 
@@ -25,7 +24,7 @@ VPS 上 207 项核心测试通过，合规 SEC 发现接口实际访问成功；
 来源：[SEC FAQ 25](https://www.sec.gov/rules-regulations/staff-guidance/frequently-asked-questions-about-form-13f)。
 本地只读预览：`python scripts/refresh_schedule.py --date 2026-10-23`。
 
-下一批计划时间（尚未激活，不能视为执行承诺）：
+下一批计划时间（工作流已配置；尚未观察到首个定时触发，不能视为准点承诺）：
 
 | 日期 | 工作 |
 |---|---|
@@ -77,5 +76,13 @@ VPS 上 207 项核心测试通过，合规 SEC 发现接口实际访问成功；
 
 ## 本次验证边界
 
-本地测试不证明 VPS 已安装上述环境，也不证明通知邮件到达。
-未完成远端配置/默认分支安全合并、一次真实运行与接收人回执前，保持 NOT_ACTIVATED。
+2026-10-24 已完成默认分支发布、VPS 专用受限通道和 GitHub Secrets/Variables 配置。
+六个发布文件经独立下载比对一致；调度单元测试 12 项通过。
+
+- [只读 CI](https://github.com/fancy0121/13f-intelligence/actions/runs/40067127950)：成功，不构建或发布镜像。
+- [连接演练](https://github.com/fancy0121/13f-intelligence/actions/runs/40067309595)：日历测试与实际受限 SSH 均成功；没有刷新 SEC 或切换生产。
+- [通知演练](https://github.com/fancy0121/13f-intelligence/actions/runs/40067341834)：按设计故意失败；通知 job 成功创建并指派 [Issue #3](https://github.com/fancy0121/13f-intelligence/issues/3)。已从负责人邮箱独立查到 Issue 创建、指派及 Actions 失败邮件。
+- 首次真实 SEC 候选采集失败：`raw_files=312 failures=1`，accession `0001541617-24-000004` 主文档获取失败。单文档复查 HTTP 200；已启动完整重试，结果尚未验收。不能把连接演练通过解释为全链路数据更新通过。
+- 服务基线校验和未变，现有看板健康检查 `ok`；无生产换库。Gate2 人工复核仍为 `NOT_REVIEWED`，Gate3 为 `PENDING_REAL_WORLD_VALIDATION`。
+
+调度状态：`SCHEDULE_CONFIGURED_NOT_YET_OBSERVED`。首次定时触发尚未发生；完整真实候选成功尚未确认。此前的 NOT_ACTIVATED 描述是配置前历史状态，不再代表当前配置。
